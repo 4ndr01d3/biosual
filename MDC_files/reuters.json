@@ -1,0 +1,78 @@
+[
+    {
+        "widget": "ResultWidget",
+        "parameters": {
+            "id": "result",
+            "target": "#docs"
+        }
+    },
+    {
+        "widget": "PagerWidget",
+        "parameters": {
+            "id": "pager",
+            "target": "#pager",
+            "prevLabel": "&lt;",
+            "nextLabel": "&gt;",
+            "innerWindow": 1
+        }
+    },
+    {
+        "widget": "TagcloudWidget",
+        "parameters": {
+            "id": "topics",
+            "target": "#topics",
+            "field": "topics"
+        }
+    },
+    {
+        "widget": "TagcloudWidget",
+        "parameters": {
+            "id": "organisations",
+            "target": "#organisations",
+            "field": "organisations"
+        }
+    },
+    {
+        "widget": "TagcloudWidget",
+        "parameters": {
+            "id": "exchanges",
+            "target": "#exchanges",
+            "field": "exchanges"
+        }
+    },
+    {
+        "widget": "CurrentSearchWidget",
+        "parameters": {
+            "id": "currentsearch",
+            "target": "#selection"
+        }
+    },
+    {
+        "widget": "AutocompleteWidget",
+        "parameters": {
+            "id": "text",
+            "target": "#search",
+            "fields": [
+                "topics",
+                "organisations",
+                "exchanges"
+            ]
+        }
+    },
+    {
+        "widget": "CountryCodeWidget",
+        "parameters": {
+            "id": "countries",
+            "target": "#countries",
+            "field": "countryCodes"
+        }
+    },
+    {
+        "widget": "CalendarWidget",
+        "parameters": {
+            "id": "calendar",
+            "target": "#calendar",
+            "field": "date"
+        }
+    }
+]
