@@ -1,0 +1,8 @@
+{
+    "name": "Result List",
+    "description": "A list of responses",
+    "dependencies":["jquery.livequery.js"],
+    "js": "ResultWidget.js",
+    "html": "ResultWidget.html",
+    "css": "ResultWidget.css"
+}

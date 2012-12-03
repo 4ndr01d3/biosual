@@ -1,0 +1,8 @@
+{
+    "name": "Pager",
+    "description": "An easy way to paginate the results",
+    "dependencies":[],
+    "js": "PagerWidget.js",
+    "html": "PagerWidget.html",
+    "css": "PagerWidget.css"
+}

@@ -1,12 +1,12 @@
 var Manager;
 (function ($) {
   $(function () {
-	    Manager = new AjaxSolr.Manager({
-	        solrUrl: 'http://evolvingweb.ca/solr/reuters/'
-	      });
-		for (var i = 0, l = json.length; i < l; i++) {
-		    Manager.addWidget(new AjaxSolr[json[i]['widget']](json[i]['parameters']));
-		}
+    Manager = new AjaxSolr.Manager({
+        solrUrl: 'http://evolvingweb.ca/solr/reuters/'
+      });
+	for (var i = 0, l = json.length; i < l; i++) {
+	    Manager.addWidget(new AjaxSolr[json[i]['widget']](json[i]['parameters']));
+	}
     Manager.init();
     Manager.store.addByValue('q', '*:*');
     var params = {
@@ -32,6 +32,6 @@ var Manager;
     }else {
       return this.hide();
     }
-  }
+  };
 
 })(jQuery);
