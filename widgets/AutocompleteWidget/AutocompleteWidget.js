@@ -1,8 +1,23 @@
 (function ($) {
 
 AjaxSolr.AutocompleteWidget = AjaxSolr.AbstractTextWidget.extend({
-  afterRequest: function () {
-    $(this.target).find('input').unbind().removeData('events').val('');
+  init: function () {
+	  var mult=false;
+	  var type='input';
+	if (typeof this.multiple=="undefined" || this.multiple==false){
+		$(this.target).append('        <input type="text" id="query" name="query" />');
+	}else if (this.multiple==true){
+		$(this.target).append('<textarea id="query" name="query" ></textarea><br/>');
+		if (typeof this.checkbox!="undefined" && this.checkbox!=""){
+			$(this.target).append('<label for="checkbox">'+this.checkbox+'</label>');
+			$(this.target).append('<input type="checkbox" id="checkbox" checked/>');
+		}
+		$(this.target).append('<button type="button">Search</button>');
+		mult=true;
+		var area= $(this.target).find('textarea');
+		type='textarea';
+	}
+    $(this.target).find(type).unbind().removeData('events').val('');
 
     var self = this;
 
@@ -20,36 +35,62 @@ AjaxSolr.AutocompleteWidget = AjaxSolr.AbstractTextWidget.extend({
       }
 
       self.requestSent = false;
-      $(self.target).find('input').unautocomplete().autocomplete(list, {
+      $(self.target).find(type).unautocomplete().autocomplete(list, {
         formatItem: function(facet) {
-          return facet.text;
-        }
-      }).result(function(e, facet) {
+          return facet[self.facet];
+        },
+        multiple: mult
+      });
+      if (mult==false) $(self.target).find(type).result(function(e, facet) {
         self.requestSent = true;
-        if (self.manager.store.addByValue('fq', facet.field + ':' + AjaxSolr.Parameter.escapeValue(facet.value))) {
-          self.doRequest();
-        }
+        self.manager.widgets["requester"].request("",[facet.field + ':' + AjaxSolr.Parameter.escapeValue(facet.value)]);
+//        if (self.manager.store.addByValue('fq', facet.field + ':' + AjaxSolr.Parameter.escapeValue(facet.value))) {
+//          self.doRequest();
+//        }
       });
 
       // This has lower priority so that requestSent is set.
-      $(self.target).find('input').bind('keydown', function(e) {
+      if (mult==false) $(self.target).find(type).bind('keydown', function(e) {
         if (self.requestSent === false && e.which == 13) {
           var value = $(this).val();
-          if (value && self.set(value)) {
-            self.doRequest();
-          }
+          self.manager.widgets["requester"].request("",[$(this).val()]);
+//          if (value && self.set(value)) {
+//            self.doRequest();
+//          }
         }
       });
-    } // end callback
+    }; // end callback
 
-    var params = [ 'rows=0&facet=true&facet.limit=-1&facet.mincount=1&json.nl=map' ];
+    if (mult) $(this.target).find('button').click(function(e){
+		var values=area.val().split(",");
+		var valuesClean=[];
+		for (var i=0; i<values.length; i++){
+			var value=$.trim(values[i]);
+			if (value!="")
+				valuesClean.push(value);
+		}
+		for (var i=0; i<valuesClean.length; i++){
+			self.requestSent = true;
+			
+			if (typeof $(self.target).find('input').attr("checked") != 'undefined')
+				self.manager.widgets["requester"].request(self.queries.basic,[ valuesClean[i] ]);
+			else{
+				var interactors= valuesClean.slice(0,i).concat(valuesClean.slice(i+1));
+				self.manager.widgets["requester"].request(self.queries.filter,[valuesClean[i],interactors]);
+			}
+		}
+		$(self.target).find('textarea').val('');
+	});
+
+	
+    var params = [ 'q=*:*&rows=0&facet=true&facet.limit=-1&facet.mincount=1&json.nl=map' ];
     for (var i = 0; i < this.fields.length; i++) {
       params.push('facet.field=' + this.fields[i]);
     }
-    var values = this.manager.store.values('fq');
-    for (var i = 0; i < values.length; i++) {
-      params.push('fq=' + encodeURIComponent(values[i]));
-    }
+//    var values = this.manager.store.values('fq');
+//    for (var i = 0; i < values.length; i++) {
+//      params.push('fq=' + encodeURIComponent(values[i]));
+//    }
     params.push('q=' + this.manager.store.get('q').val());
     jQuery.getJSON(this.manager.solrUrl + 'select?' + params.join('&') + '&wt=json&json.wrf=?', {}, callback);
   }

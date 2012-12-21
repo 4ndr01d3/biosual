@@ -1,21 +1,21 @@
 (function ($) {
 
-AjaxSolr.theme.prototype.result = function (doc, snippet) {
-  var output = '<div><h2>' + doc.title + '</h2>';
-  output += '<p id="links_' + doc.id + '" class="links"></p>';
+AjaxSolr.theme.prototype.result = function (doc, snippet,attributeNames) {
+  var output = '<div><h2>' + doc[attributeNames["title"]] + '</h2>';
+  output += '<p id="links_' + doc[attributeNames["id"]] + '" class="links"></p>';
   output += '<p>' + snippet + '</p></div>';
   return output;
 };
 
-AjaxSolr.theme.prototype.snippet = function (doc) {
+AjaxSolr.theme.prototype.snippet = function (doc,attributeNames) {
   var output = '';
-  if (doc.text.length > 300) {
-    output += doc.dateline + ' ' + doc.text.substring(0, 300);
-    output += '<span style="display:none;">' + doc.text.substring(300);
+  if (doc[attributeNames["text"]].length > 300) {
+    output += doc[attributeNames["date"]] + ' ' + doc[attributeNames["text"]].substring(0, 300);
+    output += '<span style="display:none;">' + doc[attributeNames["text"]].substring(300);
     output += '</span> <a href="#" class="more">more</a>';
   }
   else {
-    output += doc.dateline + ' ' + doc.text;
+    output += doc[attributeNames["date"]] + ' ' + doc[attributeNames["text"]];
   }
   return output;
 };

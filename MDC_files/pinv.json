@@ -1,0 +1,67 @@
+{
+"template":{
+	"name":"template2",
+	"tags":{
+		"title":"Protein Interaction Network Visualizer"
+	}
+},
+"css":	["tests/pinv/pinv.css"],
+"js":	[],
+"server":"http://biosual.cbio.uct.ac.za/solr/",
+"ajaxsolr_parameters":{
+				"facet": true,
+				"facet.field": [ "protein1", "protein2" ],
+				"facet.limit": 20,
+				"facet.mincount": 1,
+				"f.topics.facet.limit": 50,
+				"json.nl": "map",
+				"rows": 300
+		},
+"widgets": [
+    {
+        "widget": "ProteinAjaxRequesterWidget",
+        "parameters": {
+            "id": "requester"
+        }
+    },
+    {
+        "widget": "GraphWidget",
+        "parameters": {
+            "id": "graph",
+            "target": "graph"
+        },
+        "templateTarget":"center",
+		"tags":{"id":"graph"}
+    },
+    {
+        "widget": "AutocompleteWidget",
+        "parameters": {
+            "id": "text",
+            "target": "#search",
+            "fields": [
+                "protein1",
+                "protein2"
+            ],
+            "multiple":true,
+            "facet":"value",
+            "checkbox":"Include all interactions",
+            "queries":{
+            	"basic":"interactions",
+            	"filter":"protein"
+            	}
+        },
+        "templateTarget":"left",
+		"tags":{"title":"Proteins","subtitle":"(press ESC to close suggestions)","id":"search"}
+    },
+    {
+        "widget": "CurrentSearchWidget",
+        "parameters": {
+            "id": "currentsearch",
+            "target": "#selection",
+            "label_all":"Random Selection."
+        },
+        "templateTarget":"left",
+		"tags":{"title":"","id":"selection"}
+    }
+    ]
+}

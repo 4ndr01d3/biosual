@@ -3,9 +3,10 @@
 include_once 'server/JsonHandler.inc.php';
 include_once 'server/Widget.inc.php';
 
-$mandatoryWeb	= array('http://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js',
-						'http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/jquery-ui.min.js');
-$mandatoryLocal	= array('lib/ajax-solr/core/Core.js',
+$mandatoryWeb	= array();
+$mandatoryLocal	= array('lib/jquery-1.7.2.min.js',
+						'lib/jquery-ui-1.8.2.custom.min.js',
+						'lib/ajax-solr/core/Core.js',
 						'lib/ajax-solr/core/AbstractManager.js',
 						'lib/ajax-solr/core/Parameter.js',
 						'lib/ajax-solr/core/ParameterStore.js',
@@ -15,12 +16,13 @@ $mandatoryLocal	= array('lib/ajax-solr/core/Core.js',
 						'lib/ajax-solr/managers/Manager.jquery.js',
 						'lib/ajax-solr/helpers/ajaxsolr.support.js',
 						'lib/ajax-solr/helpers/jquery/ajaxsolr.theme.js',
-						'lib/ajax-solr/helpers/ajaxsolr.theme.js');
+						'lib/ajax-solr/helpers/ajaxsolr.theme.js',
+						'lib/biojs/main/javascript/Biojs.js'
+);
 
 $cssWeb		=array();
 $cssLocal	=array(	'css/jquery-ui.css',
 					'css/ui.theme.css');
-$atvarsity=true;
 
 if ($_GET['id'] != ''){
 	$theData = getFile("MDC_files/".$_GET['id'].".json");
@@ -51,9 +53,12 @@ switch ($_GET['type']){
 			echo "\n//".$url."\n".getUrl($url)."\n";
 
 		//Adding all the mandatory dependencies that are local files
-		foreach ($mandatoryLocal as $path)
+		foreach ($mandatoryLocal as $path){
+			if ($useMinify==true)
+				echo "\n//".$path."\n".getFile($path);
+						
 			echo "\n//".$path."\n".getFile($path);
-
+		}
 		//Adding the template
 		$path="templates/".$json->template->name."/markup.html";
 		if (file_exists($path) ){
@@ -79,25 +84,22 @@ switch ($_GET['type']){
 			try{
 //				echo "\n//WIDGET: ".$widgetObj->widget;
 				$widget= new Widget($widgetObj);
-				echo "\n//Dependencies for WIDGET: ".$widget->id."\n".$widget->getDependenciesText()."\n";
+				if (!in_array($widgetObj->widget,$widgetsScriptsAdded)){
+					echo "\n//Dependencies for WIDGET: ".$widget->id."\n".$widget->getDependenciesText()."\n";
+					echo "\n//WIDGET: ".$widget->id."\n".$widget->getJavaScriptText()."\n";
+					array_push($widgetsScriptsAdded,$widgetObj->widget);
+				}
 				echo "\n//Injecting HTML for WIDGET: ".$widget->id."\n".$widget->getHTMLinjector()."\n";
-				echo "\n//WIDGET: ".$widget->id."\n".$widget->getJavaScriptText()."\n";
 				//TODO: add Markup to the page
 			} catch(Exception $e) {
-				//TODO: convert all the widgets to the new format
-				$path="widgets/".$widgetObj->widget.".js";
-//				echo "\n//WIDGET: ".$path;
-				
-				if (file_exists($path) && !in_array($path,$widgetsScriptsAdded)){
-					echo "\n//WIDGET:".$widgetObj->widget."\n".getFile($path);
-					array_push($widgetsScriptsAdded,$path);
-				}
+				echo "\n//Error loading the widget: ".$widgetObj->widget;
 			}
 		}
 		
 		//creating a variable with the json to be read inside the JS
-		echo "var json = ".json_encode($json->widgets).";\n\n";
-		
+		echo "var json = ".json_encode($json->widgets).";\n";
+		echo "var params = ".json_encode($json->ajaxsolr_parameters).";\n\n";
+		echo "var server = ".json_encode($json->server).";\n";
 		
 		//Adding the AJAX SOLR manager and configuring all the widgets 
 		echo "//Manager loader\n".getFile("core/loader.js");
@@ -153,7 +155,8 @@ function getUrl($url) {
     return $file_contents;
 }
 
-function getFile($path){
+function getFile($path,$forceMinify=0){
+	global $useMinify;
 	if (file_exists($path)){
 		$fh = fopen($path, 'r');
 		$content = "\n".fread($fh, filesize($path))."\n";

@@ -2,50 +2,45 @@
 
 AjaxSolr.CurrentSearchWidget = AjaxSolr.AbstractWidget.extend({
   start: 0,
-
+//self.manager.widgets["currentsearch"].afterRequest();
+  afterRemove: function (facet) {
+	  var self=this;
+	  self.afterRequest();
+  },
   afterRequest: function () {
     var self = this;
     var links = [];
+    
+    var qs= self.manager.widgets["requester"].getQueries();
+    if (qs.length>0) {
+		for (var i = 0, l = qs.length; i < l; i++) {
+			links.push($('<a href="#"  />').html(' <img src="../../images/delete.png" />').click(
+					self.manager.widgets["requester"].removeQuery(qs[i])
+					));
+		}
+		if (links.length > 1) {
+			links.push($('<a href="#"/>').text('remove all').click(
+					self.manager.widgets["requester"].removeAll()
+					));
+		}
+		$(this.target+" .items").empty();
+		for (var i = 0, l = links.length; i < l; i++) {
+			var item = $("<div class='item' >").appendTo($(this.target+" .items")); 
+			if (i<links.length-1 || links.length==1){
+				item.append(qs[i]);
+				var num = self.manager.widgets["requester"].getNumberOfResponsesPerQuery(qs[i]);
+				if (num!=null) item.append(' ('+num+')');
+				
+				//var color = self.manager.widgets["graph"].getColor(i);
+				//item.append(" <span style='background-color: "+color+"; color: "+color+";'>__</span> ");
+			}
+			item.append(links[i]);
+		}
 
-    var q = this.manager.store.get('q').val();
-    if (q != '*:*') {
-      links.push($('<a href="#"/>').text('(x) ' + q).click(function () {
-        self.manager.store.get('q').val('*:*');
-        self.doRequest();
-        return false;
-      }));
-    }
+	} else {
+		$(this.target+" .items").html('<div class="item">'+this.label_all+'</div>');
+	}
 
-    var fq = this.manager.store.values('fq');
-    for (var i = 0, l = fq.length; i < l; i++) {
-      links.push($('<a href="#"/>').text('(x) ' + fq[i]).click(self.removeFacet(fq[i])));
-    }
-
-    if (links.length > 1) {
-      links.unshift($('<a href="#"/>').text('remove all').click(function () {
-        self.manager.store.get('q').val('*:*');
-        self.manager.store.remove('fq');
-        self.doRequest();
-        return false;
-      }));
-    }
-
-    if (links.length) {
-      AjaxSolr.theme('list_items', this.target, links);
-    }
-    else {
-      $(this.target).html('<div>Viewing all documents!</div>');
-    }
-  },
-
-  removeFacet: function (facet) {
-    var self = this;
-    return function () {
-      if (self.manager.store.removeByValue('fq', facet)) {
-        self.doRequest();
-      }
-      return false;
-    };
   }
 });
 

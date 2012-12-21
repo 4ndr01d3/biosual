@@ -1,6 +1,24 @@
-#search input {
+#search{
+	float: left;
+	text-align: left;
+}
+#search textarea{
+	width: 95%;
+	min-width: 200px;
+}	
+#search input[type="text"] {
   width: 350px;
 }
 #search_help {
-  font-size: 80%;
+  font-size: 0.6em;
+}
+#search label{
+	float: right; 
+	font-size: 70%;
+	text-align:right;
+}
+#search input[type="checkbox"]{
+	float: right; 
+	font-size: 70%;
+	text-align:right;
 }

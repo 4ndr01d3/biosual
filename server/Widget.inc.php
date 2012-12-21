@@ -67,6 +67,9 @@ class Widget {
 	}
 	function getHTMLinjector(){
 		$path="widgets/".$this->id."/".$this->html;
+		if ($this->html==null || $this->html =="")
+			return "//Not HTML file includedc in the JSON config file.";
+		
 		if (file_exists($path)){
 			$html=str_replace("\n","",getFile($path));
 			$html=str_replace("'","\"",$html);
@@ -84,7 +87,7 @@ class Widget {
 			$htmlT .="})(jQuery);\n";
 			return $htmlT;
 		}
-		throw new RuntimeException("CSS file(".$path.") couldnt be opened");
+		throw new RuntimeException("HTML file(".$path.") couldnt be opened");
 		
 	}
 }
