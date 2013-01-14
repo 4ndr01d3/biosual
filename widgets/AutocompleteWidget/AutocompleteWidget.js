@@ -44,9 +44,6 @@ AjaxSolr.AutocompleteWidget = AjaxSolr.AbstractTextWidget.extend({
       if (mult==false) $(self.target).find(type).result(function(e, facet) {
         self.requestSent = true;
         self.manager.widgets["requester"].request("",[facet.field + ':' + AjaxSolr.Parameter.escapeValue(facet.value)]);
-//        if (self.manager.store.addByValue('fq', facet.field + ':' + AjaxSolr.Parameter.escapeValue(facet.value))) {
-//          self.doRequest();
-//        }
       });
 
       // This has lower priority so that requestSent is set.
@@ -54,9 +51,6 @@ AjaxSolr.AutocompleteWidget = AjaxSolr.AbstractTextWidget.extend({
         if (self.requestSent === false && e.which == 13) {
           var value = $(this).val();
           self.manager.widgets["requester"].request("",[$(this).val()]);
-//          if (value && self.set(value)) {
-//            self.doRequest();
-//          }
         }
       });
     }; // end callback

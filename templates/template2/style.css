@@ -1,0 +1,53 @@
+body {
+	font-family: "Helvetica Neue", Helvetica, sans-serif;
+}
+header.main{
+	height:50px;
+}
+header.main h1{
+	margin-left:60px;
+	font-family: 'Jura',"Helvetica Neue", Helvetica;
+	vertical-align:text-top;
+	font-size: 45px;
+}
+.right {
+	width: 60%;
+	float: left;
+	padding: 10px 20px 10px 40px;
+	border-left: 1px solid #aaa;
+	text-align: justify;
+    height: 8em;
+    overflow: auto;
+}
+.top ::-webkit-scrollbar {
+    width: 12px;
+}
+.top ::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); 
+    border-radius: 10px;
+}
+.top ::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5); 
+}
+
+.left {
+	float: left;
+	width: 25%;
+	padding: 0 0 10px 10px;
+	text-align: right;
+    height: 8em;
+    overflow: auto;
+}
+.left h2 {
+  clear: left;
+  padding-top: 10px;
+  margin-bottom: 0px;
+  color: #333;
+  font-size: 1.2em;
+}
+
+.center{
+	margin-top: 5px;
+	}
+

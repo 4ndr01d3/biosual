@@ -1,12 +1,12 @@
 {
-"template":{
+	"template":{
 	"name":"template2",
 	"tags":{
 		"title":"Protein Interaction Network Visualizer"
 	}
 },
 "css":	["tests/pinv/pinv.css"],
-"js":	[],
+"js":	["tests/pinv/ruleExecuter.js"],
 "server":"http://biosual.cbio.uct.ac.za/solr/",
 "ajaxsolr_parameters":{
 				"facet": true,
@@ -28,7 +28,12 @@
         "widget": "GraphWidget",
         "parameters": {
             "id": "graph",
-            "target": "graph"
+            "target": "graph",
+            "predefined_stylers":[	{
+            		"id":"ruler",
+            		"method":"applyRules"
+            	}
+            ]
         },
         "templateTarget":"center",
 		"tags":{"id":"graph"}
@@ -62,6 +67,139 @@
         },
         "templateTarget":"left",
 		"tags":{"title":"","id":"selection"}
+    },
+    {
+        "widget": "RulerWidget",
+        "parameters": {
+            "id": "ruler",
+            "target": "#ruler",
+            "dynamicRuleField":[ 
+            	{
+            		"target": 0,
+            		"condition":0,
+            		"widget":"graph",
+            		"parameter":"visibleProteins"
+            	},
+            	{
+            		"target": 1,
+            		"condition":0,
+            		"widget":"graph",
+            		"parameter":"visibleProteins"
+            	},
+            	{
+            		"target": 1,
+            		"condition":1,
+            		"widget":"graph",
+            		"parameter":"visibleProteins"
+            	},
+            	{
+            		"target": 0,
+            		"condition":3,
+            		"widget":"graph",
+            		"parameter":"orderProteinFeatures"
+            	}
+            ],
+            "rules": {
+				"location": [ ],
+				"target": [ {
+					"name": "Proteins",
+		             "action": [
+		    	                 {"name":"Highlight","type":"single"},
+		    	                 {"name":"Show","type":"single"},
+		    	                 {"name":"Hide","type":"single"},
+		    	                 {"name":"Color","type":"color"},
+		    	                 {"name":"Border","type":"color"},
+		    	                 {"name":"Color By","type":"select","options":["Protein Queried","Functional Class","Organism","Gene Name"]},
+		    	                 {"name":"Border By","type":"select","options":["Protein Queried","Functional Class","Organism","Gene Name"]},
+		    	                 {"name":"Show Label","type":"select","options":["ID","Functional Class","Organism","Gene Name"]},
+		    	                 {"name":"Hide Label","type":"single"}
+		    	             ],
+					"conditions": [ {
+						"name": "interactions with",
+						"type": "selects",
+						"amount": 1,
+						"values": [ ]
+					}, {
+						"name": "number of interactions",
+						"type": "numeric_comparison"
+					}, {
+						"name": "accession number",
+						"type": "text_comparison"
+					}, {
+						"name": "feature",
+						"type": "feature_comparison",
+						"values": [	
+							
+		                      ]
+					}, {
+						"name": "no rules at all",
+						"type": "all"
+					} ]
+				}, {
+					"name": "Interactions",
+		             "action": [
+		    	                 {"name":"Highlight","type":"single"},
+		    	                 {"name":"Show","type":"single"},
+		    	                 {"name":"Hide","type":"single"},
+		    	                 {"name":"Color","type":"color"}
+		    	             ],
+					"conditions": [ {
+						"name": "protein",
+						"type": "selects",
+						"amount": 1,
+						"values": [ ]
+					}, {
+						"name": "proteins",
+						"type": "selects",
+						"amount": 2,
+						"values": [ ]
+					}, {
+						"name": "score",
+						"type": "numeric_comparison"
+					}, {
+						"name": "type of evidence",
+						"type": "selects",
+						"amount": 1,
+						"values": [ "neighborhood" ,"fusion", "cooccurrence","txt_mining","microarray","similarity","domain","experimental","knowledge","pdb","interlogs"]
+					}, {
+						"name": "no rules at all",
+						"type": "all"
+					} ]
+				} ]
+			}
+        },
+        "templateTarget":"right",
+		"tags":{"id":"ruler"}
     }
-    ]
+    ],
+"events": [	
+		{ 
+			"source":"ruler",
+			"object":"ruler",
+			"event":"onRuleCreated",
+			"listener":"graph",
+			"method":"executeStylers"
+		},
+		{ 
+			"source":"ruler",
+			"object":"ruler",
+			"event":"onRuleRemoved",
+			"listener":"graph",
+			"method":"executeStylers"
+		},
+		{ 
+			"source":"ruler",
+			"object":"ruler",
+			"event":"onRuleEditing",
+			"listener":"graph",
+			"method":"executeStylers"
+		},
+		{ 
+			"source":"ruler",
+			"object":"ruler",
+			"event":"onOrderChanged",
+			"listener":"graph",
+			"method":"executeStylers"
+		}
+	]
 }

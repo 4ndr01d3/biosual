@@ -100,9 +100,12 @@ switch ($_GET['type']){
 		echo "var json = ".json_encode($json->widgets).";\n";
 		echo "var params = ".json_encode($json->ajaxsolr_parameters).";\n\n";
 		echo "var server = ".json_encode($json->server).";\n";
+		echo "var events = ".json_encode($json->events).";\n";
 		
 		//Adding the AJAX SOLR manager and configuring all the widgets 
 		echo "//Manager loader\n".getFile("core/loader.js");
+
+		echo "//Event Manager\n".getFile("core/eventManager.js");
 		
 		break;
 		
