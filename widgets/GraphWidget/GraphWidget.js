@@ -180,18 +180,9 @@
 
 			self.previousRequest=self.manager.store.get('q').val();
 			
-			//TODO: the execution of rules should be out of this widget, as it should be unaware of the kind of rules
-	//		self.registerStyler("rules",function () {self.applyRules(self);});
 			
 			self.visibleProteins = Object.keys(self.graph.proteinsA);
 			self.executeStylers();
-//			$('.node').contextMenu('myMenu1', {
-//				bindings: Manager.widgets["context"].bindings,
-//				menuStyle:Manager.widgets["context"].menuStyle,
-//				itemStyle:Manager.widgets["context"].itemStyle,
-//				itemHoverStyle:Manager.widgets["context"].itemHoverStyle,
-//			});
-			//self.colorBySeed();
 			
 			
 		},	
