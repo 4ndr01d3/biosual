@@ -1,6 +1,7 @@
 (function ($) {
   $(function () {
-		$.fn.applyRules = function(self){
+	  	$.fn.ruler={};
+		$.fn.ruler.applyRules = function(self){
 //			var self =this;
 			var rules = Manager.widgets["ruler"].ruler.getActiveRules();
 			var model = Manager.widgets["ruler"].rules;

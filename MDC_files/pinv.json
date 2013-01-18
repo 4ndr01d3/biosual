@@ -6,7 +6,7 @@
 		}
 	},
 	"css":	["tests/pinv/pinv.css"],
-	"js":	["tests/pinv/ruleExecuter.js","tests/pinv/contextMenuFunctions.js"],
+	"js":	["tests/pinv/ruleExecuter.js","tests/pinv/contextMenuFunctions.js","tests/pinv/expressionExecuter.js"],
 	"server":"http://biosual.cbio.uct.ac.za/solr/",
 	"ajaxsolr_parameters":{
 				"facet": true,
@@ -32,6 +32,9 @@
 				"predefined_stylers":[	{
 						"id":"ruler",
 						"method":"applyRules"
+					}, {
+						"id":"expression",
+						"method":"paintProteins"
 					}
 				]
 			},
@@ -208,6 +211,15 @@
 		
 				}
 			}
+		},
+		
+		{	"widget": "ExpressionWidget",
+			"parameters": {
+				"id": "expression",
+				"target": "expression"
+			},
+			"templateTarget":"left",
+			"tags":{"id":"expression"}
 		}
 	],
 	"events": [	
@@ -232,6 +244,30 @@
 		{	"source":"ruler",
 			"object":"ruler",
 			"event":"onOrderChanged",
+			"listener":"graph",
+			"method":"executeStylers"
+		},
+		{	"source":"expression",
+			"object":"loader",
+			"event":"onFileLoaded",
+			"listener":"expression",
+			"method":"onFileLoaded"
+		},
+		{	"source":"expression",
+			"object":"loader",
+			"event":"onFileLoaded",
+			"listener":"graph",
+			"method":"executeStylers"
+		},
+		{	"source":"expression",
+			"object":"loader",
+			"event":"onFileRemoved",
+			"listener":"expression",
+			"method":"onFileRemoved"
+		},
+		{	"source":"expression",
+			"object":"loader",
+			"event":"onFileRemoved",
 			"listener":"graph",
 			"method":"executeStylers"
 		}

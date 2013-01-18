@@ -70,7 +70,11 @@
 			var self = this;
 		    for (var i in self.predefined_stylers){
 		    	var styler = self.predefined_stylers[i];
-		    	self.registerStyler(styler.id,function () {$.fn[styler.method](self);});
+		    	self.registerStyler(styler.id,function(styler){ 
+		    		return function () {
+		    			$.fn[styler.id][styler.method](self);
+		    		};
+		    	}(styler));
 		    }			
 		
 		},
@@ -308,6 +312,7 @@
 			self.graph.vis.selectAll("line").attr("visibility", 'visible').style("stroke","#999");
 			self.graph.vis.selectAll(".legend").attr("visibility",function(d) { return (d.showLegend)?"visible":"hidden";});
 			for (var i in self.stylers){
+				console.debug("styler:"+i);
 				self.stylers[i]();
 			}
 		},

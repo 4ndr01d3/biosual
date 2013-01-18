@@ -1,0 +1,8 @@
+{
+    "name": "Expresion file reader",
+    "description": "a client based reader of expresion files",
+    "dependencies":["Biojs.ExpressionLoader.js"],
+    "js": "ExpressionWidget.js",
+    "html": "ExpressionWidget.html",
+    "css": "biojs.expressionLoader.css"
+}
