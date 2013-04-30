@@ -48,6 +48,7 @@
 				sep=" OR ";
 			}
 			q = 'text:'+protein;
+			//TODO: Change to avoid to use direct reference to the widget graph
 			if (self.manager.widgets["graph"].previousRequest!="*:*"){
 				for (var i=0; i< self.manager.widgets["graph"].graph.proteins.length; i++){
 					interStr += sep+"text:"+self.manager.widgets["graph"].graph.proteins[i].id;
@@ -68,14 +69,15 @@
 		 * @param type
 		 * @param parameters
 		 */
-		request: function(type,parameters){
+		request: function(parameters,type){
 			var self=this;
+			type= (typeof type=="undefined")?"interactions":type;
 			switch (type){
 				case "interactions":
 					self.requestInteractionsByProtein(parameters[0]);
 					break;
 				case "protein":
-					self.requestSingleProtein(parameters[0])
+					self.requestSingleProtein(parameters[0]);
 					self.requestInteractionsByProtein(parameters[0],parameters[1]);
 					break;
 			}

@@ -43,14 +43,14 @@ AjaxSolr.AutocompleteWidget = AjaxSolr.AbstractTextWidget.extend({
       });
       if (mult==false) $(self.target).find(type).result(function(e, facet) {
         self.requestSent = true;
-        self.manager.widgets["requester"].request("",[facet.field + ':' + AjaxSolr.Parameter.escapeValue(facet.value)]);
+        self.manager.widgets["requester"].request([facet.field + ':' + AjaxSolr.Parameter.escapeValue(facet.value)],"");
       });
 
       // This has lower priority so that requestSent is set.
       if (mult==false) $(self.target).find(type).bind('keydown', function(e) {
         if (self.requestSent === false && e.which == 13) {
           var value = $(this).val();
-          self.manager.widgets["requester"].request("",[$(this).val()]);
+          self.manager.widgets["requester"].request([$(this).val()],"");
         }
       });
     }; // end callback
@@ -67,10 +67,10 @@ AjaxSolr.AutocompleteWidget = AjaxSolr.AbstractTextWidget.extend({
 			self.requestSent = true;
 			
 			if (typeof $(self.target).find('input').attr("checked") != 'undefined')
-				self.manager.widgets["requester"].request(self.queries.basic,[ valuesClean[i] ]);
+				self.manager.widgets["requester"].request([ valuesClean[i] ],self.queries.basic);
 			else{
 				var interactors= valuesClean.slice(0,i).concat(valuesClean.slice(i+1));
-				self.manager.widgets["requester"].request(self.queries.filter,[valuesClean[i],interactors]);
+				self.manager.widgets["requester"].request([valuesClean[i],interactors],self.queries.filter);
 			}
 		}
 		$(self.target).find('textarea').val('');

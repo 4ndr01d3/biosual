@@ -7,6 +7,7 @@
  * 
  * @author <a href="gustavoadolfo.salazar@gmail.com">Gustavo A. Salazar</a>
  * @version 0.9.0_alpha
+ * @category 1
  * 
  * @requires <a href='http://code.jquery.com/query-1.7.2.min.js'>jQuery Core 1.7.2</a>
  * @dependency <script language="JavaScript" type="text/javascript" src="../biojs/dependencies/jquery/jquery-1.7.2.min.js"></script>
@@ -62,7 +63,7 @@ Biojs.InteractionsD3 = Biojs.extend (
 
 			this._container = $("#"+self.opt.target);
 			this._container.empty();
-			$(this._container).addClass("graph");
+			$(this._container).addClass("graphNetwork");
 			
 			var	width = $(this._container).width(),
 				height = $(this._container).height(),
@@ -80,6 +81,9 @@ Biojs.InteractionsD3 = Biojs.extend (
 				height=self.opt.height*1;
 			self.opt.height=height;
 			
+			this._container.width(width);
+			this._container.height(height);
+			
 			self.color = function() {
 			    return d3.scale.ordinal().range(self.colors);
 			  }();
@@ -89,9 +93,13 @@ Biojs.InteractionsD3 = Biojs.extend (
 			    .attr("height", height)
 			    .attr("pointer-events", "all")
 			    .append('svg:g')
-			    .call(d3.behavior.zoom().on("zoom", redraw)).append('svg:g');
+			    .call(d3.behavior.zoom().
+			    		scaleExtent([1, Infinity])
+			    		.on("zoom", redraw))
+			    .append('svg:g');
 			
 			self.vis.append('svg:rect')
+				.attr("class", "frame")
 			    .attr('width', width)
 			    .attr('height', height)
 			    .attr('fill', 'white')
@@ -101,6 +109,12 @@ Biojs.InteractionsD3 = Biojs.extend (
 			function redraw() {
 				  trans=d3.event.translate;
 				  scale=d3.event.scale;
+				  if (trans[0]>0)trans[0]=0;
+				  if (trans[1]>0)trans[1]=0;
+				  var W = self.force.size()[0], H= self.force.size()[1];
+				  var Ws = W*scale, Hs = H*scale;
+				  if (Ws<W-trans[0]) trans[0]=W-Ws;
+				  if (Hs<H-trans[1]) trans[1]=H-Hs;
 				  self.vis.attr("transform",
 				      "translate(" + trans + ")"
 				      + " scale(" + scale + ")");
@@ -145,14 +159,14 @@ Biojs.InteractionsD3 = Biojs.extend (
 					});
 				}
 				self.vis.selectAll("circle.figure")
-					.attr("cx", function(d) { return d.x = Math.max(r, Math.min(width - r, d.x)); })
-					.attr("cy", function(d) { return d.y = Math.max(r, Math.min(height - r, d.y)); });
+					.attr("cx", function(d) { return d.x = Math.max(r, Math.min(self.opt.width - r, d.x)); })
+					.attr("cy", function(d) { return d.y = Math.max(r, Math.min(self.opt.height - r, d.y)); });
 				self.vis.selectAll("rect.figure")
-					.attr("x", function(d) { return d.x = Math.max(r, Math.min(width - r, d.x)); })
-					.attr("y", function(d) { return d.y = Math.max(r, Math.min(height - r, d.y)); });
+					.attr("x", function(d) { return d.x = Math.max(r, Math.min(self.opt.width - r, d.x)); })
+					.attr("y", function(d) { return d.y = Math.max(r, Math.min(self.opt.height - r, d.y)); });
 				self.vis.selectAll(".legend")
-					.attr("x", function(d) { return d.x = Math.max(r, Math.min(width - r, d.x)); })
-					.attr("y", function(d) { return d.y = Math.max(r, Math.min(height - r, d.y)); });
+					.attr("x", function(d) { return d.x = Math.max(r, Math.min(self.opt.width - r, d.x)); })
+					.attr("y", function(d) { return d.y = Math.max(r, Math.min(self.opt.height - r, d.y)); });
 				self.vis.selectAll("line.link")
 					.attr("x1", function(d) { return (self.organisms[d.source.organism]==0)?d.source.x:d.source.x+r; })
 					.attr("y1", function(d) { return (self.organisms[d.source.organism]==0)?d.source.y:d.source.y+r; })
@@ -160,7 +174,7 @@ Biojs.InteractionsD3 = Biojs.extend (
 					.attr("y2", function(d) { return (self.organisms[d.target.organism]==0)?d.target.y:d.target.y+r; });
 			};
 			//Binding the _resize method when resizing the window! 
-			d3.select(window).on("resize", function(){self._resize(self);});
+			//d3.select(window).on("resize", function(){self._resize(self);});
 			
 			self.restart();
 		},
@@ -241,7 +255,25 @@ Biojs.InteractionsD3 = Biojs.extend (
 			 * */
 			"interactionMouseOver"
 		], 
-
+		setSize:function(width,height){
+			var self =this;
+			self.opt.width=width;
+			self.opt.height=height;
+			d3.select("#"+self.opt.target+" svg")
+			    .attr('width', width)
+			    .attr('height', height);
+			d3.select("#"+self.opt.target+" .frame")
+			    .attr('width', width)
+			    .attr('height', height);
+			self._container.width(width);
+			self._container.height(height);
+			var numberOfOrganism =Object.keys(self.organisms).length;
+			self.foci=[];
+			for (var i=0; i<numberOfOrganism; i++){
+				self.foci.push({x: (self.opt.width/(numberOfOrganism+1))*(i+1), y:self.opt.height/2});
+			}
+			
+		},
 		/**
 		 * Adds an interaction between 2 proteins that are already in the graphic using their IDs
 		 * 
@@ -474,7 +506,7 @@ Biojs.InteractionsD3 = Biojs.extend (
 				.charge(-self.opt.radius*20)
 				.linkDistance(self.opt.radius*5).start();
 
-			var link =self.vis.selectAll("line.link")
+			var link =self.vis.selectAll(".graphNetwork line.link")
 				.data(self.interactions, function(d) { return d.source.id + "-" + d.target.id; });
 			
 			link.enter().insert("line" , ".node") //insert before the .node so lines won't hide the nodes
@@ -497,7 +529,7 @@ Biojs.InteractionsD3 = Biojs.extend (
 			
 			link.exit().remove();
 	
-			var nodes= self.vis.selectAll(".node")
+			var nodes= self.vis.selectAll(".graphNetwork .node")
 				.data(self.proteins, function(d) { return d.id;});
 			
 			var node=nodes
@@ -581,7 +613,7 @@ Biojs.InteractionsD3 = Biojs.extend (
 		hide: function(selector){
 			var self=this;
 			self.vis.selectAll(selector).attr("visibility", 'hidden');
-			self.vis.selectAll(selector+" .legend").attr("visibility", 'hidden');
+			self.vis.selectAll(selector).selectAll(" .legend").attr("visibility", 'hidden');
 		},
 		/**
 		 * Shows the elements on the graphic that match the selector. 
@@ -595,7 +627,7 @@ Biojs.InteractionsD3 = Biojs.extend (
 		show: function(selector){
 			var self=this;
 			self.vis.selectAll(selector).attr("visibility", 'visible');
-			self.vis.selectAll(selector+" .legend").attr("visibility",function(d) { return (d.showLegend)?"visible":"hidden";});
+			self.vis.selectAll(selector).selectAll(" .legend").attr("visibility",function(d) { return (d.showLegend)?"visible":"hidden";});
 		},
 		/**
 		 * Highlight the elements on the graphic that match the selector. 
@@ -702,22 +734,42 @@ Biojs.InteractionsD3 = Biojs.extend (
 				return (d.showLegend)?"visible":"hidden";
 			});
 		},
-		/**
-		 * 
-		 * Resizing the graph depending on the size of the window.
-		 * 
-		 * @param self
-		 */
-		_resize:  function (self) {
-			var width = window.innerWidth, height = window.innerHeight;
-			self.vis.attr("width", width).attr("height", height);
-			self.force.size([width, height]).resume();
-		},
-		colors: [ "#1f77b4", "#aec7e8", "#ff7f0e", "#ffbb78", "#2ca02c", "#98df8a", "#d62728", "#ff9896", "#9467bd", "#c5b0d5", "#8c564b", "#c49c94", "#e377c2", "#f7b6d2", "#7f7f7f", "#c7c7c7", "#bcbd22", "#dbdb8d", "#17becf", "#9edae5",
-		          "#0077b4", "#11c7e8", "#227f0e", "#33bb78", "#44a02c", "#55df8a", "#662728", "#779896", "#8867bd", "#99b0d5", "#AA564b", "#BB9c94", "#CC77c2", "#DDb6d2", "#EE7f7f", "#FFc7c7", "#00bd22", "#11db8d", "#22becf", "#33dae5",
-		          "#1f00b4", "#ae11e8", "#ff220e", "#ff3378", "#2c442c", "#98558a", "#d66628", "#ff7796", "#9488bd", "#c599d5", "#8cAA4b", "#c4BB94", "#e3CCc2", "#f7DDd2", "#7fEE7f", "#c7FFc7", "#bc0022", "#db118d", "#1722cf", "#9e33e5",
-		          "#1f7700", "#aec711", "#ff7f22", "#ffbb33", "#2ca044", "#98df55", "#d62766", "#ff9877", "#946788", "#c5b099", "#8c56AA", "#c49cBB", "#e377FC", "#f7b6FD", "#7f7fEE", "#c7c7FF", "#bcbd00", "#dbdb11", "#17be22", "#9eda33"
-		          ]
+//		/**
+//		 * 
+//		 * Resizing the graph depending on the size of the window.
+//		 * 
+//		 * @param self
+//		 */
+//		_resize:  function (self) {
+//			var width = window.innerWidth, height = window.innerHeight;
+//			self.vis.attr("width", width).attr("height", height);
+//			self.force.size([width, height]).resume();
+//		},
+		colors: [ "#1f77b4", "#aec7e8", "#ff7f0e", "#ffbb78", "#2ca02c", "#98df8a", "#d62728", "#ff9896", "#9467bd", "#c5b0d5", 
+		          "#8c564b", "#c49c94", "#e377c2", "#f7b6d2", "#7f7f7f", "#c7c7c7", "#bcbd22", "#dbdb8d", "#17becf", "#9edae5",
+		          '#3399FF', '#99FF66', '#66FF99', '#CCFF00', '#6699CC', '#99CC00', '#99FFCC', '#993399', '#33FFFF', '#33CC33', 
+		         '#66CCFF', '#009999', '#00FFFF', '#CC66CC', '#FF9966', '#CC3300', '#009966', '#660000', '#99FF33', '#330066', 
+		         '#FFFF00', '#0099FF', '#FF6699', '#33FF00', '#FFFFCC', '#990000', '#99CC33', '#0033CC', '#006699', '#6699FF', 
+		         '#FFCC00', '#330099', '#999999', '#666633', '#FFCC99', '#00CCCC', '#006633', '#CCCC99', '#3300FF', '#33CC66', 
+		         '#339999', '#6666FF', '#33FF66', '#990033', '#33CC99', '#993300', '#00FF00', '#666699', '#00CC00', '#FF66CC', 
+		         '#00FFCC', '#FF9999', '#66FF00', '#003366', '#CCFF33', '#660066', '#6633CC', '#FF3366', '#99FF00', '#FF33CC', 
+		         '#CCFFCC', '#99CCCC', '#3300CC', '#0066FF', '#66CC33', '#3366CC', '#CCCCCC', '#FF0000', '#6666CC', '#336699', 
+		         '#999966', '#FFFF99', '#66CC99', '#FF0033', '#999933', '#CC99FF', '#FF0099', '#6600CC', '#CC9966', '#00CC66', 
+		         '#33CC00', '#666666', '#33CCCC', '#FF0066', '#00CC33', '#FFCC66', '#FF6600', '#9999FF', '#CC66FF', '#9933FF', 
+		         '#FF00CC', '#CC3399', '#CC6633', '#33FFCC', '#FF33FF', '#009900', '#660099', '#669999', '#CC3366', '#0099CC', 
+		         '#9900FF', '#669933', '#FFFFFF', '#CCCCFF', '#66CCCC', '#669966', '#0066CC', '#CC9900', '#663300', '#33FF99', 
+		         '#996666', '#3399CC', '#99FF99', '#66CC66', '#CC0066', '#CCFF66', '#663366', '#99CC66', '#000033', '#003333', 
+		         '#FF6666', '#009933', '#FFFF66', '#996699', '#FFCCCC', '#00CCFF', '#339966', '#3366FF', '#00CC99', '#336633', 
+		         '#FF99FF', '#663333', '#CCFF99', '#CC99CC', '#339933', '#33CCFF', '#333366', '#006666', '#CC6600', '#333300', 
+		         '#FFCC33', '#9966CC', '#003300', '#9966FF', '#996600', '#CC9933', '#9999CC', '#FF9933', '#006600', '#6633FF', 
+		         '#CC6699', '#FF3399', '#993333', '#CCFFFF', '#330033', '#FFCCFF', '#FFFF33', '#990066', '#CCCC66', '#CC0099', 
+		         '#CCCC00', '#339900', '#660033', '#FF00FF', '#333333', '#99CC99', '#66FFCC', '#003399', '#999900', '#99FFFF', 
+		         '#990099', '#3333FF', '#CC33CC', '#CC6666', '#3333CC', '#9900CC', '#9933CC', '#CC0033', '#CC00FF', '#FF99CC', 
+		         '#FF66FF', '#66FFFF', '#6600FF', '#66FF66', '#996633', '#669900', '#00FF99', '#CC9999', '#993366', '#CC33FF', 
+		         '#336666', '#0033FF', '#336600', '#CC0000', '#FF9900', '#33FF33', '#000000', '#99CCFF', '#000066', '#0000CC', 
+		         '#000099', '#00FF33', '#666600', '#66FF33', '#CCCC33', '#66CC00', '#FF3333', '#CC3333', '#663399', '#333399', 
+		         '#FF3300', '#0000FF', '#CC00CC', '#00FF66', '#330000', '#FF6633']
+
 	});
 
 

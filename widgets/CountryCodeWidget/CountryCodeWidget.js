@@ -36,7 +36,7 @@ AjaxSolr.CountryCodeWidget = AjaxSolr.AbstractFacetWidget.extend({
     var self = this;
     $(this.target).find('#country').change(function () {
       var value = $(this).val();
-		self.manager.widgets["requester"].request("",[self.field + ':' + AjaxSolr.Parameter.escapeValue(value)]);
+		self.manager.widgets["requester"].request([self.field + ':' + AjaxSolr.Parameter.escapeValue(value)],"");
     });
 
     var chd = [];
@@ -53,5 +53,12 @@ AjaxSolr.CountryCodeWidget = AjaxSolr.AbstractFacetWidget.extend({
     }
   }
 });
+$.fn.showIf = function (condition) {
+    if (condition) {
+      return this.show();
+    }else {
+      return this.hide();
+    }
+  };
 
 })(jQuery);

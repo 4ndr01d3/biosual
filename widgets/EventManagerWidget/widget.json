@@ -1,0 +1,5 @@
+{
+    "name": "Events manager",
+    "description": "a weidget to coordinate events between other components",
+    "js": "EventManagerWidget.js"
+}

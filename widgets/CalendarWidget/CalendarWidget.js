@@ -16,7 +16,7 @@
 					return [ parseInt(count) > 0, '', count + ' documents found!' ];
 				},
 				onSelect: function (dateText, inst) {
-					self.manager.widgets["requester"].request("",[self.field + ':' + '[' + dateText + 'T00:00:00Z TO ' + dateText + 'T23:59:59Z]']);
+					self.manager.widgets["requester"].request([self.field + ':' + '[' + dateText + 'T00:00:00Z TO ' + dateText + 'T23:59:59Z]'],"");
 				}
 			});
 		}

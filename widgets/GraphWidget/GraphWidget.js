@@ -1,5 +1,5 @@
 (function ($) {
-	AjaxSolr.GraphWidget = AjaxSolr.AbstractWidget.extend(Biojs).extend({
+	AjaxSolr.GraphWidget = AjaxSolr.AbstractWidget.extend({
 		graph:null,
 		previousRequest:null,
 		selected:null,
@@ -64,7 +64,8 @@
 			self.graph = new Biojs.InteractionsD3({
 				target: self.target,
 				radius: 10,
-				height: "650" 
+				width: "800",
+				height: "800" 
 
 			});			
 			var self = this;
@@ -87,7 +88,9 @@
 //				self.nodeA = Array();
 				self.graph.resetGraphic();
 				self.graph = new Biojs.InteractionsD3({
-				     target: self.target,
+					target: self.target,
+					width: "800",
+					height: "800" 
 				});			
 			}
 				
@@ -139,27 +142,6 @@
 				}
 			}
 			self.graph.restart();
-			self.graph.proteinClick( function(d){
-				var newClick = (new Date()).getTime();
-				if (newClick-self.lastClick<300)
-					return;
-				self.lastClick=newClick;
-				if (d.protein.name==self.selected){
-					$('[id="node_'+self.selected+'"] .figure').css("stroke",'');
-					self.selected=null;
-					Manager.info.updateFeatures({id:"Selection Empty"});
-				}else{
-					Manager.info.updateFeatures(d.protein.features,self.orderProteinFeatures);
-					if (self.selected!=null){
-						if (self.selected.indexOf("_")==-1)
-							$('[id="node_'+self.selected+'"] .figure').css("stroke",'');
-						else
-							self.graph.setColor('[id="link_'+self.selected+'"]',"#999");
-					}
-					self.graph.setColor('[id="node_'+d.protein.name+'"] .figure',"#000");
-					self.selected=d.protein.name;
-				}
-			});
 			self.graph.interactionClick( function(d){
 				var newClick = (new Date()).getTime();
 				if (newClick-self.lastClick<300)
@@ -190,6 +172,34 @@
 			
 			
 		},	
+		setSize: function(size){
+			var self=this;
+			var s=size.split("x");
+			self.graph.setSize(s[0],s[1]);
+			self.executeStylers();
+		},
+		proteinClick: function(d){
+			var self=this;
+			var newClick = (new Date()).getTime();
+			if (newClick-self.lastClick<300)
+				return;
+			self.lastClick=newClick;
+			if (d.protein.name==self.selected){
+				$('[id="node_'+self.selected+'"] .figure').css("stroke",'');
+				self.selected=null;
+//				Manager.info.updateFeatures({id:"Selection Empty"});
+			}else{
+//				Manager.info.updateFeatures(d.protein.features,self.orderProteinFeatures);
+				if (self.selected!=null){
+					if (self.selected.indexOf("_")==-1)
+						$('[id="node_'+self.selected+'"] .figure').css("stroke",'');
+					else
+						self.graph.setColor('[id="link_'+self.selected+'"]',"#999");
+				}
+				self.graph.setColor('[id="node_'+d.protein.name+'"] .figure',"#000");
+				self.selected=d.protein.name;
+			}
+		},
 		_getInteractionFeaturesFromDoc: function(doc){
 			features = {};
 			for (var key in doc){
@@ -312,7 +322,7 @@
 			self.graph.vis.selectAll("line").attr("visibility", 'visible').style("stroke","#999");
 			self.graph.vis.selectAll(".legend").attr("visibility",function(d) { return (d.showLegend)?"visible":"hidden";});
 			for (var i in self.stylers){
-				console.debug("styler:"+i);
+//				console.debug("styler:"+i);
 				self.stylers[i]();
 			}
 		},
@@ -325,6 +335,7 @@
 			var qs= self.manager.widgets["requester"].getQueries();
 			self.removeProtein(facet,qs);
 			self.visibleProteins = Object.keys(self.graph.proteinsA);
+			self.executeStylers();
 		},
 		stylers:{}
 	});

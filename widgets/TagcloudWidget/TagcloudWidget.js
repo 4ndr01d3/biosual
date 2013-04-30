@@ -3,7 +3,7 @@
 		click: function (value) {
 			var self = this;
 			return function () {
-				self.manager.widgets["requester"].request("",[self.field + ':' + AjaxSolr.Parameter.escapeValue(value)]);
+				self.manager.widgets["requester"].request([self.field + ':' + AjaxSolr.Parameter.escapeValue(value)],"");
 			};
 		},
 		afterRequest: function () {

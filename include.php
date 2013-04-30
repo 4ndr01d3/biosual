@@ -24,8 +24,18 @@ $cssWeb		=array();
 $cssLocal	=array(	'css/jquery-ui.css',
 					'css/ui.theme.css');
 
+$MDCpath="MDC_files/";
 if ($_GET['id'] != ''){
-	$theData = getFile("MDC_files/".$_GET['id'].".json");
+	$filename=$MDCpath.$_GET['id'].".json";
+	if (!file_exists($filename)){
+		$MDCpath="MDC_files/".$_GET['id']."/";
+		$filename=$MDCpath.$_GET['id'].".json";
+	}
+	if (!file_exists($filename)){
+		echo "ERROR: There is not a json file associated with the id ".$_GET['id'];
+		return;
+	}
+	$theData = getFile($filename);
 	try {
 	    $json = JsonHandler::decode($theData);
 	} catch(Exception $e) {
@@ -75,8 +85,10 @@ switch ($_GET['type']){
 		}
 		
 		//Adding the dependencies included in the MDC json
-		foreach ($json->js as $dependency)
-			echo getFile($dependency);
+		if (isset($json->js) && $json->js!=null)
+			foreach ($json->js as $dependency)
+				if (strlen(trim($dependency))>0 && file_exists($MDCpath.$dependency))
+					echo getFile($MDCpath.$dependency);
 			
 		//Adding the widgets JSs
 		$widgetsScriptsAdded =array();
@@ -92,7 +104,7 @@ switch ($_GET['type']){
 				echo "\n//Injecting HTML for WIDGET: ".$widget->id."\n".$widget->getHTMLinjector()."\n";
 				//TODO: add Markup to the page
 			} catch(Exception $e) {
-				echo "\n//Error loading the widget: ".$widgetObj->widget;
+				echo "\n//Error loading the widget: ".$widgetObj->widget."\n";
 			}
 		}
 		
@@ -102,10 +114,16 @@ switch ($_GET['type']){
 		echo "var server = ".json_encode($json->server).";\n";
 		echo "var events = ".json_encode($json->events).";\n";
 		
+		echo "//pre-loader script".$json->preloader;
+		if (isset($json->preloader) && $json->preloader!=null && strlen(trim($json->preloader))>0 && file_exists($MDCpath.$json->preloader))
+			echo getFile($MDCpath.$json->preloader);
+			
 		//Adding the AJAX SOLR manager and configuring all the widgets 
 		echo "//Manager loader\n".getFile("core/loader.js");
 
-		echo "//Event Manager\n".getFile("core/eventManager.js");
+		if (isset($json->postloader) && $json->postloader!=null && strlen(trim($json->postloader))>0 && file_exists($MDCpath.$json->postloader))
+			echo "//postloader script\n".getFile($MDCpath.$json->postloader);
+		//		echo "//Event Manager\n".getFile("core/eventManager.js");
 		
 		break;
 		

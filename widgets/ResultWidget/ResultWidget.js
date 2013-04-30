@@ -25,7 +25,7 @@
 		facetHandler: function (facet_field, facet_value) {
 			var self = this;
 			return function () {
-				self.manager.widgets["requester"].request("",[facet_field + ':' + AjaxSolr.Parameter.escapeValue(facet_value)]);
+				self.manager.widgets["requester"].request([facet_field + ':' + AjaxSolr.Parameter.escapeValue(facet_value)],"");
 				return false;
 			};
 		},

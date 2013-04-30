@@ -1,6 +1,6 @@
 (function ($) {
 	AjaxSolr.ReutersAjaxRequesterWidget = AjaxSolr.AbstractFacetWidget.extend({
-		request: function(type,parameters){
+		request: function(parameters,type){
 			var self = this;
 			if (self.manager.store.addByValue('fq', parameters[0])) {
 				self.doRequest();

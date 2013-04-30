@@ -1,0 +1,139 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+    <link type="text/css" rel="stylesheet" href="styleSVG.css"/>  
+  </head>
+  <body>
+    <input type="submit" onclick="testing()" id="some" >
+    <script type="text/javascript" src="../../lib/d3/d3.v2.min.js"></script>
+    <script type="text/javascript" src="packages.js"></script>
+    <script type="text/javascript">
+
+var w = 1280,
+    h = 800,
+    rx = w / 2,
+    ry = h / 2,
+    m0,
+    rotate = 0;
+
+var cluster = d3.layout.cluster()
+.size([360, ry - 120])
+.sort(function(a, b) { return d3.ascending(a.key, b.key); });
+
+var bundle = d3.layout.bundle();
+var splines = [];
+
+
+var line = d3.svg.line.radial()
+    .interpolate("bundle")
+    .tension(.45)
+    .radius(function(d) { return d.y; })
+    .angle(function(d) { return d.x / 180 * Math.PI; });
+
+// Chrome 15 bug: <http://code.google.com/p/chromium/issues/detail?id=98951>
+var div = d3.select("body").insert("div", "h2")
+    .style("width", w + "px")
+    .style("height", w + "px");
+
+var svg = div.append("svg:svg")
+    .attr("width", w)
+    .attr("height", w)
+    .append("svg:g")
+      .attr("transform", "translate(" + rx + "," + ry + ")");
+
+svg.append("svg:path")
+    .attr("class", "arc")
+    .attr("d", d3.svg.arc().outerRadius(ry - 120).innerRadius(0).startAngle(0).endAngle(2 * Math.PI));
+
+
+var jsons= {"name":"", "children":[] };
+var organisms ={},
+	proteins = {};
+	
+var addOrganism=function(organism){
+	if (!organisms.hasOwnProperty(organism)){
+		organisms[organism] = {"key":organism,"name":organism,"parent":jsons,"children":[]}
+		jsons.children.push(organisms[organism]);
+	}
+}
+var addProtein =function(protein,organism){
+	addOrganism(organism);
+	if (!proteins.hasOwnProperty(protein)){
+		proteins[protein] = {"key":protein,"name":protein,"parent":organisms[organism],"imports":[]}
+		organisms[organism].children.push(proteins[protein]);
+	}
+}
+var addInteraction = function(protein1,protein2,organism1,organism2){
+	addProtein(protein1,organism1);
+	addProtein(protein2,organism2);
+	var pos=proteins[protein1].imports.indexOf(protein2)
+	if (pos==-1)
+		proteins[protein1].imports.push(protein2);
+	pos=proteins[protein2].imports.indexOf(protein1)
+	if (pos==-1)
+		proteins[protein2].imports.push(protein1);
+	
+}
+var removeInteraction = function(protein1,protein2){
+	var pos = proteins[protein2].imports.indexOf(protein1);
+	if (pos!=-1)
+		proteins[protein2].imports.splice(pos,1);
+	pos = proteins[protein1].imports.indexOf(protein2);
+	if (pos!=-1)
+		proteins[protein1].imports.splice(pos,1);
+		
+}
+addInteraction("A","B","Human","Human");
+addInteraction("A","C","Human","Human");
+addInteraction("A","D","Human","Human");
+addInteraction("B","C","Human","Human");
+addInteraction("C","D","Human","Human");
+addInteraction("D","E","Human","Human");
+var restart= function() {
+
+  var nodes = cluster.nodes(jsons),
+      links = packages.imports(nodes),
+      splines = bundle(links);
+
+  svg.selectAll("path.link").remove();
+  var path = svg.selectAll("path.link")
+      .data(links)
+    .enter().append("svg:path")
+      .attr("class", function(d) { return "link source-" + d.source.key + " target-" + d.target.key; })
+      .attr("d", function(d, i) { return line(splines[i]); });
+
+  svg.selectAll("g.node").remove();
+  svg.selectAll("g.node")
+      .data(nodes.filter(function(n) { return !n.children; }))
+    .enter().append("svg:g")
+      .attr("class", "node")
+      .attr("id", function(d) { return "node-" + d.key; })
+      .attr("transform", function(d) { return "rotate(" + (d.x - 90) + ")translate(" + d.y + ")"; })
+    .append("svg:text")
+      .attr("dx", function(d) { return d.x < 180 ? 8 : -8; })
+      .attr("dy", ".31em")
+      .attr("text-anchor", function(d) { return d.x < 180 ? "start" : "end"; })
+      .attr("transform", function(d) { return d.x < 180 ? null : "rotate(180)"; })
+      .text(function(d) { return d.key; });
+  
+};
+restart();
+var test="";
+var testing=function(){
+	addInteraction("A","W"+test,"Human","TB");
+	addInteraction("F","W","Human","TB");
+	addInteraction("X","W","TB","TB");
+	addInteraction("Y","W"+test,"TB","TB");
+	addInteraction("X","Y","TB","TB");
+	test += "-";
+	
+	removeInteraction("D","C")
+	restart();
+}
+
+
+    </script>
+  </body>
+</html>

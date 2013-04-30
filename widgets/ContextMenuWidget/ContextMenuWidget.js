@@ -24,6 +24,15 @@
 				itemStyle:self.itemStyle,
 				itemHoverStyle:self.itemHoverStyle,
 			});
+		},
+		afterRemove: function() {
+			var self=this;
+			$(self.triggerer).contextMenu("context_"+self.id, {
+				bindings: self.bindings,
+				menuStyle:self.menuStyle,
+				itemStyle:self.itemStyle,
+				itemHoverStyle:self.itemHoverStyle,
+			});
 			
 		}
 	});

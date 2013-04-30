@@ -1,34 +1,23 @@
-.node {
+.graphNetwork .node {
 	stroke: #fff;
 	stroke-width: 1.5px;
 }
-.figure{
+.graphNetwork .figure{
   pointer-events: all;
   fill:	#89B;
 }
-.legend {
+.graphNetwork .legend {
   pointer-events: none;
   font: 10px sans-serif;
 }
-line.link {
+.graphNetwork line.link {
 	stroke: #999;
 	stroke-opacity: .6;
 }
 
-div#graph {
+.graphNetwork  {
 	border: 1px solid #000;
 	background-color: #E5E5EF;
 }
-div#expression{
-	float:right;
-	padding-top:10px;
-	width:100%;
-}
-#selection {
-	float: right;
-	margin: 0;
-	margin-bottom: 10px;
-	padding: 0;
-	text-align:rigth;
-}
+
 .clearBoth { clear:both; }

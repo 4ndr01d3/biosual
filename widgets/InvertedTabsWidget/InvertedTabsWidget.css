@@ -1,0 +1,58 @@
+
+.invertedshiftdown{
+padding: 0;
+width: 100%;
+border-top: 5px solid #D10000; /*Red color theme*/
+background: transparent;
+voice-family: "\"}\"";
+voice-family: inherit;
+}
+
+.invertedshiftdown ul{
+margin:0;
+margin-left: 40px; /*margin between first menu item and left browser edge*/
+padding: 0;
+list-style: none;
+}
+
+.invertedshiftdown li{
+display: inline;
+margin: 0 2px 0 0;
+padding: 0;
+text-transform:uppercase;
+}
+
+.invertedshiftdown a{
+float: left;
+display: block;
+font: bold 12px Arial;
+color: black;
+text-decoration: none;
+margin: 0 1px 0 0; /*Margin between each menu item*/
+padding: 5px 10px 9px 10px; /*Padding within each menu item*/
+background-color: white; /*Default menu color*/
+
+/*BELOW 4 LINES add rounded bottom corners to each menu item.
+  ONLY WORKS IN FIREFOX AND FUTURE CSS3 CAPABLE BROWSERS
+  REMOVE IF DESIRED*/
+-moz-border-radius-bottomleft: 5px;
+border-bottom-left-radius: 5px;
+-moz-border-radius-bottomright: 5px;
+border-bottom-right-radius: 5px;
+}
+
+.invertedshiftdown a:hover{
+background-color: #D10000; /*Red color theme*/
+padding-top: 9px; /*Flip default padding-top value with padding-bottom */
+padding-bottom: 5px; /*Flip default padding-bottom value with padding-top*/
+color: white;
+cursor: pointer;
+}
+
+.invertedshiftdown .current a{ /** currently selected menu item **/
+background-color: #D10000; /*Red color theme*/
+padding-top: 9px; /*Flip default padding-top value with padding-bottom */
+padding-bottom: 5px; /*Flip default padding-bottom value with padding-top*/
+color: white;
+}
+

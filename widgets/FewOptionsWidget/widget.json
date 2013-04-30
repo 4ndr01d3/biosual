@@ -1,0 +1,8 @@
+{
+    "name": "Few Options Widget",
+    "description": "Display of few option buttons",
+    "dependencies":[],
+    "js": "FewOptionsWidget.js",
+    "html": "FewOptionsWidget.html",
+    "css": "FewOptionsWidget.css"
+}

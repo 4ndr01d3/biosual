@@ -8,17 +8,14 @@ var Manager;
 	    Manager.addWidget(new AjaxSolr[json[i]['widget']](json[i]['parameters']));
 	}
     Manager.init();
-    Manager.store.addByValue('q', '*:*');
     for (var name in params)
-      Manager.store.addByValue(name, params[name]);
+        Manager.store.addByValue(name, params[name]);
+    if ( typeof URLrequests == "undefined" || !Array.isArray(URLrequests) || URLrequests.length<1)
+    	Manager.store.addByValue('q', '*:*');
+    else
+		for (var i=0;i<URLrequests.length;i++)
+			Manager.widgets["requester"].request([URLrequests[i]]);
     Manager.doRequest();
   });
-  $.fn.showIf = function (condition) {
-    if (condition) {
-      return this.show();
-    }else {
-      return this.hide();
-    }
-  };
 
 })(jQuery);
