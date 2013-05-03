@@ -51,6 +51,8 @@
 			"parameters": {
 			"id": "graph",
 				"target": "graph",
+				"width":"1400",
+				"height":"600",
 				"predefined_stylers":[	{
 						"id":"ruler",
 						"method":"applyRules"
@@ -63,10 +65,20 @@
 			"templateTarget":"center",
 			"tags":{"id":"graph"}
 		},
+		{	"widget": "SvgExporter",
+			"parameters": {
+				"id": "svggraph",
+				"target": "#graph",
+				"formats":["PNG","SVG"],
+				"css":".figure {fill: #89B; stroke: #fff;}"
+			}
+		},
 		{	"widget": "CircleGraphWidget",
 			"parameters": {
 			"id": "graph2",
 				"target": "graph2",
+				"width":"1400",
+				"height":"600",
 				"predefined_stylers":[	{
 						"id":"ruler",
 						"method":"applyRules2"
@@ -79,23 +91,43 @@
 			"templateTarget":"center",
 			"tags":{"id":"graph2"}
 		},
+		{	"widget": "SvgExporter",
+			"parameters": {
+				"id": "svggraph2",
+				"target": "#graph2",
+				"formats":["PNG","SVG"],
+				"css": "path.arc {  fill: #fff;}  .node {  font-size: 10px;}  .node:hover {  fill: #1f77b4;}  .link {  fill: none;  stroke: #1f77b4;  stroke-opacity: .4;  pointer-events: none;}  .link.source,   .link.target {  stroke-opacity: 1;  stroke-width: 2px;}  .node.target {  fill: #d62728 !important;}  .link.source {  stroke: #d62728;}  .node.source {  fill: #2ca02c;}  .link.target {  stroke: #2ca02c;}  .figure { fill: #46D;}  .legend {  stroke: transparent;  pointer-events: none;}"
+			}
+		},
 		{	"widget": "FewOptionsWidget",
 			"parameters": {
 			"id": "size",
 				"target": "size",
 				"options": [
-				     { "title": "800x800",
+				     { "title": "1400x600",
 					       "selected":true
 				     },
-				     { "title": "1000x1000",
+				     { "title": "1200x600",
 				       "selected":false
 				     },
-				     { "title": "1200x800",
+				     { "title": "1000x600",
+					       "selected":false
+					 },
+				     { "title": "800x600",
 					       "selected":false
 					 },
 				     { "title": "1400x800",
+					       "selected":false
+				     },
+				     { "title": "1200x800",
 				       "selected":false
-				     }
+				     },
+				     { "title": "1000x800",
+					       "selected":false
+					 },
+				     { "title": "800x800",
+					       "selected":false
+					 }
 				],
 				"trigger":[
 				    {

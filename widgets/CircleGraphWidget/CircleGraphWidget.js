@@ -63,8 +63,8 @@
 //			self.nodeA = Array(); // Associative array  [id]->Node
 			self.graph = new Biojs.InteractionsBundleD3({
 				target: self.target,
-				width: "800",
-				height: "800"
+				width: (typeof self.width == "undefined")?"800":self.width,
+				height: (typeof self.height == "undefined")?"800":self.height 
 			});			
 			var self = this;
 		    for (var i in self.predefined_stylers){
@@ -87,8 +87,8 @@
 				self.graph.resetGraphic();
 				self.graph = new Biojs.InteractionsBundleD3({
 				    target: self.target,
-					width: "800",
-					height: "800"
+					width: (typeof self.width == "undefined")?"800":self.width,
+					height: (typeof self.height == "undefined")?"800":self.height 
 				});			
 			}
 				

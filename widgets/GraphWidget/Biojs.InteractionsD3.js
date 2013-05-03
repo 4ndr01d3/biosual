@@ -98,7 +98,7 @@ Biojs.InteractionsD3 = Biojs.extend (
 			    		.on("zoom", redraw))
 			    .append('svg:g');
 			
-			self.vis.append('svg:rect')
+			self.rect= self.vis.append('svg:rect')
 				.attr("class", "frame")
 			    .attr('width', width)
 			    .attr('height', height)
@@ -111,7 +111,8 @@ Biojs.InteractionsD3 = Biojs.extend (
 				  scale=d3.event.scale;
 				  if (trans[0]>0)trans[0]=0;
 				  if (trans[1]>0)trans[1]=0;
-				  var W = self.force.size()[0], H= self.force.size()[1];
+
+				  var W = self.rect[0][0].width.animVal.value, H= self.rect[0][0].height.animVal.value;
 				  var Ws = W*scale, Hs = H*scale;
 				  if (Ws<W-trans[0]) trans[0]=W-Ws;
 				  if (Hs<H-trans[1]) trans[1]=H-Hs;
@@ -265,6 +266,7 @@ Biojs.InteractionsD3 = Biojs.extend (
 			d3.select("#"+self.opt.target+" .frame")
 			    .attr('width', width)
 			    .attr('height', height);
+
 			self._container.width(width);
 			self._container.height(height);
 			var numberOfOrganism =Object.keys(self.organisms).length;
@@ -272,7 +274,12 @@ Biojs.InteractionsD3 = Biojs.extend (
 			for (var i=0; i<numberOfOrganism; i++){
 				self.foci.push({x: (self.opt.width/(numberOfOrganism+1))*(i+1), y:self.opt.height/2});
 			}
-			
+
+			self.restart();
+			self.raiseEvent('sizeChanged', {
+				width:width,
+				height:height
+			});
 		},
 		/**
 		 * Adds an interaction between 2 proteins that are already in the graphic using their IDs

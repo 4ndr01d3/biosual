@@ -155,10 +155,7 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 			function redraw() {
 				  trans=d3.event.translate;
 				  scale=d3.event.scale;
-//			 	  if (trans[0]/2>0)trans[0]=0;
-//				  if (trans[1]/2>0)trans[1]=0;
 				  var W = self.rect[0][0].width.animVal.value, H= self.rect[0][0].height.animVal.value;
-//				  var W = self.cluster.size()[0], H= self.cluster.size()[1];
 				  var Ws = W*scale, Hs = H*scale;
 				  if (Ws/2<W/2+trans[0]) trans[0]=(Ws-W)/2;
 				  if (Hs/2<H/2+trans[1]) trans[1]=(Hs-H)/2;

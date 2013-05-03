@@ -60,12 +60,13 @@
 		init: function () {
 			var self =this;
 			$("#"+this.target).empty();
+			$("#"+this.target).html('<div id="exportGraph" class="svgexporter"> <a><img src="../../widgets/SvgExporter/images/File_SVG_64.png" /></a>	<a><img src="../../widgets/SvgExporter/images/File_PNG_64.png" /></a></div>');
 //			self.nodeA = Array(); // Associative array  [id]->Node
 			self.graph = new Biojs.InteractionsD3({
 				target: self.target,
 				radius: 10,
-				width: "800",
-				height: "800" 
+				width: (typeof self.width == "undefined")?"800":self.width,
+				height: (typeof self.height == "undefined")?"800":self.height 
 
 			});			
 			var self = this;
@@ -89,8 +90,8 @@
 				self.graph.resetGraphic();
 				self.graph = new Biojs.InteractionsD3({
 					target: self.target,
-					width: "800",
-					height: "800" 
+					width: (typeof self.width == "undefined")?"800":self.width,
+					height: (typeof self.height == "undefined")?"800":self.height 
 				});			
 			}
 				
