@@ -12,8 +12,8 @@
 				selector ="";
 				var rule=rules[i];
 				if (rule.target==model.target[0].name){ //Proteins
-					var prefix=(rule.action.name=="Color" || rule.action.name=="Color By")?"figure_":"node_";
-					var prefix2=(rule.action.name=="Color" || rule.action.name=="Color By")?".figure":".node";
+					var prefix =(rule.action.name=="Color" || rule.action.name=="Color By" || rule.action.name=="Border" || rule.action.name=="Border By")?"figure_":"node_";
+					var prefix2=(rule.action.name=="Color" || rule.action.name=="Color By" || rule.action.name=="Border" || rule.action.name=="Border By")?".figure":".node";
 					switch (rule.condition){
 						case model.target[0].conditions[1].name: // interactions with
 							//TODO: Add validations in case proteins have been deleted

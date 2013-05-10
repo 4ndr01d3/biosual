@@ -21,15 +21,14 @@
 						svgDom.prepend('<style type="text/css" ><![CDATA[  '+self.css+'  ]]></style>');
 					var svg = $("<div />").append(svgDom).html();
 					
-					var downloadLink = document.createElement("a");
-					downloadLink.href = "data:application/octet-stream;title:export.svg;base64,\n" + btoa(svg);
-					downloadLink.download = "pinv_export.svg";
-					downloadLink.title= "pinv_export.svg";
-					downloadLink.target ="_blank";
-
-					document.body.appendChild(downloadLink);
-					downloadLink.click();
-					document.body.removeChild(downloadLink);
+					if(/chrom(e|ium)/.test(navigator.userAgent.toLowerCase())){
+						$("body").append("<a id='"+self.id+"_link' download='pinv_export.svg' title='pinv_export.svg' target='_blank'>downloading...</a>");
+						$("#"+self.id+"_link").attr("href","data:application/octet-stream;title:export.svg;base64,\n" + btoa(svg));
+						$("#"+self.id+"_link")[0].click();
+						$("#"+self.id+"_link").remove();
+					}else{
+						window.open( "data:application/octet-stream;title:export.svg;base64,\n" + btoa(svg),"_blank","title=export.svg");
+					}
 
 				});
 			$(self.target+" .PNG")
@@ -47,16 +46,24 @@
 				canvg(canvas, svg);
 				
 				var img = canvas.toDataURL("image/png");
+				if(/chrom(e|ium)/.test(navigator.userAgent.toLowerCase())){
+					$("body").append("<a id='"+self.id+"_link' download='pinv_export.png' title='pinv_export.png' target='_blank'>downloading...</a>");
+					$("#"+self.id+"_link").attr("href", img);
+					$("#"+self.id+"_link")[0].click();
+					$("#"+self.id+"_link").remove();
+				}else{
+					window.open( img,"_blank","title=export.png;download=export.png");
+				}
 				
-				var downloadLink = document.createElement("a");
-				downloadLink.href = img;
-				downloadLink.download = "pinv_export.png";
-				downloadLink.title= "pinv_export.png";
-				downloadLink.target ="_blank";
-
-				document.body.appendChild(downloadLink);
-				downloadLink.click();
-				document.body.removeChild(downloadLink);
+//				var downloadLink = document.createElement("a");
+//				downloadLink.href = img;
+//				downloadLink.download = "pinv_export.png";
+//				downloadLink.title= "pinv_export.png";
+//				downloadLink.target ="_blank";
+//
+//				document.body.appendChild(downloadLink);
+//				downloadLink.click();
+//				document.body.removeChild(downloadLink);
 				document.body.removeChild(canvas);
 
 			});

@@ -78,7 +78,7 @@
 					break;
 				case "protein":
 					self.requestSingleProtein(parameters[0]);
-					self.requestInteractionsByProtein(parameters[0],parameters[1]);
+					self.requestInteractionsBetweenProteins(parameters[0],parameters[1]);
 					break;
 			}
 		},
