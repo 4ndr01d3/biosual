@@ -389,6 +389,244 @@
 				self.manager.widgets["ruler"].ruler.setAffectedByRule(rule.id,affected);
 			}
 		};
+		$.fn.ruler.applyRules3 = function(self){
+			var rules = Manager.widgets["ruler"].ruler.getActiveRules();
+			var model = Manager.widgets["ruler"].rules;
+			var selectorTR ="",selectorTD ="";
+			for (var i=0;i<rules.length;i++){
+				selectorTR ="";
+				selectorTD ="";
+				var rule=rules[i];
+				if (rule.target==model.target[0].name){ //Proteins
+					switch (rule.condition){
+						case model.target[0].conditions[0].name: // all
+							selectorTD = ".cell_protein1, .cell_protein2";
+							break;
+						case model.target[0].conditions[1].name: // interactions with
+							selectorTR = "tr[id*="+rule.parameters[0]+"], tr[id*="+rule.parameters[0]+"]"
+							selectorTD = ".cell_protein1, .cell_protein2";
+							break;
+						case model.target[0].conditions[4].name: // features
+							var added=[];
+							for (var j in self.trIds){
+								var node = self.trIds[j];
+								
+								var doc= self.oTable.$('tr', {"filter": "applied"}).filter("#"+node).data("doc");
+								
+								switch (rule.parameters[1]){
+									case "equals":
+										if  (doc["p1_"+rule.parameters[0]] == rule.parameters[2] )
+											if (added.indexOf(doc["protein1"])==-1){
+												selectorTD += " .cell_protein1[content="+doc['protein1']+"], .cell_protein2[content="+doc['protein1']+"],";
+												added.push(doc["protein1"]);
+											}
+										if  (doc["p2_"+rule.parameters[0]] == rule.parameters[2] )
+											if (added.indexOf(doc["protein2"])==-1){
+												selectorTD += " .cell_protein1[content="+doc['protein2']+"], .cell_protein2[content="+doc['protein2']+"],";
+												added.push(doc["protein2"]);
+											}
+										break;
+									case "contains":
+										if  (doc["p1_"+rule.parameters[0]].indexOf(rule.parameters[2])!=-1)
+											if (added.indexOf(doc["protein1"])==-1){
+												selectorTD += " .cell_protein1[content="+doc['protein1']+"], .cell_protein2[content="+doc['protein1']+"],";
+												added.push(doc["protein1"]);
+											}
+										if  (doc["p2_"+rule.parameters[0]].indexOf(rule.parameters[2])!=-1)
+											if (added.indexOf(doc["protein2"])==-1){
+												selectorTD += " .cell_protein1[content="+doc['protein2']+"], .cell_protein2[content="+doc['protein2']+"],";
+												added.push(doc["protein2"]);
+											}
+										break;
+									case "different":
+										if  (doc["p1_"+rule.parameters[0]] != rule.parameters[2] )
+											if (added.indexOf(doc["protein1"])==-1){
+												selectorTD += " .cell_protein1[content="+doc['protein1']+"], .cell_protein2[content="+doc['protein1']+"],";
+												added.push(doc["protein1"]);
+											}
+										if  (doc["p2_"+rule.parameters[0]] != rule.parameters[2] )
+											if (added.indexOf(doc["protein2"])==-1){
+												selectorTD += " .cell_protein1[content="+doc['protein2']+"], .cell_protein2[content="+doc['protein2']+"],";
+												added.push(doc["protein2"]);
+											}
+										break;
+									case "not contains":
+										if  (doc["p1_"+rule.parameters[0]].indexOf(rule.parameters[2])==-1)
+											if (added.indexOf(doc["protein1"])==-1){
+												selectorTD += " .cell_protein1[content="+doc['protein1']+"], .cell_protein2[content="+doc['protein1']+"],";
+												added.push(doc["protein1"]);
+											}
+										if  (doc["p2_"+rule.parameters[0]].indexOf(rule.parameters[2])==-1)
+											if (added.indexOf(doc["protein2"])==-1){
+												selectorTD += " .cell_protein1[content="+doc['protein2']+"], .cell_protein2[content="+doc['protein2']+"],";
+												added.push(doc["protein2"]);
+											}
+										break;
+								}
+							}
+							if (selectorTD.length>0) selectorTD = selectorTD.substring(0, selectorTD.length-1);
+							break;
+						case model.target[0].conditions[3].name: // accession number
+							switch (rule.parameters[0]){
+								case "equals":
+									selectorTD = ".cell_protein1[content="+rule.parameters[1]+"], .cell_protein2[content="+rule.parameters[1]+"]";
+									break;
+								case "contains":
+									selectorTD = ".cell_protein1[content *=\""+rule.parameters[1]+"\"], .cell_protein2[content *=\""+rule.parameters[1]+"\"]";
+									break;
+								case "different":
+									selectorTD = ".cell_protein1:not([content="+rule.parameters[1]+"]), .cell_protein2:not([content="+rule.parameters[1]+"])";
+									break;
+								case "not contains":
+									selectorTD =".cell_protein1:not([content *="+rule.parameters[1]+"]),.cell_protein2:not([content *="+rule.parameters[1]+"])";
+									break;
+
+							}
+							break;
+						case model.target[0].conditions[2].name: // number of interactions
+							for (var i in self.ids){
+								var id= self.ids[i];
+								
+								var len = self.oTable.$('tr', {"filter": "applied"}).filter("[id *=\""+id+"\"]").length;
+								
+								switch (rule.parameters[0]){
+									case "==":
+										if (1*len==1*rule.parameters[1])
+											selectorTD +=" .cell_protein1[content="+id+"], .cell_protein2[content="+id+"],";
+										break;
+									case ">":
+										if (1*len>1*rule.parameters[1])
+											selectorTD +=" .cell_protein1[content="+id+"], .cell_protein2[content="+id+"],";
+										break;
+									case "<":
+										if (1*len<1*rule.parameters[1])
+											selectorTD +=" .cell_protein1[content="+id+"], .cell_protein2[content="+id+"],";
+										break;
+									case "<=":
+										if (1*len<=1*rule.parameters[1])
+											selectorTD +=" .cell_protein1[content="+id+"], .cell_protein2[content="+id+"],";
+										break;
+									case ">=":
+										if (1*len>=1*rule.parameters[1])
+											selectorTD +=" .cell_protein1[content="+id+"], .cell_protein2[content="+id+"],";
+										break;
+								}
+							}
+							if (selectorTD.length>0) selectorTD = selectorTD.substring(0, selectorTD.length-1);
+							break;
+					}
+					if (selectorTR!="" || selectorTD!="") switch (rule.action.name){
+						case "Hide":
+							self.hideCell(selectorTR,selectorTD);
+							break;
+						case "Show":
+							self.showCell(selectorTR,selectorTD);
+							break;
+						case "Highlight":
+							self.paintCell(selectorTR,selectorTD,"#00ff00");
+							break;
+						case "Border":
+							self.paintBorderCell(selectorTR,selectorTD,rule.actionParameters[0]);
+							break;
+						case "Color":
+							self.paintCell(selectorTR,selectorTD,rule.actionParameters[0]);
+							break;
+						case "Color By":
+						case "Border By":
+							var type = (rule.action.name=="Color By")?"color":"border";
+							switch(rule.actionParameters[0]){
+								case "Protein Queried":
+									self.colorBySeed(selectorTR,selectorTD,type);
+									break;
+								case "Functional Class":
+									self.colorByFeature(selectorTR,selectorTD,"funct_class",type);
+									break;
+								case "Gene Name":
+									self.colorByFeature(selectorTR,selectorTD,"gene_name",type);
+									break;
+								case "Organism":
+									self.colorByFeature(selectorTR,selectorTD,"organism",type);
+									break;
+							}
+							break;
+					}
+				} else if (rule.target==model.target[1].name) { //Interactions
+					var selectorTR ="";
+					switch (rule.condition){
+						case model.target[1].conditions[0].name: // all
+							selectorTR ="tr[id *=cell_]";
+							break;
+						case model.target[1].conditions[1].name: // protein
+							selectorTR ="tr[id*="+rule.parameters[0]+"]";
+							break;
+						case model.target[1].conditions[2].name: // proteins
+							selectorTR ="tr#cell_"+rule.parameters[0]+"_"+rule.parameters[1]+", tr#cell_"+rule.parameters[1]+"_"+rule.parameters[2];
+							break;
+						case model.target[1].conditions[3].name: // score
+							for (var j in self.trIds){
+								var node = self.trIds[j];
+								
+								var doc= self.oTable.$('tr', {"filter": "applied"}).filter("#"+node).data("doc");
+								var score=doc.unified_score;
+								if (score!="" && score!="-" ){
+									score=score*1.0;
+									switch (rule.parameters[0]){
+										case "==":
+											if (score==1*rule.parameters[1])
+												selectorTR +=" #"+node+",";
+											break;
+										case ">":
+											if (score>1*rule.parameters[1])
+												selectorTR +=" #"+node+",";
+											break;
+										case "<":
+											if (score<1*rule.parameters[1])
+												selectorTR +=" #"+node+",";
+											break;
+										case "<=":
+											if (score<=1*rule.parameters[1])
+												selectorTR +=" #"+node+",";
+											break;
+										case ">=":
+											if (score>=1*rule.parameters[1])
+												selectorTR +=" #"+node+",";
+											break;
+									}
+								}
+							}
+							if (selectorTR.length>0) selectorTR = selectorTR.substring(0, selectorTR.length-1);
+							break;
+						case model.target[1].conditions[4].name: // type of evidence
+							for (var j in self.trIds){
+								var node = self.trIds[j];
+								
+								var doc= self.oTable.$('tr', {"filter": "applied"}).filter("#"+node).data("doc");
+								var score=doc[rule.parameters[0]];
+								if (typeof score != "undefined" && score!="" && score!="-" && score*1>0.0){
+									selectorTR +=" #"+node+",";
+								}
+							}
+							if (selectorTR.length>0) selectorTR = selectorTR.substring(0, selectorTR.length-1);
+							break;
+					}
+					if (selectorTR!="") switch (rule.action.name){
+						case "Hide":
+							self.hideCell(selectorTR,selectorTD);
+							break;
+						case "Show":
+							self.showCell(selectorTR,selectorTD);
+							break;
+						case "Highlight":
+							self.paintRowBackground(selectorTR,"#00ff00");
+							break;
+						case "Border":
+							self.paintRowBackground(selectorTR,rule.actionParameters[0]);
+							break;
+					}
+				}
+			}
+
+		};	  	
   });
 })(jQuery);
   

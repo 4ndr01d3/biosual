@@ -66,7 +66,6 @@
 				width: (typeof self.width == "undefined")?"800":self.width,
 				height: (typeof self.height == "undefined")?"800":self.height 
 			});			
-			var self = this;
 		    for (var i in self.predefined_stylers){
 		    	var styler = self.predefined_stylers[i];
 		    	self.registerStyler(styler.id,function(styler){ 

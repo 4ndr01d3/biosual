@@ -226,7 +226,7 @@
 					],
 				"predefined_stylers":[	{
 						"id":"ruler",
-						"method":"applyRules2"
+						"method":"applyRules3"
 					}, {
 						"id":"expression",
 						"method":"paintProteins"
@@ -568,6 +568,34 @@
 				   			"object":"ruler",
 				   			"event":"onOrderChanged",
 				   			"listener":"graph2",
+				   			"method":"executeStylers",
+				   			"type":"init"
+				   		},
+				   		{	"source":"ruler",
+				   			"object":"ruler",
+				   			"event":"onRuleCreated",
+				   			"listener":"table",
+				   			"method":"executeStylers",
+				   			"type":"init"
+				   		},
+				   		{	"source":"ruler",
+				   			"object":"ruler",
+				   			"event":"onRuleRemoved",
+				   			"listener":"table",
+				   			"method":"executeStylers",
+				   			"type":"init"
+				   		},
+				   		{	"source":"ruler",
+				   			"object":"ruler",
+				   			"event":"onRuleEditing",
+				   			"listener":"table",
+				   			"method":"executeStylers",
+				   			"type":"init"
+				   		},
+				   		{	"source":"ruler",
+				   			"object":"ruler",
+				   			"event":"onOrderChanged",
+				   			"listener":"table",
 				   			"method":"executeStylers",
 				   			"type":"init"
 				   		},
