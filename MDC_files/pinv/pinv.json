@@ -35,7 +35,7 @@
 				"tabs": [
 				     { "title": "Network",
 				       "target":"graph",
-				       "selected":false
+				       "selected":true
 				     },
 				     { "title": "Circle",
 				       "target":"graph2",
@@ -43,7 +43,7 @@
 				     },
 				     { "title": "Table",
 				       "target":"table",
-				       "selected":true
+				       "selected":false
 				     }
 				],
 				"sideEffects":[
@@ -97,7 +97,7 @@
 						"method":"applyRules2"
 					}, {
 						"id":"expression",
-						"method":"paintProteins"
+						"method":"paintCircleProteins"
 					}
 				]
 			},
@@ -118,118 +118,13 @@
 				"target": "table",
 				"width":"1400",
 				"height":"600",
-				"columns":
-					[
-				         { "id":"protein1",
-				           "label":"Protein 1",
-				           "subcolumns":[
-					           "p1_ddtrp",
-					           "p1_closeness",
-					           "p1_non_bacteria",
-					           "p1_betweenness",
-					           "p1_actinobacteridae",
-					           "p1_mtb",
-					           "p1_tdr",
-					           "p1_description",
-					           "p1_mtb_cplx",
-					           "p1_strand_direction",
-					           "p1_dn_vs_ds",
-					           "p1_gas_nic",
-					           "p1_actinomycetales",
-					           "p1_bacteria",
-					           "p1_gene_name",
-					           "p1_cordon_bias",
-					           "p1_hub",
-					           "p1_go_growth",
-					           "p1_num_paralogs",
-					           "p1_eigen",
-					           "p1_in_leprae",
-					           "p1_degree",
-					           "p1_sass_growth",
-					           "p1_uniprot",
-					           "p1_location",
-					           "p1_corynebacterineae",
-					           "p1_h.sapiens",
-					           "p1_funct_class",
-					           "p1_percentage_gc",
-					           "p1_chrom_location",
-					           "p1_sass_infect",
-					           "p1_codon_volatility"
-				           ]
-				         },
-				         {
-				        	"id": "organism1",
-				        	"label":"Organism 1"
-				         },
-				         { "id":"protein2",
-				           "label":"Protein 2",
-				           "subcolumns":[
-					           "p2_cordon_bias",
-					           "p2_in_leprae",
-					           "p2_funct_class",
-					           "p2_percentage_gc",
-					           "p2_go_growth",
-					           "p2_hub",
-					           "p2_mtb",
-					           "p2_closeness",
-					           "p2_gene_name",
-					           "p2_sass_growth",
-					           "p2_actinobacteridae",
-					           "p2_num_paralogs",
-					           "p2_gas_nic",
-					           "p2_mtb_cplx",
-					           "p2_tdr",
-					           "p2_codon_volatility",
-					           "p2_ddtrp",
-					           "p2_uniprot",
-					           "p2_non_bacteria",
-					           "p2_strand_direction",
-					           "p2_dn_vs_ds",
-					           "p2_sass_infect",
-					           "p2_degree",
-					           "p2_description",
-					           "p2_location",
-					           "p2_actinomycetales",
-					           "p2_betweenness",
-					           "p2_corynebacterineae",
-					           "p2_chrom_location",
-					           "p2_eigen",
-					           "p2_h.sapiens",
-					           "p2_bacteria"
-					       ]
-				         },
-				         {
-				        	"id": "organism2",
-				        	"label":"Organism 2"
-				         },
-				         { "id":"unified_score",
-				           "label":"Score",
-				           "subcolumns":[
-					           "interolog_array",
-					           "domain",
-					           "neighborhood",
-					           "similarity",
-					           "txt_mining",
-					           "interlogs",
-					           "database_array",
-					           "knowledge",
-					           "microarray",
-					           "interolog_known",
-					           "fusion",
-					           "cooccurrence",
-					           "interologs",
-					           "known",
-					           "pdb",
-					           "experimental"
-					       ]
-				         }
-					],
+
 				"predefined_stylers":[	{
 						"id":"ruler",
 						"method":"applyRules3"
 					}, {
 						"id":"expression",
-						"method":"paintProteins"
+						"method":"paintCellProteins"
 					}
 				]
 			},
@@ -624,6 +519,34 @@
 				   			"object":"loader",
 				   			"event":"onFileRemoved",
 				   			"listener":"graph",
+				   			"method":"executeStylers",
+				   			"type":"init"
+				   		},
+				   		{	"source":"expression",
+				   			"object":"loader",
+				   			"event":"onFileLoaded",
+				   			"listener":"graph2",
+				   			"method":"executeStylers",
+				   			"type":"init"
+				   		},
+				   		{	"source":"expression",
+				   			"object":"loader",
+				   			"event":"onFileRemoved",
+				   			"listener":"graph2",
+				   			"method":"executeStylers",
+				   			"type":"init"
+				   		},
+				   		{	"source":"expression",
+				   			"object":"loader",
+				   			"event":"onFileLoaded",
+				   			"listener":"table",
+				   			"method":"executeStylers",
+				   			"type":"init"
+				   		},
+				   		{	"source":"expression",
+				   			"object":"loader",
+				   			"event":"onFileRemoved",
+				   			"listener":"table",
 				   			"method":"executeStylers",
 				   			"type":"init"
 				   		},

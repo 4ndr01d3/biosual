@@ -385,8 +385,8 @@
 						self.graph.hideLegend(selector);
 						break;
 				}
-				var affected = (selector=="")?0:self.graph.vis.selectAll(selector)[0].length;
-				self.manager.widgets["ruler"].ruler.setAffectedByRule(rule.id,affected);
+//				var affected = (selector=="")?0:self.graph.vis.selectAll(selector)[0].length;
+//				self.manager.widgets["ruler"].ruler.setAffectedByRule(rule.id,affected);
 			}
 		};
 		$.fn.ruler.applyRules3 = function(self){

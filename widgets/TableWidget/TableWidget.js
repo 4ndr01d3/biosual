@@ -10,6 +10,17 @@
 			$("#"+this.target).empty();
 			
 			var self=this;
+			
+			if (typeof self.columns =="undefined"){
+				modelrequester.done(function(p){
+					self.columns=model;
+					self.builtTable();
+				});
+			}else
+				self.builtTable();
+		},
+		builtTable:function() {
+			var self = this;
 			var html ='<div class="clear"></div><table cellpadding="0" cellspacing="0" border="0" class="display" id="'+self.target+'_table" width="100%">';
 				html +='	<thead>';
 				html +='		<tr>';
