@@ -185,7 +185,7 @@
 						}
 						break;
 					case "Show Label":
-						self.graph.showLegend(selector,self._getTypeLegend(rule.actionParameters[0]));
+						self.graph.showLegend(selector,rule.actionParameters[0]);
 						break;
 					case "Hide Label":
 						self.graph.hideLegend(selector);
@@ -484,8 +484,8 @@
 							}
 							break;
 						case model.target[0].conditions[2].name: // number of interactions
-							for (var i in self.ids){
-								var id= self.ids[i];
+							for (var pos in self.ids){
+								var id= self.ids[pos];
 								
 								var len = self.oTable.$('tr', {"filter": "applied"}).filter("[id *=\""+id+"\"]").length;
 								

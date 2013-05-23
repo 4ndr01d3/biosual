@@ -30,7 +30,7 @@
 		
 		{	"widget": "InvertedTabsWidget",
 			"parameters": {
-			"id": "tabs",
+				"id": "tabs",
 				"target": "tabs",
 				"tabs": [
 				     { "title": "Network",
@@ -66,6 +66,18 @@
 				"target": "graph",
 				"width":"1400",
 				"height":"600",
+				"fields":{
+					"p1":"protein1",
+					"p2":"protein2",
+					"organism1":"organism1",
+					"organism2":"organism2",
+					"score":"unified_score"
+				},
+				"prefixes":{
+					"p1":"p1_",
+					"p2":"p2_",
+					"score":""
+				},
 				"predefined_stylers":[	{
 						"id":"ruler",
 						"method":"applyRules"
@@ -213,23 +225,28 @@
 				"dynamicRuleField":[ 
 					{	"target": 0,
 						"condition":1,
-						"widget":"graph",
-						"parameter":"visibleProteins"
+						"widget":"requester",
+						"parameter":"ids"
 					},
 					{	"target": 1,
 						"condition":1,
-						"widget":"graph",
-						"parameter":"visibleProteins"
+						"widget":"requester",
+						"parameter":"ids"
 					},
 					{	"target": 1,
 						"condition":2,
-						"widget":"graph",
-						"parameter":"visibleProteins"
+						"widget":"requester",
+						"parameter":"ids"
 					},
 					{	"target": 0,
 						"condition":4,
-						"widget":"graph",
-						"parameter":"orderProteinFeatures"
+						"widget":"requester",
+						"parameter":"features"
+					},
+					{	"target": 0,
+						"action":7,
+						"widget":"requester",
+						"parameter":"features"
 					}
 				],
 				"rules": {
@@ -555,6 +572,13 @@
 				   			"event":"proteinClick",
 				   			"listener":"graph",
 				   			"method":"proteinClick",
+				   			"type":"afterRequest"
+				   		},
+				   		{	"source":"graph",
+				   			"object":"graph",
+				   			"event":"interactionClick",
+				   			"listener":"graph",
+				   			"method":"interactionClick",
 				   			"type":"afterRequest"
 				   		},
 				   		{	"source":"graph",

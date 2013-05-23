@@ -115,7 +115,13 @@
 			}
 			if (self.previousRequest!=null && self.previousRequest=="*:*")
 				self.afterRemove("*:*");
-			self.processJson( this.manager.response);
+			if (typeof self.columns =="undefined"){
+				modelrequester.done(function(p){
+					self.processJson( this.manager.response);
+				});
+			}else
+				self.processJson( this.manager.response);
+
 			self.responses.push(this.manager.response);
 
 			self.previousRequest=self.manager.store.get('q').val();

@@ -22,7 +22,10 @@
 			var self = this;
 		    for (var i in self.dynamicRuleField){
 		    	var drf = self.dynamicRuleField[i];
-		    	self.rules.target[drf.target].conditions[drf.condition].values=self.manager.widgets[drf.widget][drf.parameter];
+		    	if (typeof drf.condition != 'undefined')
+		    		self.rules.target[drf.target].conditions[drf.condition].values=self.manager.widgets[drf.widget][drf.parameter];
+		    	else if (typeof drf.action != 'undefined')
+		    		self.rules.target[drf.target].action[drf.action].options=self.manager.widgets[drf.widget][drf.parameter];
 		    }			
 		}
 	});

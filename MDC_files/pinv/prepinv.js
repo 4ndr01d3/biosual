@@ -17,7 +17,6 @@ var model=[],
 	prefix=["p1_",false,"p2_",false,""];
 
 var callback = function (response) {
-
 	for (var i=0;i<mainfields.length;i++) {
 		var subfields=[];
 		if (prefix[i]==="")
