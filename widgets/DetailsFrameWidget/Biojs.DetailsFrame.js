@@ -89,7 +89,7 @@ Biojs.DetailsFrame = Biojs.extend (
 			html += 	'		<div class="dragger" src="../../main/resources/css/images/draggable.png" ></div>';
 		html += 	'		<header class="protein-label" />';
 		html += 	'		<ul />';
-		$("#"+target).addClass("protein");
+		$("#"+target).addClass("floater");
 		$("#"+target).append(html);
 		self.updateFeatures();
 		if (self.opt.minizable)
@@ -105,7 +105,7 @@ Biojs.DetailsFrame = Biojs.extend (
 				}
 			});
 		if (self.opt.draggable){
-			$("#"+target).draggable({cursor:"move",cancel: "ul"});
+			$("#"+target).draggable({cursor:"move",handle: ".dragger"});
 		}
 	},
 

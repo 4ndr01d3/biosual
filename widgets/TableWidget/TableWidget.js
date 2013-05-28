@@ -7,10 +7,10 @@
 		ids:[],trIds:[],
 		
 		init: function () {
-			$("#"+this.target).empty();
-			
 			var self=this;
-			
+			self.fields=self.manager.widgets["requester"].fields;
+			self.prefixes=self.manager.widgets["requester"].prefixes;
+			$("#"+this.target).empty();
 			if (typeof self.columns =="undefined"){
 				modelrequester.done(function(p){
 					self.columns=model;
@@ -19,6 +19,7 @@
 			}else
 				self.builtTable();
 		},
+		
 		builtTable:function() {
 			var self = this;
 			var html ='<div class="clear"></div><table cellpadding="0" cellspacing="0" border="0" class="display" id="'+self.target+'_table" width="100%">';
@@ -117,7 +118,7 @@
 				self.afterRemove("*:*");
 			if (typeof self.columns =="undefined"){
 				modelrequester.done(function(p){
-					self.processJson( this.manager.response);
+					self.processJson( self.manager.response);
 				});
 			}else
 				self.processJson( this.manager.response);
@@ -131,7 +132,7 @@
 			for (var i = 0, l = json.response.docs.length; i < l; i++) {
 				var doc = json.response.docs[i];
 				var doc_array=[];
-				var id = "cell_"+doc.protein1+"_"+doc.protein2;
+				var id = "cell_"+doc[self.fields["p1"]]+"_"+doc[self.fields["p2"]];
 				if (self.trIds.indexOf(id)==-1)
 					self.trIds.push(id);
 				else

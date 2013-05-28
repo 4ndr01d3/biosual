@@ -55,15 +55,6 @@
 					window.open( img,"_blank","title=export.png;download=export.png");
 				}
 				
-//				var downloadLink = document.createElement("a");
-//				downloadLink.href = img;
-//				downloadLink.download = "pinv_export.png";
-//				downloadLink.title= "pinv_export.png";
-//				downloadLink.target ="_blank";
-//
-//				document.body.appendChild(downloadLink);
-//				downloadLink.click();
-//				document.body.removeChild(downloadLink);
 				document.body.removeChild(canvas);
 
 			});

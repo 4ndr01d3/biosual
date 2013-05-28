@@ -34,7 +34,6 @@
 				}
 			}
 			self.previousRequest=self.manager.store.get('q').val();
-			
 		}
 	});
 })(jQuery);

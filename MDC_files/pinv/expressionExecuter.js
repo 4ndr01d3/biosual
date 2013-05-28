@@ -15,6 +15,7 @@
 			}			
 			self.manager.widgets["graph"].graph.restart();
 		};
+		
 	  	$.fn.expression.paintCircleProteins = function(self){
 	  		var expW= self.manager.widgets["expression"];
 			if (expW.active==false) return;
@@ -27,9 +28,9 @@
 					var rgb = expW.loader.getRGBString(value);
 					self.manager.widgets["graph2"].graph.setFillColor("[id =figure_"+proteins[i].id+"]",rgb);
 				}
-			}			
-//			self.manager.widgets["graph2"].graph.restart();
+			}
 		};
+		
 	  	$.fn.expression.paintCellProteins = function(self){
 	  		var expW= self.manager.widgets["expression"];
 			if (expW.active==false) return;
@@ -42,8 +43,7 @@
 					var rgb = expW.loader.getRGBString(value);
 					self.manager.widgets["table"].paintCell("",".cell_protein1[content="+proteins[i]+"], .cell_protein2[content="+proteins[i]+"]",rgb);
 				}
-			}			
-//			self.manager.widgets["graph2"].graph.restart();
+			}
 		};
   });
 })(jQuery);

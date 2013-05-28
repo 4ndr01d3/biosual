@@ -5,11 +5,14 @@
 		selected:null,
 		lastClick:0,
 		visibleProteins:[],
-
 		
 		init: function () {
 			var self =this;
 			$("#"+this.target).empty();
+			self.fields=self.manager.widgets["requester"].fields;
+			self.prefixes=self.manager.widgets["requester"].prefixes;
+
+
 			self.graph = new Biojs.InteractionsD3({
 				target: self.target,
 				radius: 10,
@@ -63,8 +66,8 @@
 			self.previousRequest=self.manager.store.get('q').val();
 			self.visibleProteins = Object.keys(self.graph.proteinsA);
 			self.executeStylers();
-			
 		},	
+
 		addProtein:function(doc,id,prefix,orgfield,singleProt){
 			var self = this;
 			var queried=this.manager.response.responseHeader.params.q;

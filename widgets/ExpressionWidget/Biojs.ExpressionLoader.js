@@ -53,6 +53,7 @@ Biojs.ExpressionLoader = Biojs.extend (
 			var self 	= this;
 			if (window.File && window.FileReader && window.FileList && window.Blob) {
 				$("#"+self.opt.target).html('<input type="file" name="files[]" class="button-link" /><div class="fake-file">'+self.opt.label+'</div><br/><output></output>');
+				$("#"+self.opt.target).addClass("expressionloader");
 				$("#"+self.opt.target+' .fake-file').click(function(){
 					$("#"+self.opt.target+" .button-link").click();
 				});

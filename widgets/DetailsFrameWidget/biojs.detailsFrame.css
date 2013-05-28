@@ -1,15 +1,15 @@
-.protein ::-webkit-scrollbar {
+.floater ::-webkit-scrollbar {
     width: 12px;
 }
-.protein ::-webkit-scrollbar-track {
+.floater ::-webkit-scrollbar-track {
     -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); 
     border-radius: 10px;
 }
-.protein ::-webkit-scrollbar-thumb {
+.floater ::-webkit-scrollbar-thumb {
     border-radius: 10px;
     -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5); 
 }
-.protein{
+.floater{
 	font-family: "Helvetica Neue", Helvetica, sans-serif;
 	display: inline-block;
 	position: relative;
@@ -34,8 +34,9 @@ header.protein-label {
 	letter-spacing: .8px;
 	text-align: center;
 	padding-bottom: 0px;
+	
 }
-.protein ul {
+.floater ul {
 	line-height: 150%;
 	list-style: none;
 	text-align: left;
@@ -45,17 +46,17 @@ header.protein-label {
     overflow: auto;
 }
 
-.protein li {
+.floater li {
 	padding: 0px;
 	display: block;
 	margin: 0 auto 0 auto;
 	color: gray;
 }
-.protein .protein-description{
+.floater .protein-description{
 	text-align: center;
 	margin: 0 0 0 auto;
 }
-.protein .protein-description h2 {
+.floater .protein-description h2 {
 	font-weight: normal;
 	font-variant: normal;
 	font-style:italic;
@@ -69,15 +70,15 @@ header.protein-label {
 	border-bottom: 1px dotted gray;
 	zoom: 1;
 }
-.to_minimize{
+.floater .to_minimize{
 	background-image:url('images/arrowAR.png');
 	background-repeat: no-repeat;
 }
-.minimized{
+.floater .minimized{
 	background-image:url('images/arrowDL.png');
 	background-repeat: no-repeat;
 }
-.minimize{
+.floater .minimize{
     float: right;
     position:relative; 
     top: 5px; 
@@ -85,10 +86,10 @@ header.protein-label {
     width:20px;
     height: 20px;
 }
-.minimize:hover{
+.floater .minimize:hover{
 	cursor: pointer;
 }
-.dragger{
+.floater .dragger{
 	background-image:url('images/draggable.png');
 	background-repeat: no-repeat;
     width:20px;
@@ -98,6 +99,6 @@ header.protein-label {
     top: 5px; 
     left: 5px; 
 }
-.dragger:hover{
+.floater .dragger:hover{
 	cursor: move;
 }

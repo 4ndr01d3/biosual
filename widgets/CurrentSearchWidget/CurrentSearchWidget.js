@@ -2,7 +2,7 @@
 
 AjaxSolr.CurrentSearchWidget = AjaxSolr.AbstractWidget.extend({
   start: 0,
-//self.manager.widgets["currentsearch"].afterRequest();
+
   afterRemove: function (facet) {
 	  var self=this;
 	  self.afterRequest();
@@ -15,13 +15,13 @@ AjaxSolr.CurrentSearchWidget = AjaxSolr.AbstractWidget.extend({
     if (qs.length>0) {
 		for (var i = 0, l = qs.length; i < l; i++) {
 			links.push($('<a href="#"  />').html(' <img src="../../images/delete.png" />').click(
-					self.manager.widgets["requester"].removeQuery(qs[i])
-					));
+				self.manager.widgets["requester"].removeQuery(qs[i])
+			));
 		}
 		if (links.length > 1) {
 			links.push($('<a href="#"/>').text('remove all').click(
-					self.manager.widgets["requester"].removeAll()
-					));
+				self.manager.widgets["requester"].removeAll()
+			));
 		}
 		$(this.target+" .items").empty();
 		for (var i = 0, l = links.length; i < l; i++) {
@@ -30,17 +30,12 @@ AjaxSolr.CurrentSearchWidget = AjaxSolr.AbstractWidget.extend({
 				item.append(qs[i]);
 				var num = self.manager.widgets["requester"].getNumberOfResponsesPerQuery(qs[i]);
 				if (num!=null) item.append(' ('+num+')');
-				
-				//var color = self.manager.widgets["graph"].getColor(i);
-				//item.append(" <span style='background-color: "+color+"; color: "+color+";'>__</span> ");
 			}
 			item.append(links[i]);
 		}
-
 	} else {
 		$(this.target+" .items").html('<div class="item">'+this.label_all+'</div>');
 	}
-
   }
 });
 

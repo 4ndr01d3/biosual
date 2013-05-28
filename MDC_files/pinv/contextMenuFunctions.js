@@ -6,11 +6,16 @@
 		$.fn.context ={};
 		$.fn.context.interactions = function(t){
 			var protein= t.id.substr(5);
-			Manager.widgets["requester"].request([ protein ],"interactions");
+			Manager.widgets["requester"].request([ protein ],Manager.widgets["requester"].basic);
 		};
 		$.fn.context.hideProtein = function(t){
 			var protein= t.id.substr(5);
 			var rule= {location:"Current Graphic",action:{name:"Hide",type:"single"},target:"Proteins",condition:"accession number",parameters:["equals",protein]};
+			Manager.widgets["ruler"].ruler.addActiveRule(rule);
+		};
+		$.fn.context.hideInteractions = function(t){
+			var protein= t.id.substr(5);
+			var rule= {location:"Current Graphic",action:{name:"Hide",type:"single"},target:"Interactions",condition:"protein",parameters:[protein]};
 			Manager.widgets["ruler"].ruler.addActiveRule(rule);
 		};
 		$.fn.context.label = function(t){
@@ -41,11 +46,16 @@
 		$.fn.context2 ={};
 		$.fn.context2.interactions = function(t){
 			var protein= t.id.substr(5);
-			Manager.widgets["requester"].request([ protein ],"interactions");
+			Manager.widgets["requester"].request([ protein ],Manager.widgets["requester"].basic);
 		};
 		$.fn.context2.hideProtein = function(t){
 			var protein= t.id.substr(5);
 			var rule= {location:"Current Graphic",action:{name:"Hide",type:"single"},target:"Proteins",condition:"accession number",parameters:["equals",protein]};
+			Manager.widgets["ruler"].ruler.addActiveRule(rule);
+		};
+		$.fn.context2.hideInteractions = function(t){
+			var protein= t.id.substr(5);
+			var rule= {location:"Current Graphic",action:{name:"Hide",type:"single"},target:"Interactions",condition:"protein",parameters:[protein]};
 			Manager.widgets["ruler"].ruler.addActiveRule(rule);
 		};
 		$.fn.context2.label = function(t){

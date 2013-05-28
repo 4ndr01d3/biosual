@@ -40,13 +40,13 @@
 	background-repeat: no-repeat;
 	background-position: 10px 4px; 
 }
-.rule {
+.ruler .rule {
 	width:80%;
 }
-.rights {
+.ruler .rights {
 	text-align:right;
 }
-.affected {
+.ruler .affected {
 	width:9%;
 	text-align:center;
 	font-size: 70%;
@@ -57,20 +57,20 @@
 	-moz-border-radius: .5em;
 	text-align:right;
 }
-table {
+.ruler table {
 	width:100%
 }
-.rule_item{
+.ruler .rule_item{
 	list-style-type: none;
 }
-.rule_item td {
+.ruler .rule_item td {
 	background: transparent;
 	border: 0px;
 }
-.rule_item table{
+.ruler .rule_item table{
 	margin: 0px;
 }
-.action {
+.ruler .action {
 	width:9%;
 	text-align:center;
 	font-size: 85%;
@@ -81,16 +81,16 @@ table {
 	-moz-border-radius: 7px;
 	-webkit-box-shadow: rgba(0, 0, 128, 0.246094) 2px 2px 1px;
 }
-.action:active {
+.ruler .action:active {
 	background-color: #F3F3F3;
 	-webkit-box-shadow: rgba(0, 0, 128, 0.246094) -2px -2px 1px;
 		
 }
-.action:hover {
+.ruler .action:hover {
 	font-weight:bold;
 	cursor: pointer;
 }
-.styled-select {
+.ruler .styled-select {
 	background-color: transparent;
 	font-family:Helvetica, Arial, sans-serif;
 	font-size: 12px;
@@ -99,18 +99,18 @@ table {
 	overflow: hidden;
 	-webkit-appearance: none;
 }
-.styled-select:hover {
+.ruler .styled-select:hover {
 	cursor: pointer;
 }
-.add_rule {
+.ruler .add_rule {
 	text-align:right;
 	margin-top:10px;
 	text-decoration: underline;
 }
-.add_rule a{
+.ruler .add_rule a{
 	font-weight:bold;
 }
-.add_rule a:hover {
+.ruler .add_rule a:hover {
 	color: #898;
 	cursor: pointer;
 }

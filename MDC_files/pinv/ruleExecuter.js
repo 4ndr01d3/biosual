@@ -2,10 +2,9 @@
   $(function () {
 	  	$.fn.ruler={};
 		$.fn.ruler.applyRules = function(self){
-//			var self =this;
+
 			var rules = Manager.widgets["ruler"].ruler.getActiveRules();
 			var model = Manager.widgets["ruler"].rules;
-			//Reseting the graph 
 
 			var selector ="";
 			for (var i=0;i<rules.length;i++){
@@ -108,7 +107,7 @@
 							var links= self.graph.force.links();
 							for (var j in links){
 								var link = links[j];
-								var score=link.doc["unified_score"];
+								var score=link.doc[self.fields["score"]];
 								switch (rule.parameters[0]){
 									case "==":
 										if (1*score==1*rule.parameters[1])
@@ -169,20 +168,10 @@
 					case "Color By":
 					case "Border By":
 						var type = (rule.action.name=="Color By")?"color":"border";
-						switch(rule.actionParameters[0]){
-							case "Protein Queried":
-								self.colorBySeed(self,selector,type);
-								break;
-							case "Functional Class":
-								self.colorByFeature(self,"funct_class",selector,type);
-								break;
-							case "Gene Name":
-								self.colorByFeature(self,"gene_name",selector,type);
-								break;
-							case "Organism":
-								self.colorByFeature(self,"organism",selector,type);
-								break;
-						}
+						if (rule.actionParameters[0]=="Protein Queried")
+							self.colorBySeed(self,selector,type);
+						else
+							self.colorByFeature(self,rule.actionParameters[0],selector,type);
 						break;
 					case "Show Label":
 						self.graph.showLegend(selector,rule.actionParameters[0]);
@@ -196,10 +185,8 @@
 			}
 		};	  	
 		$.fn.ruler.applyRules2 = function(self){
-//			var self =this;
 			var rules = Manager.widgets["ruler"].ruler.getActiveRules();
 			var model = Manager.widgets["ruler"].rules;
-			//Reseting the graph 
 
 			var selector ="";
 			for (var i=0;i<rules.length;i++){
@@ -302,7 +289,8 @@
 							var links= self.graph.interactions;
 							for (var j in links){
 								var link = links[j];
-								var score=link.doc["unified_score"];
+								var score=link.doc[self.fields["score"]];
+
 								switch (rule.parameters[0]){
 									case "==":
 										if (1*score==1*rule.parameters[1])
@@ -363,30 +351,18 @@
 					case "Color By":
 					case "Border By":
 						var type = (rule.action.name=="Color By")?"color":"border";
-						switch(rule.actionParameters[0]){
-							case "Protein Queried":
-								self.colorBySeed(self,selector,type);
-								break;
-							case "Functional Class":
-								self.colorByFeature(self,"funct_class",selector,type);
-								break;
-							case "Gene Name":
-								self.colorByFeature(self,"gene_name",selector,type);
-								break;
-							case "Organism":
-								self.colorByFeature(self,"organism",selector,type);
-								break;
-						}
+						if (rule.actionParameters[0]=="Protein Queried")
+							self.colorBySeed(self,selector,type);
+						else
+							self.colorByFeature(self,rule.actionParameters[0],selector,type);
 						break;
 					case "Show Label":
-						self.graph.showLegend(selector,self._getTypeLegend(rule.actionParameters[0]));
+						self.graph.showLegend(selector,rule.actionParameters[0]);
 						break;
 					case "Hide Label":
 						self.graph.hideLegend(selector);
 						break;
 				}
-//				var affected = (selector=="")?0:self.graph.vis.selectAll(selector)[0].length;
-//				self.manager.widgets["ruler"].ruler.setAffectedByRule(rule.id,affected);
 			}
 		};
 		$.fn.ruler.applyRules3 = function(self){
@@ -403,7 +379,7 @@
 							selectorTD = ".cell_protein1, .cell_protein2";
 							break;
 						case model.target[0].conditions[1].name: // interactions with
-							selectorTR = "tr[id*="+rule.parameters[0]+"], tr[id*="+rule.parameters[0]+"]"
+							selectorTR = "tr[id*="+rule.parameters[0]+"], tr[id*="+rule.parameters[0]+"]";
 							selectorTD = ".cell_protein1, .cell_protein2";
 							break;
 						case model.target[0].conditions[4].name: // features
@@ -534,20 +510,10 @@
 						case "Color By":
 						case "Border By":
 							var type = (rule.action.name=="Color By")?"color":"border";
-							switch(rule.actionParameters[0]){
-								case "Protein Queried":
-									self.colorBySeed(selectorTR,selectorTD,type);
-									break;
-								case "Functional Class":
-									self.colorByFeature(selectorTR,selectorTD,"funct_class",type);
-									break;
-								case "Gene Name":
-									self.colorByFeature(selectorTR,selectorTD,"gene_name",type);
-									break;
-								case "Organism":
-									self.colorByFeature(selectorTR,selectorTD,"organism",type);
-									break;
-							}
+							if (rule.actionParameters[0]=="Protein Queried")
+								self.colorBySeed(selectorTR,selectorTD,type);
+							else
+								self.colorByFeature(selectorTR,selectorTD,rule.actionParameters[0],type);
 							break;
 					}
 				} else if (rule.target==model.target[1].name) { //Interactions
@@ -567,7 +533,7 @@
 								var node = self.trIds[j];
 								
 								var doc= self.oTable.$('tr', {"filter": "applied"}).filter("#"+node).data("doc");
-								var score=doc.unified_score;
+								var score=doc[self.fields["score"]];
 								if (score!="" && score!="-" ){
 									score=score*1.0;
 									switch (rule.parameters[0]){

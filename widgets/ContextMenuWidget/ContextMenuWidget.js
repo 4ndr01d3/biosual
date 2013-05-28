@@ -33,7 +33,6 @@
 				itemStyle:self.itemStyle,
 				itemHoverStyle:self.itemHoverStyle,
 			});
-			
 		}
 	});
 })(jQuery);

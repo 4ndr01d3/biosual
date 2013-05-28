@@ -24,7 +24,23 @@
 		
 		{	"widget": "ProteinAjaxRequesterWidget",
 			"parameters": {
-				"id": "requester"
+				"id": "requester",
+				"fields":{
+					"p1":"protein1",
+					"p2":"protein2",
+					"organism1":"organism1",
+					"organism2":"organism2",
+					"score":"unified_score"
+				},
+				"prefixes":{
+					"p1":"p1_",
+					"p2":"p2_",
+					"score":""
+				},
+				"queries":{
+					"basic":"interactions",
+					"filter":"protein"
+				}
 			}
 		},
 		
@@ -66,18 +82,6 @@
 				"target": "graph",
 				"width":"1400",
 				"height":"600",
-				"fields":{
-					"p1":"protein1",
-					"p2":"protein2",
-					"organism1":"organism1",
-					"organism2":"organism2",
-					"score":"unified_score"
-				},
-				"prefixes":{
-					"p1":"p1_",
-					"p2":"p2_",
-					"score":""
-				},
 				"predefined_stylers":[	{
 						"id":"ruler",
 						"method":"applyRules"
@@ -124,13 +128,34 @@
 				"css": "path.arc {  fill: #fff;}  .node {  font-size: 10px;}  .node:hover {  fill: #1f77b4;}  .link {  fill: none;  stroke: #1f77b4;  stroke-opacity: .4;  pointer-events: none;}  .link.source,   .link.target {  stroke-opacity: 1;  stroke-width: 2px;}  .node.target {  fill: #d62728 !important;}  .link.source {  stroke: #d62728;}  .node.source {  fill: #2ca02c;}  .link.target {  stroke: #2ca02c;}  .figure { fill: #46D;}  .legend {  stroke: transparent;  pointer-events: none;}"
 			}
 		},
+		{	"widget": "FewOptionsWidget",
+			"parameters": {
+			"id": "size",
+				"target": "size",
+				"options": [
+				     { "title": "1400x600", "selected":true  },
+				     { "title": "1200x600", "selected":false },
+				     { "title": "1000x600", "selected":false },
+				     { "title": "800x600",  "selected":false },
+				     { "title": "1400x800", "selected":false },
+				     { "title": "1200x800", "selected":false },
+				     { "title": "1000x800", "selected":false },
+				     { "title": "800x800",  "selected":false }
+				],
+				"trigger":[
+				    { "widget":"graph",  "method":"setSize" },
+					{ "widget":"graph2", "method":"setSize" }
+				]
+			},
+			"templateTarget":"center",
+			"tags":{"id":"size"}
+		},
 		{	"widget": "TableWidget",
 			"parameters": {
 			"id": "table",
 				"target": "table",
 				"width":"1400",
 				"height":"600",
-
 				"predefined_stylers":[	{
 						"id":"ruler",
 						"method":"applyRules3"
@@ -143,50 +168,6 @@
 			"templateTarget":"center",
 			"tags":{"id":"table"}
 		},
-		{	"widget": "FewOptionsWidget",
-			"parameters": {
-			"id": "size",
-				"target": "size",
-				"options": [
-				     { "title": "1400x600",
-					       "selected":true
-				     },
-				     { "title": "1200x600",
-				       "selected":false
-				     },
-				     { "title": "1000x600",
-					       "selected":false
-					 },
-				     { "title": "800x600",
-					       "selected":false
-					 },
-				     { "title": "1400x800",
-					       "selected":false
-				     },
-				     { "title": "1200x800",
-				       "selected":false
-				     },
-				     { "title": "1000x800",
-					       "selected":false
-					 },
-				     { "title": "800x800",
-					       "selected":false
-					 }
-				],
-				"trigger":[
-				    {
-						"widget":"graph",
-						"method":"setSize"
-					},
-					{
-						"widget":"graph2",
-						"method":"setSize"
-					}
-					]
-			},
-			"templateTarget":"center",
-			"tags":{"id":"size"}
-		},
 		
 		{	"widget": "AutocompleteWidget",
 			"parameters": {
@@ -198,11 +179,7 @@
 				],
 				"multiple":true,
 				"facet":"value",
-				"checkbox":"Include all interactions",
-				"queries":{
-					"basic":"interactions",
-					"filter":"protein"
-				}
+				"checkbox":"Include all interactions"
 			},
 			"templateTarget":"left",
 			"tags":{"title":"Proteins","subtitle":"(press ESC to close suggestions)","id":"search"}
@@ -242,6 +219,18 @@
 						"condition":4,
 						"widget":"requester",
 						"parameter":"features"
+					},
+					{	"target": 0,
+						"action":5,
+						"widget":"requester",
+						"parameter":"features",
+						"otherValues":["Protein Queried","organism"]
+					},
+					{	"target": 0,
+						"action":6,
+						"widget":"requester",
+						"parameter":"features",
+						"otherValues":["Protein Queried","organism"]
 					},
 					{	"target": 0,
 						"action":7,
@@ -328,38 +317,18 @@
 				"id": "context",
 				"target": "body",
 				"triggerer":".graphNetwork .node",
-				"menuStyle": {
-					"width": "150px"
-				},
-				"itemStyle": {
-					"font-size": "0.7em"
-				},
-				"itemHoverStyle": {
-					"font-size": "0.8em"
-				},
+				"menuStyle": 		{"width" :		"150px"},
+				"itemStyle": 		{"font-size" :	"0.7em"},
+				"itemHoverStyle" : 	{"font-size":	"0.8em"},
 				"menu": {
-					"interactions":{
-						"label":"Get Interactions"
-					},
-					"hideProtein":{
-						"label":"Hide"
-					},
-					"label":{
-						"label":"Show/Hide Label"
-					},
-					"lock":{
-						"label":"Release"
-					},
-					"highlight":{
-						"label":"Highlight"
-					},
-					"highlight_p":{
-						"label":"Highlight Interactors"
-					},
-					"highlight_i":{
-						"label":"Highlight Interactions"
-					}
-		
+					"interactions" :	{ "label":	"Get Interactions"},
+					"hideProtein" :		{ "label":	"Hide"},
+					"hideInteractions":	{ "label":	"Hide Interactions"},
+					"label" :			{ "label":	"Show/Hide Label"},
+					"lock" :			{ "label":"Release"},
+					"highlight" :		{ "label":"Highlight"},
+					"highlight_p" :		{ "label":"Highlight Interactors"},
+					"highlight_i" :		{ "label":"Highlight Interactions"}
 				}
 			}
 		},
@@ -368,35 +337,17 @@
 				"id": "context2",
 				"target": "body",
 				"triggerer":".graphCircle .node",
-				"menuStyle": {
-					"width": "150px"
-				},
-				"itemStyle": {
-					"font-size": "0.7em"
-				},
-				"itemHoverStyle": {
-					"font-size": "0.8em"
-				},
+				"menuStyle":		{"width": "150px"},
+				"itemStyle":		{"font-size": "0.7em"},
+				"itemHoverStyle":	{"font-size": "0.8em"},
 				"menu": {
-					"interactions":{
-						"label":"Get Interactions"
-					},
-					"hideProtein":{
-						"label":"Hide"
-					},
-					"label":{
-						"label":"Show/Hide Label"
-					},
-					"highlight":{
-						"label":"Highlight"
-					},
-					"highlight_p":{
-						"label":"Highlight Interactors"
-					},
-					"highlight_i":{
-						"label":"Highlight Interactions"
-					}
-		
+					"interactions":		{"label":	"Get Interactions"},
+					"hideProtein":		{"label":	"Hide"},
+					"hideInteractions":	{ "label":	"Hide Interactions"},
+					"label":			{"label":	"Show/Hide Label"},
+					"highlight":		{"label":	"Highlight"},
+					"highlight_p":		{"label":	"Highlight Interactors"},
+					"highlight_i":		{"label":	"Highlight Interactions"}
 				}
 			}
 		},
@@ -414,6 +365,7 @@
 			"parameters": {
 				"id": "info",
 				"target": "info",
+				"locations":["protein.features","interaction.doc"],
 				"defeultText": "Selection Empty",
 				"positionTarget": "ruler",
 				"myPosition":"right bottom",
@@ -588,6 +540,13 @@
 				   			"method":"fillDetails",
 				   			"type":"afterRequest"
 				   		},
+				   		{	"source":"graph",
+				   			"object":"graph",
+				   			"event":"interactionClick",
+				   			"listener":"info",
+				   			"method":"fillDetails",
+				   			"type":"afterRequest"
+				   		},
 				   		{	"source":"graph2",
 				   			"object":"graph",
 				   			"event":"proteinClick",
@@ -614,6 +573,13 @@
 				   			"event":"proteinMouseOut",
 				   			"listener":"graph2",
 				   			"method":"outOfProtein",
+				   			"type":"afterRequest"
+				   		},
+				   		{	"source":"graph2",
+				   			"object":"graph",
+				   			"event":"interactionClick",
+				   			"listener":"graph2",
+				   			"method":"interactionClick",
 				   			"type":"afterRequest"
 				   		},
 				   		{	"source":"graph2",

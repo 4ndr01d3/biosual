@@ -4,22 +4,22 @@
 .ui-dialog td, .ui-dialog th {
 	background-color:white; text-align:center;
 }
-.button-link { 
+.expressionloader .button-link { 
 	display:none;
 }
-.fake-file{
+.expressionloader .fake-file{
 	padding-left:32px;
 	padding-top:16px;
 	vertical-align:middle;
 	background-image:url('images/open-exp.png');
 }
-.exp-edit{
+.expressionloader .exp-edit{
 	background-image:url('images/pencil-exp.png');
 }
-.exp-remove{
+.expressionloader .exp-remove{
 	background-image:url('images/off-exp.png');
 }
-.fake-file, .exp-edit , .exp-remove{ 
+.expressionloader .fake-file, .expressionloader .exp-edit , .exp-remove{ 
 	min-width:32px;
 	height:32px;
 	background-repeat: no-repeat;
@@ -29,17 +29,17 @@
 	text-decoration: underline;
 	font-size: 75%;
 }
-.fake-file:hover, .exp-edit:hover, .exp-remove:hover  {
+.expressionloader .fake-file:hover, .expressionloader .exp-edit:hover, .expressionloader .exp-remove:hover  {
 	cursor: pointer;
 	font-weight:bold;
 	background-color: #FDD;
 }
-output {
+.expressionloader output {
 	text-decoration: none;
 	font-size: 75%;
 	color: #F55;
 }
-label[for=color] {
+.expressionloader label[for=color] {
 	font-size: 75%;
 	text-decoration: none;
 	padding-top: 10px;

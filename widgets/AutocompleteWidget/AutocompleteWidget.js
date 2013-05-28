@@ -1,8 +1,10 @@
 (function ($) {
 	AjaxSolr.AutocompleteWidget = AjaxSolr.AbstractTextWidget.extend({
 		init: function () {
+			var self = this;
 			var mult=false;
 			var type='input';
+			self.queries=self.manager.widgets["requester"].queries;
 			if (typeof this.multiple=="undefined" || this.multiple==false){
 				$(this.target).append('        <input type="text" id="query" name="query" />');
 			}else if (this.multiple==true){
@@ -18,7 +20,6 @@
 			}
 			$(this.target).find(type).unbind().removeData('events').val('');
 
-			var self = this;
 
 			var callback = function (response) {
 				var list = [];

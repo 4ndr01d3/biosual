@@ -750,10 +750,10 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 				d.typeLegend=typeLegend;
 				if (d.typeLegend=="id") 
 					return d.id;
-				else if (d.typeLegend.indexOf("features.")==0)
-					return d.features[d.typeLegend.substr(9)];
+//				else if (d.typeLegend.indexOf("features.")==0)
+//					return d.features[d.typeLegend.substr(9)];
 				else
-					return d[d.typeLegend];
+					return d.features[d.typeLegend];
 				});
 //			self.restart();
 		}, 

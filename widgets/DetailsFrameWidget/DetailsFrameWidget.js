@@ -3,14 +3,13 @@
 		info:null,
 		selected:null,
 		lastClick:0,
+
 		init: function(){
 			var self = this;
-			
 			self.info = new Biojs.DetailsFrame({
 				target: self.target,
 				features: {id:self.defeultText}
 			});
-			
 			if (typeof self.positionTarget != "undefined") {
 				$("#"+self.target).position({
 					of: $("#"+self.positionTarget),
@@ -25,25 +24,34 @@
 			if (newClick-self.lastClick<300)
 				return;
 			self.lastClick=newClick;
-			if (d.protein.name==self.selected){
+			var obj=false;
+			
+			if (typeof self.locations!="undefined") 
+				for (var i=0;i<self.locations.length;i++){
+					obj=self.extractFromLocation(d, self.locations[i]);
+					if (obj !== false)
+						break;
+				}
+			
+			if (obj==false || obj.id==self.selected){
 				self.info.updateFeatures({id:self.defeultText});
 				self.selected=null;
 			}else{
-				self.info.updateFeatures(d.protein.features);//,self.orderProteinFeatures);
-				self.selected=d.protein.name;
+				self.info.updateFeatures(obj);//,self.orderProteinFeatures);
+				self.selected=obj.id;
 			}
 		},
-		afterRequest: function(){
-		    for (var i in events){
-		    	var event = events[i];
-		    	if (event.type=="afterRequest")
-			    	Manager.widgets[event.source][event.object][event.event](function(event){
-			    			return function( objEvent ) {
-			    				Manager.widgets[event.listener][event.method](objEvent);
-			    			};
-					}(event)); 
-		    	
-		    }			
+		extractFromLocation: function(object,location){
+			var parts = location.split(".");
+			var objtemp=object;
+			for (var i=0;i<parts.length;i++){
+				var part=parts[i];
+				if (typeof objtemp[part]=="undefined")
+					return false;
+				else
+					objtemp=objtemp[part];
+			}
+			return objtemp;
 		}
 	});
 })(jQuery);
