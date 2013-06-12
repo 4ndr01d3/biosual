@@ -29,6 +29,7 @@ class Widget {
 	
 	function getJavaScriptText(){
 		$path="widgets/".$this->id."/".$this->js;
+		echo "//PATH: ".$path;
 		if (file_exists($path)){
 			return getFile($path);
 		}

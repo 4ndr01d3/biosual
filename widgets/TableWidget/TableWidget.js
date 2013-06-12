@@ -148,8 +148,8 @@
 				self.oTable.fnAddData( doc_array,false);
 				var ntr = self.oTable.fnSettings().aoData.slice(-1)[0].nTr;
 				$(ntr).attr("id",id);
-				$(ntr.children).filter(".cell_protein1").attr( "content", $(ntr.children).filter(".cell_protein1").text());
-				$(ntr.children).filter(".cell_protein2").attr( "content", $(ntr.children).filter(".cell_protein2").text());
+				$(ntr.children).filter(".cell_"+self.columns[0].id).attr( "content", $(ntr.children).filter(".cell"+self.columns[0].id).text());
+				$(ntr.children).filter(".cell_"+self.columns[2].id).attr( "content", $(ntr.children).filter(".cell_"+self.columns[2].id).text());
 				$(ntr).data("doc",doc);
 			}			
 			self.oTable.fnDraw();
@@ -266,7 +266,7 @@
 			for (var i=0;i<self.ids.length;i++){
 				//ignoring the scores that have id and have a '.'
 				var trs=[];
-				if (self.ids[i].indexOf(".")==-1) trs= self.oTable.$('tr', {"filter": "applied"}).filter("[id*="+self.ids[i]+"]");
+				if (self.ids[i].indexOf(".")==-1) trs= self.oTable.$('tr', {"filter": "applied"}).filter("[id*='"+self.ids[i]+"']");
 				if (trs.length>0){
 					var doc = $(trs[0]).data("doc");
 					var c=""; 

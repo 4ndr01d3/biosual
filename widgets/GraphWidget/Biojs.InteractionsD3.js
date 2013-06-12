@@ -86,8 +86,10 @@ Biojs.InteractionsD3 = Biojs.extend (
 			
 			self.color = function() {
 			    return d3.scale.ordinal().range(self.colors);
-			  }();
-			
+			}();
+			self.color2 = function() {
+			    return d3.scale.ordinal().range(self.colors);
+			}();
 			self.vis = d3.select("#"+self.opt.target).append("svg")
 			    .attr("width", width)
 			    .attr("height", height)
@@ -597,16 +599,106 @@ Biojs.InteractionsD3 = Biojs.extend (
 					else
 						return d[d.typeLegend];
 					})
-				.attr("stroke","#901")
-				.style("font-size", self.opt.radius+"px")
-				.attr("stroke-width","0")
 				.attr("visibility",function(d) { return (d.showLegend)?"visible":"hidden";})
 				.attr("transform",function(d) {
 					return (self.organisms[d.organism] == 0)?"translate(-"+(self.opt.radius*1.9)+","+(self.opt.radius*0.4)+")":"translate(-"+(self.opt.radius*0.9)+","+(self.opt.radius*1.3)+")";
 				});
 
 			nodes.exit().remove();
-		    
+			
+			self.vis.selectAll(".legendBlock").remove();
+			if (typeof self.legends!="undefined" && self.legends!=null)
+				self._paintLegends();
+		},
+		_sortLegends:function(){
+			var self = this;
+			self.legends.sort(function(a,b){
+				if (a[1]==b[1]){
+					if (a[0]=="label") return -1;
+					if (b[0]=="label") return 1;
+				}else if (a[1]>b[1]){
+					return -1;
+				}else
+					return 1;
+				return 0;
+			});
+		},
+		_paintLegend:function(legend,type){
+			var self = this;
+			legend.filter(function(d) { return d[0]== "label" && d[1]==type; }).append("text")
+				.attr("x", self.opt.width - 6)
+				.attr("y", 7)
+				.attr("dy", ".35em")
+				.style("text-anchor", "end")
+				.style("font-size", "1.2em")
+				.text(type+":");
+			
+			legend.filter(function(d) { return d[0]!="label" && d[1]==type; }).append("rect")
+				.attr("x", self.opt.width - 18) 
+				.attr("width", 13)
+				.attr("height", 13)
+				.style("fill", function(d,i) {
+					if (typeof d[2]== "undefined")
+						return self.color(i);
+					return d[2];
+				});
+			legend.filter(function(d) { return d[0]!="label" && d[1]== type; }).append("text")
+				.attr("x", self.opt.width - 24)
+				.attr("y", 7)
+				.attr("dy", ".35em")
+				.style("text-anchor", "end")
+				.text(function(d) { return d[0]; });
+		},
+		_paintLegends: function(){
+			var self = this;
+			var w=18 + self.longestLegend*7 + 10;
+			var legendBlock = self.vis.insert("g",".link")
+				.attr("class", "legendBlock");
+			self._sortLegends();
+			legendBlock.append("rect")
+				.attr("x", self.opt.width -w)
+				.attr("height", 6 + self.legends.length *16)
+				.attr("width", w)
+				.style("fill", "#ddd")
+				.style("fill-opacity","0.4");
+
+			var legend = legendBlock.selectAll(".mainLegend") 
+				.data(self.legends)
+				.enter().insert("g")
+				.attr("class", "mainLegend")
+				.attr("transform", function(d, i) { return "translate(0," + (3 + i * 16) + ")"; });
+			for (var i=0; i< self.legendTypes.length; i++)
+				self._paintLegend(legend,self.legendTypes[i]);
+
+		},
+		longestLegend:4,
+		legendTypes:[],
+		addLegends:function(legends,type,color){
+			var self = this;
+			if (self.legends==null) self.legends=[],self.legendTypes=[];
+			
+			if (legends==null) {
+				self.legends = null;
+				self.legendTypes=[];
+				self.longestLegend=4;
+				return;
+			}
+			if (self.legendTypes.indexOf(type)==-1) {
+				self.legends.push(["label",type]);
+				self.legendTypes.push(type);
+				if (type.length>self.longestLegend)
+					self.longestLegend=type.length;
+			}
+			
+			for (var i=0;i<legends.length;i++){
+				if (typeof color=="undefined")
+					self.legends.push([legends[i],type]);
+				else
+					self.legends.push([legends[i],type,color]);
+				
+				if (legends[i].length>self.longestLegend)
+					self.longestLegend=legends[i].length;
+			}
 		},
 		/**
 		 * Hides the elements on the graphic that match the selector. 

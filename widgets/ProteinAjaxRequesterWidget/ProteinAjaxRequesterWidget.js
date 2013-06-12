@@ -5,12 +5,15 @@
 		numOfInteracts:{},
 		previousRequest:null,ids:[],responses:[],
 		features:["id"],
+		scores:[],
 		init:function(){
 			var self = this;
 			modelrequester.done(function(p){
 				for (var i=0;i<model[0].subcolumns.length;i++){
 					self.features.push(model[0].subcolumns[i].substring(prefix[0].length));
 				}
+				
+				self.scores = model[4].subcolumns;
 			});
 		},
 		afterRequest: function () {
@@ -35,10 +38,10 @@
 			var self=this;
 			for (var i = 0, l = json.response.docs.length; i < l; i++) {
 				var doc = json.response.docs[i];
-				if (self.ids.indexOf(doc["protein1"])==-1)
-					self.ids.push(doc["protein1"]);
-				if (self.ids.indexOf(doc["protein2"])==-1)
-					self.ids.push(doc["protein2"]);
+				if (self.ids.indexOf(doc[self.fields["p1"]])==-1)
+					self.ids.push(doc[self.fields["p1"]]);
+				if (self.ids.indexOf(doc[self.fields["p2"]])==-1)
+					self.ids.push(doc[self.fields["p2"]]);
 			}			
 		},
 		afterRemove: function (facet) {

@@ -13,7 +13,7 @@
 	"postloader":"",
 	"ajaxsolr_parameters":{
 				"facet": true,
-				"facet.field": [ "protein1", "protein2" ],
+				"facet.field": [ "p1", "p2" ],
 				"facet.limit": 20,
 				"facet.mincount": 1,
 				"f.topics.facet.limit": 50,
@@ -27,16 +27,16 @@
 			"parameters": {
 				"id": "requester",
 				"fields":{
-					"p1":"protein1",
-					"organism1":"organism1",
-					"p2":"protein2",
-					"organism2":"organism2",
-					"score":"unified_score"
+					"p1":"p1",
+					"organism1":"p1_organism",
+					"p2":"p2",
+					"organism2":"p1_organism",
+					"score":"score"
 				},
 				"prefixes":{
 					"p1":"p1_",
 					"p2":"p2_",
-					"score":""
+					"score":"score_"
 				},
 				"queries":{
 					"basic":"interactions",
@@ -100,7 +100,7 @@
 				"id": "svggraph",
 				"target": "#graph",
 				"formats":["PNG","SVG"],
-				"css":".figure {fill: #89B; stroke: #fff;}"
+				"css":".figure {fill: #89B; stroke: #fff;} text {font: 10px sans-serif; font-weight:normal; stroke: #000; stroke-width: 0px;}"
 			}
 		},
 		{	"widget": "CircleGraphWidget",
@@ -233,6 +233,11 @@
 						"action":7,
 						"widget":"requester",
 						"parameter":"features"
+					},
+					{	"target": 1,
+						"condition":4,
+						"widget":"requester",
+						"parameter":"scores"
 					}
 				],
 				"rules": {
@@ -298,7 +303,7 @@
 								{	"name": "type of evidence",
 									"type": "selects",
 									"amount": 1,
-									"values": [ "neighborhood" ,"fusion", "cooccurrence","txt_mining","microarray","similarity","domain","experimental","knowledge","pdb","interlogs"]
+									"values": [ ]
 								} 
 							]
 						} 

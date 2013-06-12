@@ -9,6 +9,9 @@
 .graphNetwork .legend {
   pointer-events: none;
   font: 10px sans-serif;
+  font-weight:normal; 
+  stroke: #000; 
+  stroke-width: 0px;
 }
 .graphNetwork line.link {
 	stroke: #999;
@@ -21,3 +24,7 @@
 }
 
 .clearBoth { clear:both; }
+
+.graphNetwork .mainLegend{
+	font-size: 70%;
+}

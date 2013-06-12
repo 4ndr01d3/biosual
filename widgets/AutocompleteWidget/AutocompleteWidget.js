@@ -77,16 +77,13 @@
 			});
 
 
-			var params = [ 'q=*:*&rows=0&facet=true&facet.limit=-1&facet.mincount=1&json.nl=map' ];
-			for (var i = 0; i < this.fields.length; i++) {
-				params.push('facet.field=' + this.fields[i]);
-			}
-//			var values = this.manager.store.values('fq');
-//			for (var i = 0; i < values.length; i++) {
-//			params.push('fq=' + encodeURIComponent(values[i]));
-//			}
-			params.push('q=' + this.manager.store.get('q').val());
-			jQuery.getJSON(this.manager.solrUrl + 'select?' + params.join('&') + '&wt=json&json.wrf=?', {}, callback);
+			var paramsL = [ 'q=*:*&rows=0&facet=true&facet.limit=-1&facet.mincount=1&json.nl=map' ];
+			if (typeof self.fields == "undefined")
+				self.fields = params['facet.field'];
+			for (var i = 0; i < self.fields.length; i++) 
+				paramsL.push('facet.field=' + self.fields[i]);
+			paramsL.push('q=' + this.manager.store.get('q').val());
+			jQuery.getJSON(this.manager.solrUrl + 'select?' + paramsL.join('&') + '&wt=json&json.wrf=?', {}, callback);
 		}
 	});
 

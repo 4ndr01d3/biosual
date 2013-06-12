@@ -161,11 +161,11 @@
 						break;
 					case "Border":
 						self.graph.setColor(selector,rule.actionParameters[0]); 
-						self.graph.addLegends([rule.condition+" "+rule.parameters.join(" ")],"border",rule.actionParameters[0]);
+						self.graph.addLegends([rule.condition+" "+rule.parameters.join(" ")],"Border ("+rule.target+")",rule.actionParameters[0]);
 						break;
 					case "Color":
 						self.graph.setFillColor(selector,rule.actionParameters[0]);
-						self.graph.addLegends([rule.condition+" "+rule.parameters.join(" ")],"color",rule.actionParameters[0]);
+						self.graph.addLegends([rule.condition+" "+rule.parameters.join(" ")],"Color",rule.actionParameters[0]);
 						break;
 					case "Color By":
 					case "Border By":
@@ -391,53 +391,59 @@
 								
 								var doc= self.oTable.$('tr', {"filter": "applied"}).filter("#"+node).data("doc");
 								
+								var p1key="p1_"+rule.parameters[0],
+									p2key="p2_"+rule.parameters[0];
+								if (rule.parameters[0]=="id"){
+									p1key=self.columns[0].id;
+									p2key=self.columns[2].id;
+								}
 								switch (rule.parameters[1]){
 									case "equals":
-										if  (doc["p1_"+rule.parameters[0]] == rule.parameters[2] )
-											if (added.indexOf(doc["protein1"])==-1){
-												selectorTD += " .cell_"+self.columns[0].id+"[content="+doc['protein1']+"], .cell_"+self.columns[2].id+"[content="+doc['protein1']+"],";
-												added.push(doc["protein1"]);
+										if  (doc[p1key] == rule.parameters[2] )
+											if (added.indexOf(doc[self.columns[0].id])==-1){
+												selectorTD += " .cell_"+self.columns[0].id+"[content="+doc[self.columns[0].id]+"], .cell_"+self.columns[2].id+"[content="+doc[self.columns[0].id]+"],";
+												added.push(doc[self.columns[0].id]);
 											}
-										if  (doc["p2_"+rule.parameters[0]] == rule.parameters[2] )
-											if (added.indexOf(doc["protein2"])==-1){
-												selectorTD += " .cell_"+self.columns[0].id+"[content="+doc['protein2']+"], .cell_"+self.columns[2].id+"[content="+doc['protein2']+"],";
-												added.push(doc["protein2"]);
+										if  (doc[p2key] == rule.parameters[2] )
+											if (added.indexOf(doc[self.columns[2].id])==-1){
+												selectorTD += " .cell_"+self.columns[0].id+"[content="+doc[self.columns[2].id]+"], .cell_"+self.columns[2].id+"[content="+doc[self.columns[2].id]+"],";
+												added.push(doc[self.columns[2].id]);
 											}
 										break;
 									case "contains":
-										if  (doc["p1_"+rule.parameters[0]].indexOf(rule.parameters[2])!=-1)
-											if (added.indexOf(doc["protein1"])==-1){
-												selectorTD += " .cell_"+self.columns[0].id+"[content="+doc['protein1']+"], .cell_"+self.columns[2].id+"[content="+doc['protein1']+"],";
-												added.push(doc["protein1"]);
+										if  (doc[p1key].indexOf(rule.parameters[2])!=-1)
+											if (added.indexOf(doc[self.columns[0].id])==-1){
+												selectorTD += " .cell_"+self.columns[0].id+"[content="+doc[self.columns[0].id]+"], .cell_"+self.columns[2].id+"[content="+doc[self.columns[0].id]+"],";
+												added.push(doc[self.columns[0].id]);
 											}
-										if  (doc["p2_"+rule.parameters[0]].indexOf(rule.parameters[2])!=-1)
-											if (added.indexOf(doc["protein2"])==-1){
-												selectorTD += " .cell_"+self.columns[0].id+"[content="+doc['protein2']+"], .cell_"+self.columns[2].id+"[content="+doc['protein2']+"],";
-												added.push(doc["protein2"]);
+										if  (doc[p2key].indexOf(rule.parameters[2])!=-1)
+											if (added.indexOf(doc[self.columns[2].id])==-1){
+												selectorTD += " .cell_"+self.columns[0].id+"[content="+doc[self.columns[2].id]+"], .cell_"+self.columns[2].id+"[content="+doc[self.columns[2].id]+"],";
+												added.push(doc[self.columns[2].id]);
 											}
 										break;
 									case "different":
-										if  (doc["p1_"+rule.parameters[0]] != rule.parameters[2] )
-											if (added.indexOf(doc["protein1"])==-1){
-												selectorTD += " .cell_"+self.columns[0].id+"[content="+doc['protein1']+"], .cell_"+self.columns[2].id+"[content="+doc['protein1']+"],";
-												added.push(doc["protein1"]);
+										if  (doc[p1key] != rule.parameters[2] )
+											if (added.indexOf(doc[self.columns[0].id])==-1){
+												selectorTD += " .cell_"+self.columns[0].id+"[content="+doc[self.columns[0].id]+"], .cell_"+self.columns[2].id+"[content="+doc[self.columns[0].id]+"],";
+												added.push(doc[self.columns[0].id]);
 											}
-										if  (doc["p2_"+rule.parameters[0]] != rule.parameters[2] )
-											if (added.indexOf(doc["protein2"])==-1){
-												selectorTD += " .cell_"+self.columns[0].id+"[content="+doc['protein2']+"], .cell_"+self.columns[2].id+"[content="+doc['protein2']+"],";
-												added.push(doc["protein2"]);
+										if  (doc[p2key] != rule.parameters[2] )
+											if (added.indexOf(doc[self.columns[2].id])==-1){
+												selectorTD += " .cell_"+self.columns[0].id+"[content="+doc[self.columns[2].id]+"], .cell_"+self.columns[2].id+"[content="+doc[self.columns[2].id]+"],";
+												added.push(doc[self.columns[2].id]);
 											}
 										break;
 									case "not contains":
-										if  (doc["p1_"+rule.parameters[0]].indexOf(rule.parameters[2])==-1)
-											if (added.indexOf(doc["protein1"])==-1){
-												selectorTD += " .cell_"+self.columns[0].id+"[content="+doc['protein1']+"], .cell_"+self.columns[2].id+"[content="+doc['protein1']+"],";
-												added.push(doc["protein1"]);
+										if  (doc[p1key].indexOf(rule.parameters[2])==-1)
+											if (added.indexOf(doc[self.columns[0].id])==-1){
+												selectorTD += " .cell_"+self.columns[0].id+"[content="+doc[self.columns[0].id]+"], .cell_"+self.columns[2].id+"[content="+doc[self.columns[0].id]+"],";
+												added.push(doc[self.columns[0].id]);
 											}
-										if  (doc["p2_"+rule.parameters[0]].indexOf(rule.parameters[2])==-1)
-											if (added.indexOf(doc["protein2"])==-1){
-												selectorTD += " .cell_"+self.columns[0].id+"[content="+doc['protein2']+"], .cell_"+self.columns[2].id+"[content="+doc['protein2']+"],";
-												added.push(doc["protein2"]);
+										if  (doc[p2key].indexOf(rule.parameters[2])==-1)
+											if (added.indexOf(doc[self.columns[2].id])==-1){
+												selectorTD += " .cell_"+self.columns[0].id+"[content="+doc[self.columns[2].id]+"], .cell_"+self.columns[2].id+"[content="+doc[self.columns[2].id]+"],";
+												added.push(doc[self.columns[2].id]);
 											}
 										break;
 								}

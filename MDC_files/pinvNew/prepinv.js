@@ -13,8 +13,8 @@ if (coreURL!=null && coreURL!="null" && jQuery.trim(coreURL)!=""){
 	server += coreURL+"/";
 }
 var model=[],
-	mainfields=["protein1","organism1","protein2","organism2","unified_score"],
-	prefix=["p1_",false,"p2_",false,""];
+	mainfields=["p1","p1_organism","p2","p1_organism","score"],
+	prefix=["p1_",false,"p2_",false,"score_"];
 
 var callback = function (response) {
 	for (var i=0;i<mainfields.length;i++) {
