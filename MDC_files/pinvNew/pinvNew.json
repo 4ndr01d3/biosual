@@ -2,7 +2,8 @@
 	"template":{
 		"name":"template2",
 		"tags":{
-			"title":"Protein Interaction Network Visualizer"
+			"title":"Protein Interaction Network Visualizer",
+			"subtitle":"Core:"
 		}
 	},
 	"css":	["tests/pinv/pinv.css"],

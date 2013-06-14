@@ -161,20 +161,25 @@ Biojs.InteractionsD3 = Biojs.extend (
 						o.x += (self.foci[self.organisms[o.organism]].x - o.x) * k;
 					});
 				}
-				self.vis.selectAll("circle.figure")
-					.attr("cx", function(d) { return d.x = Math.max(r, Math.min(self.opt.width - r, d.x)); })
-					.attr("cy", function(d) { return d.y = Math.max(r, Math.min(self.opt.height - r, d.y)); });
-				self.vis.selectAll("rect.figure")
-					.attr("x", function(d) { return d.x = Math.max(r, Math.min(self.opt.width - r, d.x)); })
-					.attr("y", function(d) { return d.y = Math.max(r, Math.min(self.opt.height - r, d.y)); });
+//				self.vis.selectAll("circle.figure")
+//					.attr("cx", function(d) { return d.x = Math.max(r, Math.min(self.opt.width - r, d.x)); })
+//					.attr("cy", function(d) { return d.y = Math.max(r, Math.min(self.opt.height - r, d.y)); });
+//				self.vis.selectAll("rect.figure")
+//					.attr("x", function(d) { return d.x = Math.max(r, Math.min(self.opt.width - r, d.x)); })
+//					.attr("y", function(d) { return d.y = Math.max(r, Math.min(self.opt.height - r, d.y)); });
+				self.vis.selectAll("path.figure")
+						.attr("transform", function(d) { 
+							return "translate(" + Math.max(r, Math.min(self.opt.width , d.x+r)) + "," + Math.max(r, Math.min(self.opt.height, d.y+r)) + ")"; 
+						});
+
 				self.vis.selectAll(".legend")
 					.attr("x", function(d) { return d.x = Math.max(r, Math.min(self.opt.width - r, d.x)); })
 					.attr("y", function(d) { return d.y = Math.max(r, Math.min(self.opt.height - r, d.y)); });
 				self.vis.selectAll("line.link")
-					.attr("x1", function(d) { return (self.organisms[d.source.organism]==0)?d.source.x:d.source.x+r; })
-					.attr("y1", function(d) { return (self.organisms[d.source.organism]==0)?d.source.y:d.source.y+r; })
-					.attr("x2", function(d) { return (self.organisms[d.target.organism]==0)?d.target.x:d.target.x+r; })
-					.attr("y2", function(d) { return (self.organisms[d.target.organism]==0)?d.target.y:d.target.y+r; });
+					.attr("x1", function(d) { return d.source.x+r; })
+					.attr("y1", function(d) { return d.source.y+r; })
+					.attr("x2", function(d) { return d.target.x+r; })
+					.attr("y2", function(d) { return d.target.y+r; });
 			};
 			//Binding the _resize method when resizing the window! 
 			//d3.select(window).on("resize", function(){self._resize(self);});
@@ -548,8 +553,14 @@ Biojs.InteractionsD3 = Biojs.extend (
 				.attr("organism", function(d) { return d.organism; })
 				.call(self.node_drag);
 			
-			node.filter(function(d) { return self.organisms[d.organism] == 1; }).append("rect")
+			node.append("path")
 				.attr("class", "figure")
+				.attr("d", d3.svg.symbol()
+						.size(self.opt.radius*40)
+						.type(function(d) {
+							return d3.svg.symbolTypes[self.organisms[d.organism]];
+						})
+					)
 				.attr("id", function(d) { return "figure_"+d.id; })
 				.on("click", function(d){ 
 					self.raiseEvent('proteinClick', {
@@ -564,28 +575,22 @@ Biojs.InteractionsD3 = Biojs.extend (
 				.attr("width", self.opt.radius*2)
 				.attr("height", self.opt.radius*2)
 				.attr("stroke-width",self.opt.radius*0.3);
-//				.style("fill", function(d) {       	
-//					return self.color(d.group);   
-//				});
 			
-			node.filter(function(d) { return self.organisms[d.organism] == 0; }).append("circle")
-				.attr("class", "figure")
-				.attr("id", function(d) { return "figure_"+d.id; })
-				.on("click", function(d){ 
-					self.raiseEvent('proteinClick', {
-						protein: d
-					});
-				})
-				.on("mouseover", function(d){ 
-					self.raiseEvent('proteinMouseOver', {
-						protein: d
-					});
-				})
-				.attr("r", self.opt.radius)
-				.attr("stroke-width",self.opt.radius*0.3);
-//				.style("fill", function(d) {       	
-//					return self.color(d.group);   
-//				});
+//			node.filter(function(d) { return self.organisms[d.organism] == 0; }).append("circle")
+//				.attr("class", "figure")
+//				.attr("id", function(d) { return "figure_"+d.id; })
+//				.on("click", function(d){ 
+//					self.raiseEvent('proteinClick', {
+//						protein: d
+//					});
+//				})
+//				.on("mouseover", function(d){ 
+//					self.raiseEvent('proteinMouseOver', {
+//						protein: d
+//					});
+//				})
+//				.attr("r", self.opt.radius)
+//				.attr("stroke-width",self.opt.radius*0.3);
 				
 			node
 				.append("svg:text")

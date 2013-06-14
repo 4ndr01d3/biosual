@@ -19,6 +19,38 @@
 			},
 			"templateTarget":"center",
 			"tags":{"id":"listofcores"}
+		},
+		{	"widget": "InvertedTabsWidget",
+			"parameters": {
+				"id": "tabs",
+				"target": "tabs",
+				"tabs": [
+				     { "title": "Data Sets",
+				       "target":"listofcores",
+				       "selected":true
+				     },
+				     { "title": "Load Data",
+				       "target":"graph2",
+				       "selected":false
+				     },
+				     { "title": "Documentation",
+				       "target":"table",
+				       "selected":false
+				     }
+				],
+				"sideEffects":[
+				     { "target":"size",
+				       "visibleWith":["Network","Circle"] 
+				     },
+				     { "target":"info",
+					       "visibleWith":["Network","Circle"] 
+					 }
+
+				]
+			},
+			"templateTarget":"optionbar",
+			"tags":{"id":"tabs"}
 		}
+
 	]
 }

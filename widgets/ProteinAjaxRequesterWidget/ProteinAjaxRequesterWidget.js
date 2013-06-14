@@ -8,6 +8,11 @@
 		scores:[],
 		init:function(){
 			var self = this;
+			if (coreURL!=null && coreURL!="null" && jQuery.trim(coreURL)!=""){
+				$("header.main h2").html("Core: "+coreURL);
+			}else
+				$("header.main h2").html("Core: Default");
+			
 			modelrequester.done(function(p){
 				for (var i=0;i<model[0].subcolumns.length;i++){
 					self.features.push(model[0].subcolumns[i].substring(prefix[0].length));

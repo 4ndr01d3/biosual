@@ -9,9 +9,9 @@ if (proteins!=null && proteins!="null" && jQuery.trim(proteins)!=""){
 	URLrequests=proteins.split(",");
 }
 var coreURL=getURLParameter("core");
-if (coreURL!=null && coreURL!="null" && jQuery.trim(coreURL)!=""){
+if (coreURL!=null && coreURL!="null" && jQuery.trim(coreURL)!="")
 	server += coreURL+"/";
-}
+
 var model=[],
 	mainfields=["p1","p1_organism","p2","p1_organism","score"],
 	prefix=["p1_",false,"p2_",false,"score_"];

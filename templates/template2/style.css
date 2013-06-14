@@ -11,6 +11,14 @@ header.main h1{
 	vertical-align:text-top;
 	font-size: 45px;
 }
+header.main h2{
+	margin-left:60px;
+	font-family: 'Jura',"Helvetica Neue", Helvetica;
+	vertical-align:text-top;
+	font-size: 20px;
+	margin-top: -38px;
+	color: #369;
+}
 .right {
 	width: 60%;
 	float: left;
