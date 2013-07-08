@@ -1,0 +1,10 @@
+#result a {
+  margin-right: 5px;
+}
+.links li {
+  list-style-type: none;
+  display: inline;
+}
+#docs {
+  padding-top: 1px;
+}

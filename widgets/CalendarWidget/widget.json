@@ -1,0 +1,8 @@
+{
+    "name": "Calendar widget",
+    "description": "A way to by date",
+    "dependencies":[],
+    "js": "CalendarWidget.js",
+    "html": "CalendarWidget.html",
+    "css": "CalendarWidget.css"
+}

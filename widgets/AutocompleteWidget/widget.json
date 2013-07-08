@@ -1,0 +1,9 @@
+{
+    "name": "Search with Autocomplete",
+    "description": "a text based widget to start a search",
+    "dependencies":["jquery.autocomplete.js"],
+    "dependenciesCSS":["jquery.autocomplete.css"],
+    "js": "AutocompleteWidget.js",
+    "html": "AutocompleteWidget.html",
+    "css": "AutocompleteWidget.css"
+}

@@ -1,0 +1,130 @@
+{
+"template":{
+	"name":"template1",
+	"tags":{
+		"title":"AJAX-SOLR from PHP",
+		"subtitle":"all the js are been obtained and altered via PHP"
+	}
+},
+"css":	["tests/reuters/reuters.css"],
+"js":	["tests/reuters/reuters.theme.js"],
+"server":"http://evolvingweb.ca/solr/reuters/",
+"ajaxsolr_parameters":{
+      "facet": true,
+      "facet.field": [ "topics", "organisations", "exchanges", "countryCodes" ],
+      "facet.limit": 20,
+      "facet.mincount": 1,
+      "f.topics.facet.limit": 50,
+      "f.countryCodes.facet.limit": -1,
+      "facet.date": "date",
+      "facet.date.start": "1987-02-26T00:00:00.000Z/DAY",
+      "facet.date.end": "1987-10-20T00:00:00.000Z/DAY+1DAY",
+      "facet.date.gap": "+1DAY",
+      "json.nl": "map"
+    },
+"widgets": [
+    {
+        "widget": "ReutersAjaxRequesterWidget",
+        "parameters": {
+            "id": "requester"
+        }
+    },
+    {
+        "widget": "ResultWidget",
+        "parameters": {
+            "id": "result",
+            "target": "#docs",
+            "attributeNames": {"id":"id","title":"title","text":"text","date":"dateline"},
+            "facets": [ "topics", "organisations", "exchanges"]
+        },
+        "templateTarget":"right",
+		"tags":{"id":"result"}
+    },
+    {
+        "widget": "PagerWidget",
+        "parameters": {
+            "id": "pager",
+            "target": "#pager",
+            "prevLabel": "&lt;",
+            "nextLabel": "&gt;",
+            "innerWindow": 1
+        },
+        "templateTarget":"result",
+		"tags":{"pager_id":"pager","pager_header_id":"pager-header","id":"navigation"}
+    },
+    {
+        "widget": "CurrentSearchWidget",
+        "parameters": {
+            "id": "currentsearch",
+            "target": "#selection",
+            "label_all":"Viewing all documents!"
+        },
+        "templateTarget":"left",
+		"tags":{"title":"Current Search","id":"selection"}
+    },
+    {
+        "widget": "AutocompleteWidget",
+        "parameters": {
+            "id": "text",
+            "target": "#search",
+            "fields": [
+                "topics",
+                "organisations",
+                "exchanges"
+            ],
+            "facet":"text"
+        },
+        "templateTarget":"left",
+		"tags":{"title":"Search","subtitle":"(press ESC to close suggestions)","id":"search"}
+    },
+    {
+        "widget": "TagcloudWidget",
+        "parameters": {
+            "id": "topics",
+            "target": "#topics",
+            "field": "topics"
+        },
+        "templateTarget":"left",
+		"tags":{"title":"Top Topics","id":"topics"}
+    },
+    {
+        "widget": "TagcloudWidget",
+        "parameters": {
+            "id": "organisations",
+            "target": "#organisations",
+            "field": "organisations"
+        },
+        "templateTarget":"left",
+		"tags":{"title":"Top Organisations","id":"organisations"}
+    },
+    {
+        "widget": "TagcloudWidget",
+        "parameters": {
+            "id": "exchanges",
+            "target": "#exchanges",
+            "field": "exchanges"
+        },
+        "templateTarget":"left",
+		"tags":{"title":"Top Exchanges","id":"exchanges"}
+    },
+    {
+        "widget": "CountryCodeWidget",
+        "parameters": {
+            "id": "countries",
+            "target": "#countries",
+            "field": "countryCodes"
+        },
+        "templateTarget":"left",
+		"tags":{"title":"By Country","id":"countries","preview_id":"preview"}
+    },
+    {
+        "widget": "CalendarWidget",
+        "parameters": {
+            "id": "calendar",
+            "target": "#calendar",
+            "field": "date"
+        },
+        "templateTarget":"left",
+		"tags":{"title":"By Date","id":"calendar"}
+    }
+]}

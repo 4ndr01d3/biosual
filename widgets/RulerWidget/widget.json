@@ -1,0 +1,10 @@
+{
+    "name": "Ruler",
+    "description": "A dynamic creator of rules to filter/interact with other components",
+    "dependencies":["jquery.miniColors.min.js","Biojs.Ruler.js"],
+    "dependenciesCSS":["jquery.miniColors.css"],
+    "js": "RulerWidget.js",
+    "html": "RulerWidget.html",
+    "css": "biojs.ruler.css"
+    
+}

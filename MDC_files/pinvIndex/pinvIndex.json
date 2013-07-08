@@ -1,0 +1,56 @@
+{
+	"template":{
+		"name":"template3",
+		"tags":{
+			"title":"Protein Interaction Network Visualizer",
+			"logoURL":"../../MDC_files/pinvIndex/images/PINV_240.png"
+		}
+	},
+	"css":	["tests/pinv/pinvIndex.css"],
+	"server":"http://biosual.cbio.uct.ac.za/solr/", 
+	"widgets": [
+		{	"widget": "ListOfCoresWidget",
+			"parameters": {
+				"id": "listofcores",
+				"target": "listofcores",
+				"url":"./pinvNew.html",
+				"header": "List of Datasets:",
+				"filter":true
+			},
+			"templateTarget":"center",
+			"tags":{"id":"listofcores"}
+		},
+		{	"widget": "InvertedTabsWidget",
+			"parameters": {
+				"id": "tabs",
+				"target": "tabs",
+				"tabs": [
+				     { "title": "Data Sets",
+				       "target":"listofcores",
+				       "selected":true
+				     },
+				     { "title": "Load Data",
+				       "target":"graph2",
+				       "selected":false
+				     },
+				     { "title": "Documentation",
+				       "target":"table",
+				       "selected":false
+				     }
+				],
+				"sideEffects":[
+				     { "target":"size",
+				       "visibleWith":["Network","Circle"] 
+				     },
+				     { "target":"info",
+					       "visibleWith":["Network","Circle"] 
+					 }
+
+				]
+			},
+			"templateTarget":"optionbar",
+			"tags":{"id":"tabs"}
+		}
+
+	]
+}

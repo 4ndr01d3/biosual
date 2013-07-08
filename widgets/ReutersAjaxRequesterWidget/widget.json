@@ -1,0 +1,5 @@
+{
+    "name": "Reuters Solr Requester",
+    "description": "Common requester for reuters news from a solr server",
+    "js": "ReutersAjaxRequesterWidget.js"
+}

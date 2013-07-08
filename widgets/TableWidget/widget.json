@@ -1,0 +1,9 @@
+{
+    "name": "Table Displayer",
+    "description": "Display the responses using the dataTables jquery plugin.",
+    "dependencies":["jquery.dataTables.min.js","ZeroClipboard.js","TableTools.js"],
+    "dependenciesCSS":["TableTools.css"],
+    "js": "TableWidget.js",
+    "html": "TableWidget.html",
+    "css": "TableWidget.css"
+}

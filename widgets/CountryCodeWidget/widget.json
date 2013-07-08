@@ -1,0 +1,6 @@
+{
+    "name": "Country searcher",
+    "description": "A way to select countries",
+    "js": "CountryCodeWidget.js",
+    "html": "CountryCodeWidget.html"
+}
