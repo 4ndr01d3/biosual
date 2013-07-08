@@ -1,0 +1,6 @@
+{
+    "name": "Contextual Menu",
+    "description": "A way to display a contextual menu",
+    "dependencies":["jquery.contextmenu.r2.js"],
+    "js": "ContextMenuWidget.js"
+}

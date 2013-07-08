@@ -1,0 +1,26 @@
+[
+    {
+        "name": "flare.analytics.cluster.AgglomerativeCluster",
+        "imports": [
+            "flare.analytics.cluster.MergeEdge",
+            "flare.analytics.cluster.HierarchicalCluster"
+        ]
+    },
+    {
+        "name": "flare.analytics.cluster.CommunityStructure",
+        "imports": [
+            "flare.analytics.cluster.HierarchicalCluster",
+            "flare.analytics.cluster.MergeEdge"
+        ]
+    },
+    {
+        "name": "flare.analytics.cluster.HierarchicalCluster",
+        "imports": [
+            "flare.analytics.cluster.MergeEdge"
+        ]
+    },
+    {
+        "name": "flare.analytics.cluster.MergeEdge",
+        "imports": []
+    }
+]

@@ -1,0 +1,8 @@
+{
+    "name": "Inverted Tabs",
+    "description": "A Tab manager based on CSS",
+    "dependencies":[],
+    "js": "InvertedTabsWidget.js",
+    "html": "InvertedTabsWidget.html",
+    "css": "InvertedTabsWidget.css"
+}

@@ -1,0 +1,9 @@
+{
+    "name": "Details Frame",
+    "description": "pop up window to show information",
+    "dependencies":["Biojs.DetailsFrame.js"],
+    "dependenciesCSS": ["biojs.detailsFrame.css"],
+    "js": "DetailsFrameWidget.js",
+    "html": "DetailsFrameWidget.html",
+    "css": "DetailsFrameWidget.css"
+}

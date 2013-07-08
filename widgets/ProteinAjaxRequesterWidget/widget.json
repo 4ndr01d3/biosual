@@ -1,0 +1,5 @@
+{
+    "name": "Protein Solr Requester",
+    "description": "Common requester for proteins from a solr server",
+    "js": "ProteinAjaxRequesterWidget.js"
+}

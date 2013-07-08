@@ -1,0 +1,57 @@
+
+.fewoptionswidget{
+padding: 0;
+width: 100%;
+}
+
+.fewoptionswidget ul{
+margin:0;
+margin-left: 20px; /*margin between first menu item and left browser edge*/
+margin-right: 20px; /*margin between first menu item and left browser edge*/
+padding: 0;
+list-style: none;
+}
+
+.fewoptionswidget li{
+display: inline;
+margin: 0 2px 0 0;
+padding: 0;
+text-transform:uppercase;
+}
+
+.fewoptionswidget a{
+float: left;
+display: block;
+font: 10px Arial;
+color: #99A2B4;
+text-decoration: none;
+margin: 0 1px 0 0; /*Margin between each menu item*/
+padding: 9px 10px 5px 10px; /*Padding within each menu item*/
+background-color: #DCE5F8; /*Default menu color*/
+
+/*BELOW 4 LINES add rounded bottom corners to each menu item.
+  ONLY WORKS IN FIREFOX AND FUTURE CSS3 CAPABLE BROWSERS
+  REMOVE IF DESIRED*/
+-moz-border-radius-bottomleft: 5px;
+border-bottom-left-radius: 5px;
+-moz-border-radius-bottomright: 5px;
+border-bottom-right-radius: 5px;
+}
+
+.fewoptionswidget a:hover{
+background-color: #c0d0f0;
+padding-top: 5px; /*Flip default padding-top value with padding-bottom */
+padding-bottom: 9px; /*Flip default padding-bottom value with padding-top*/
+color: #3E5E9c;
+cursor: pointer;
+font: 12px Arial;
+}
+
+.fewoptionswidget .current a{ /** currently selected menu item **/
+background-color: #c0d0f0;
+padding-top: 5px; /*Flip default padding-top value with padding-bottom */
+padding-bottom: 9px; /*Flip default padding-bottom value with padding-top*/
+color: #222;
+font: 12px Arial;
+}
+

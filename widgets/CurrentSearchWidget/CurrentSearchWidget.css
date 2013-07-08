@@ -1,0 +1,7 @@
+#selection {
+  padding: 10px 0px 0;
+}
+#selection .item {
+  padding: 0px 15px 0;
+  list-style-type: none;
+}

@@ -1,0 +1,11 @@
+#navigation {
+  border-bottom: 1px solid #000;
+}
+#pager,
+#pager-header {
+  display: inline;
+}
+#pager li {
+  list-style-type: none;
+  display: inline;
+}

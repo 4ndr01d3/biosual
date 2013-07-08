@@ -1,0 +1,8 @@
+{
+    "name": "Tag cloud",
+    "description": "Simple Tag Cluod widget",
+    "dependencies":[],
+    "js": "TagcloudWidget.js",
+    "html": "TagcloudWidget.html",
+    "css": "TagcloudWidget.css"
+}

@@ -1,0 +1,30 @@
+.graphNetwork .node {
+	stroke: #fff;
+	stroke-width: 1.5px;
+}
+.graphNetwork .figure{
+  pointer-events: all;
+  fill:	#89B;
+}
+.graphNetwork .legend {
+  pointer-events: none;
+  font: 10px sans-serif;
+  font-weight:normal; 
+  stroke: #000; 
+  stroke-width: 0px;
+}
+.graphNetwork line.link {
+	stroke: #999;
+	stroke-opacity: .6;
+}
+
+.graphNetwork  {
+	border: 1px solid #000;
+	background-color: #E5E5EF;
+}
+
+.clearBoth { clear:both; }
+
+.graphNetwork .mainLegend{
+	font-size: 70%;
+}

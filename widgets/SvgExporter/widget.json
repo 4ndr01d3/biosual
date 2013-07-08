@@ -1,0 +1,7 @@
+{
+    "name": "SVG exporter",
+    "description": "Exports a svg embedded in the same div.",
+    "dependencies":["canvg/canvg.js","canvg/rgbcolor.js"],
+    "js": "SvgExporter.js",
+    "css": "SvgExporter.css"
+}

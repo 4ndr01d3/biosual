@@ -1,0 +1,8 @@
+{
+    "name": "Interaction network",
+    "description": "A network graph using D3",
+    "dependencies":["d3.v2.min.js","Biojs.InteractionsD3.js"],
+    "js": "GraphWidget.js",
+    "html": "GraphWidget.html",
+    "css": "GraphWidget.css"
+}

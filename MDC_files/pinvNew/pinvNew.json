@@ -1,0 +1,607 @@
+{
+	"template":{
+		"name":"template2",
+		"tags":{
+			"title":"Protein Interaction Network Visualizer",
+			"subtitle":"Core:"
+		}
+	},
+	"css":	["tests/pinv/pinv.css"],
+	"js":	["ruleExecuter.js","contextMenuFunctions.js","expressionExecuter.js"],
+	"server":"http://biosual.cbio.uct.ac.za/solr/",
+	"url_parameters":["core","proteins"],
+	"preloader":"prepinv.js",
+	"postloader":"",
+	"ajaxsolr_parameters":{
+				"facet": true,
+				"facet.field": [ "p1", "p2" ],
+				"facet.limit": 20,
+				"facet.mincount": 1,
+				"f.topics.facet.limit": 50,
+				"json.nl": "map",
+				"rows": 300,
+				"Explicit":"True"
+	},
+	"widgets": [
+		
+		{	"widget": "ProteinAjaxRequesterWidget",
+			"parameters": {
+				"id": "requester",
+				"fields":{
+					"p1":"p1",
+					"organism1":"p1_organism",
+					"p2":"p2",
+					"organism2":"p1_organism",
+					"score":"score"
+				},
+				"prefixes":{
+					"p1":"p1_",
+					"p2":"p2_",
+					"score":"score_"
+				},
+				"queries":{
+					"basic":"interactions",
+					"filter":"protein"
+				}
+			}
+		},
+		
+		{	"widget": "InvertedTabsWidget",
+			"parameters": {
+				"id": "tabs",
+				"target": "tabs",
+				"tabs": [
+				     { "title": "Network",
+				       "target":"graph",
+				       "selected":true
+				     },
+				     { "title": "Circle",
+				       "target":"graph2",
+				       "selected":false
+				     },
+				     { "title": "Table",
+				       "target":"table",
+				       "selected":false
+				     }
+				],
+				"sideEffects":[
+				     { "target":"size",
+				       "visibleWith":["Network","Circle"] 
+				     },
+				     { "target":"info",
+					       "visibleWith":["Network","Circle"] 
+					 }
+
+				]
+			},
+			"templateTarget":"center",
+			"tags":{"id":"tabs"}
+		},
+	
+		{	"widget": "GraphWidget",
+			"parameters": {
+			"id": "graph",
+				"target": "graph",
+				"width":"1400",
+				"height":"600",
+				"predefined_stylers":[	{
+						"id":"ruler",
+						"method":"applyRules"
+					}, {
+						"id":"expression",
+						"method":"paintProteins"
+					}
+				]
+			},
+			"templateTarget":"center",
+			"tags":{"id":"graph"}
+		},
+		{	"widget": "SvgExporter",
+			"parameters": {
+				"id": "svggraph",
+				"target": "#graph",
+				"formats":["PNG","SVG"],
+				"css":".figure {fill: #89B; stroke: #fff;} text {font: 10px sans-serif; font-weight:normal; stroke: #000; stroke-width: 0px;}"
+			}
+		},
+		{	"widget": "CircleGraphWidget",
+			"parameters": {
+			"id": "graph2",
+				"target": "graph2",
+				"width":"1400",
+				"height":"600",
+				"predefined_stylers":[	{
+						"id":"ruler",
+						"method":"applyRules2"
+					}, {
+						"id":"expression",
+						"method":"paintCircleProteins"
+					}
+				]
+			},
+			"templateTarget":"center",
+			"tags":{"id":"graph2"}
+		},
+		{	"widget": "SvgExporter",
+			"parameters": {
+				"id": "svggraph2",
+				"target": "#graph2",
+				"formats":["PNG","SVG"],
+				"css": "path.arc {  fill: #fff;}  .node {  font-size: 10px;}  .node:hover {  fill: #1f77b4;}  .link {  fill: none;  stroke: #1f77b4;  stroke-opacity: .4;  pointer-events: none;}  .link.source,   .link.target {  stroke-opacity: 1;  stroke-width: 2px;}  .node.target {  fill: #d62728 !important;}  .link.source {  stroke: #d62728;}  .node.source {  fill: #2ca02c;}  .link.target {  stroke: #2ca02c;}  .figure { fill: #46D;}  .legend {  stroke: transparent;  pointer-events: none;}"
+			}
+		},
+		{	"widget": "FewOptionsWidget",
+			"parameters": {
+			"id": "size",
+				"target": "size",
+				"options": [
+				     { "title": "1400x600", "selected":true  },
+				     { "title": "1200x600", "selected":false },
+				     { "title": "1000x600", "selected":false },
+				     { "title": "800x600",  "selected":false },
+				     { "title": "1400x800", "selected":false },
+				     { "title": "1200x800", "selected":false },
+				     { "title": "1000x800", "selected":false },
+				     { "title": "800x800",  "selected":false }
+				],
+				"trigger":[
+				    { "widget":"graph",  "method":"setSize" },
+					{ "widget":"graph2", "method":"setSize" }
+				]
+			},
+			"templateTarget":"center",
+			"tags":{"id":"size"}
+		},
+		{	"widget": "TableWidget",
+			"parameters": {
+			"id": "table",
+				"target": "table",
+				"width":"1400",
+				"height":"600",
+				"predefined_stylers":[	{
+						"id":"ruler",
+						"method":"applyRules3"
+					}, {
+						"id":"expression",
+						"method":"paintCellProteins"
+					}
+				]
+			},
+			"templateTarget":"center",
+			"tags":{"id":"table"}
+		},
+		
+		{	"widget": "AutocompleteWidget",
+			"parameters": {
+				"id": "text",
+				"target": "#search",
+				"multiple":true,
+				"facet":"value",
+				"checkbox":"Include all interactions"
+			},
+			"templateTarget":"left",
+			"tags":{"title":"Proteins","subtitle":"(press ESC to close suggestions)","id":"search"}
+		},
+		
+		{	"widget": "CurrentSearchWidget",
+			"parameters": {
+				"id": "currentsearch",
+				"target": "#selection",
+				"label_all":"Random Selection."
+			},
+			"templateTarget":"middle",
+			"tags":{"title":"","id":"selection"}
+		},
+		
+		{	"widget": "RulerWidget",
+			"parameters": {
+				"id": "ruler",
+				"target": "#ruler",
+				"dynamicRuleField":[ 
+					{	"target": 0,
+						"condition":1,
+						"widget":"requester",
+						"parameter":"ids"
+					},
+					{	"target": 1,
+						"condition":1,
+						"widget":"requester",
+						"parameter":"ids"
+					},
+					{	"target": 1,
+						"condition":2,
+						"widget":"requester",
+						"parameter":"ids"
+					},
+					{	"target": 0,
+						"condition":4,
+						"widget":"requester",
+						"parameter":"features"
+					},
+					{	"target": 0,
+						"action":5,
+						"widget":"requester",
+						"parameter":"features",
+						"otherValues":["Protein Queried","organism"]
+					},
+					{	"target": 0,
+						"action":6,
+						"widget":"requester",
+						"parameter":"features",
+						"otherValues":["Protein Queried","organism"]
+					},
+					{	"target": 0,
+						"action":7,
+						"widget":"requester",
+						"parameter":"features"
+					},
+					{	"target": 1,
+						"condition":4,
+						"widget":"requester",
+						"parameter":"scores"
+					}
+				],
+				"rules": {
+					"location": [ ],
+					"target": [ 
+						{	"name": "Proteins",
+							"action": [
+									 {"name":"Highlight","type":"single"},
+									 {"name":"Show","type":"single"},
+									 {"name":"Hide","type":"single"},
+									 {"name":"Color","type":"color"},
+									 {"name":"Border","type":"color"},
+									 {"name":"Color By","type":"select","options":["Protein Queried","Functional Class","Organism","Gene Name"]},
+									 {"name":"Border By","type":"select","options":["Protein Queried","Functional Class","Organism","Gene Name"]},
+									 {"name":"Show Label","type":"select","options":["ID","Functional Class","Organism","Gene Name"]},
+									 {"name":"Hide Label","type":"single"}
+							],
+							"conditions": [ 
+								{	"name": "no filters",
+									"type": "all"
+								},
+								{	"name": "interactions with",
+									"type": "selects",
+									"amount": 1,
+									"values": [ ]
+								}, 
+								{	"name": "number of interactions",
+									"type": "numeric_comparison"
+								}, 
+								{	"name": "accession number",
+									"type": "text_comparison"
+								}, 
+								{	"name": "feature",
+									"type": "feature_comparison",
+									"values": []
+								}
+							]
+						}, 
+						{	"name": "Interactions",
+							"action": [
+									 {"name":"Highlight","type":"single"},
+									 {"name":"Show","type":"single"},
+									 {"name":"Hide","type":"single"},
+									 {"name":"Border","type":"color"}
+							],
+							"conditions": [ 
+								{	"name": "no filters",
+									"type": "all"
+								},
+								{	"name": "protein",
+									"type": "selects",
+									"amount": 1,
+									"values": [ ]
+								}, 
+								{	"name": "proteins",
+									"type": "selects",
+									"amount": 2,
+									"values": [ ]
+								}, 
+								{	"name": "score",
+									"type": "numeric_comparison"
+								}, 
+								{	"name": "type of evidence",
+									"type": "selects",
+									"amount": 1,
+									"values": [ ]
+								} 
+							]
+						} 
+					]
+				}
+			},
+			"templateTarget":"right",
+			"tags":{"id":"ruler"}
+		},
+		
+		{	"widget": "ContextMenuWidget",
+			"parameters": {
+				"id": "context",
+				"target": "body",
+				"triggerer":".graphNetwork .node",
+				"menuStyle": 		{"width" :		"150px"},
+				"itemStyle": 		{"font-size" :	"0.7em"},
+				"itemHoverStyle" : 	{"font-size":	"0.8em"},
+				"menu": {
+					"interactions" :	{ "label":	"Get Interactions"},
+					"hideProtein" :		{ "label":	"Hide"},
+					"hideInteractions":	{ "label":	"Hide Interactions"},
+					"label" :			{ "label":	"Show/Hide Label"},
+					"lock" :			{ "label":"Release"},
+					"highlight" :		{ "label":"Highlight"},
+					"highlight_p" :		{ "label":"Highlight Interactors"},
+					"highlight_i" :		{ "label":"Highlight Interactions"}
+				}
+			}
+		},
+		{	"widget": "ContextMenuWidget",
+			"parameters": {
+				"id": "context2",
+				"target": "body",
+				"triggerer":".graphCircle .node",
+				"menuStyle":		{"width": "150px"},
+				"itemStyle":		{"font-size": "0.7em"},
+				"itemHoverStyle":	{"font-size": "0.8em"},
+				"menu": {
+					"interactions":		{"label":	"Get Interactions"},
+					"hideProtein":		{"label":	"Hide"},
+					"hideInteractions":	{ "label":	"Hide Interactions"},
+					"label":			{"label":	"Show/Hide Label"},
+					"highlight":		{"label":	"Highlight"},
+					"highlight_p":		{"label":	"Highlight Interactors"},
+					"highlight_i":		{"label":	"Highlight Interactions"}
+				}
+			}
+		},
+		
+		{	"widget": "ExpressionWidget",
+			"parameters": {
+				"id": "expression",
+				"target": "expression"
+			},
+			"templateTarget":"right",
+			"tags":{"id":"expression"}
+		},
+		
+		{	"widget": "DetailsFrameWidget",
+			"parameters": {
+				"id": "info",
+				"target": "info",
+				"locations":["protein.features","interaction.doc"],
+				"defeultText": "Selection Empty",
+				"positionTarget": "ruler",
+				"myPosition":"right bottom",
+				"atPosition":"right bottom"
+			},
+			"templateTarget":"center",
+			"tags":{"id":"info"}
+		},
+		
+		{	"widget": "EventManagerWidget",
+			"parameters": {
+				"id": "events",
+				"events": [	
+				   		{	"source":"ruler",
+				   			"object":"ruler",
+				   			"event":"onRuleCreated",
+				   			"listener":"graph",
+				   			"method":"executeStylers",
+				   			"type":"init"
+				   		},
+				   		{	"source":"ruler",
+				   			"object":"ruler",
+				   			"event":"onRuleRemoved",
+				   			"listener":"graph",
+				   			"method":"executeStylers",
+				   			"type":"init"
+				   		},
+				   		{	"source":"ruler",
+				   			"object":"ruler",
+				   			"event":"onRuleEditing",
+				   			"listener":"graph",
+				   			"method":"executeStylers",
+				   			"type":"init"
+				   		},
+				   		{	"source":"ruler",
+				   			"object":"ruler",
+				   			"event":"onOrderChanged",
+				   			"listener":"graph",
+				   			"method":"executeStylers",
+				   			"type":"init"
+				   		},
+				   		{	"source":"ruler",
+				   			"object":"ruler",
+				   			"event":"onRuleCreated",
+				   			"listener":"graph2",
+				   			"method":"executeStylers",
+				   			"type":"init"
+				   		},
+				   		{	"source":"ruler",
+				   			"object":"ruler",
+				   			"event":"onRuleRemoved",
+				   			"listener":"graph2",
+				   			"method":"executeStylers",
+				   			"type":"init"
+				   		},
+				   		{	"source":"ruler",
+				   			"object":"ruler",
+				   			"event":"onRuleEditing",
+				   			"listener":"graph2",
+				   			"method":"executeStylers",
+				   			"type":"init"
+				   		},
+				   		{	"source":"ruler",
+				   			"object":"ruler",
+				   			"event":"onOrderChanged",
+				   			"listener":"graph2",
+				   			"method":"executeStylers",
+				   			"type":"init"
+				   		},
+				   		{	"source":"ruler",
+				   			"object":"ruler",
+				   			"event":"onRuleCreated",
+				   			"listener":"table",
+				   			"method":"executeStylers",
+				   			"type":"init"
+				   		},
+				   		{	"source":"ruler",
+				   			"object":"ruler",
+				   			"event":"onRuleRemoved",
+				   			"listener":"table",
+				   			"method":"executeStylers",
+				   			"type":"init"
+				   		},
+				   		{	"source":"ruler",
+				   			"object":"ruler",
+				   			"event":"onRuleEditing",
+				   			"listener":"table",
+				   			"method":"executeStylers",
+				   			"type":"init"
+				   		},
+				   		{	"source":"ruler",
+				   			"object":"ruler",
+				   			"event":"onOrderChanged",
+				   			"listener":"table",
+				   			"method":"executeStylers",
+				   			"type":"init"
+				   		},
+				   		{	"source":"expression",
+				   			"object":"loader",
+				   			"event":"onFileLoaded",
+				   			"listener":"expression",
+				   			"method":"onFileLoaded",
+				   			"type":"init"
+				   		},
+				   		{	"source":"expression",
+				   			"object":"loader",
+				   			"event":"onFileLoaded",
+				   			"listener":"graph",
+				   			"method":"executeStylers",
+				   			"type":"init"
+				   		},
+				   		{	"source":"expression",
+				   			"object":"loader",
+				   			"event":"onFileRemoved",
+				   			"listener":"expression",
+				   			"method":"onFileRemoved",
+				   			"type":"init"
+				   		},
+				   		{	"source":"expression",
+				   			"object":"loader",
+				   			"event":"onFileRemoved",
+				   			"listener":"graph",
+				   			"method":"executeStylers",
+				   			"type":"init"
+				   		},
+				   		{	"source":"expression",
+				   			"object":"loader",
+				   			"event":"onFileLoaded",
+				   			"listener":"graph2",
+				   			"method":"executeStylers",
+				   			"type":"init"
+				   		},
+				   		{	"source":"expression",
+				   			"object":"loader",
+				   			"event":"onFileRemoved",
+				   			"listener":"graph2",
+				   			"method":"executeStylers",
+				   			"type":"init"
+				   		},
+				   		{	"source":"expression",
+				   			"object":"loader",
+				   			"event":"onFileLoaded",
+				   			"listener":"table",
+				   			"method":"executeStylers",
+				   			"type":"init"
+				   		},
+				   		{	"source":"expression",
+				   			"object":"loader",
+				   			"event":"onFileRemoved",
+				   			"listener":"table",
+				   			"method":"executeStylers",
+				   			"type":"init"
+				   		},
+				   		{	"source":"graph",
+				   			"object":"graph",
+				   			"event":"proteinClick",
+				   			"listener":"graph",
+				   			"method":"proteinClick",
+				   			"type":"afterRequest"
+				   		},
+				   		{	"source":"graph",
+				   			"object":"graph",
+				   			"event":"interactionClick",
+				   			"listener":"graph",
+				   			"method":"interactionClick",
+				   			"type":"afterRequest"
+				   		},
+				   		{	"source":"graph",
+				   			"object":"graph",
+				   			"event":"proteinClick",
+				   			"listener":"info",
+				   			"method":"fillDetails",
+				   			"type":"afterRequest"
+				   		},
+				   		{	"source":"graph",
+				   			"object":"graph",
+				   			"event":"interactionClick",
+				   			"listener":"info",
+				   			"method":"fillDetails",
+				   			"type":"afterRequest"
+				   		},
+				   		{	"source":"graph2",
+				   			"object":"graph",
+				   			"event":"proteinClick",
+				   			"listener":"graph2",
+				   			"method":"proteinClick",
+				   			"type":"afterRequest"
+				   		},
+				   		{	"source":"graph2",
+				   			"object":"graph",
+				   			"event":"proteinClick",
+				   			"listener":"info",
+				   			"method":"fillDetails",
+				   			"type":"afterRequest"
+				   		},
+				   		{	"source":"graph2",
+				   			"object":"graph",
+				   			"event":"proteinMouseOver",
+				   			"listener":"graph2",
+				   			"method":"overProtein",
+				   			"type":"afterRequest"
+				   		},
+				   		{	"source":"graph2",
+				   			"object":"graph",
+				   			"event":"proteinMouseOut",
+				   			"listener":"graph2",
+				   			"method":"outOfProtein",
+				   			"type":"afterRequest"
+				   		},
+				   		{	"source":"graph2",
+				   			"object":"graph",
+				   			"event":"interactionClick",
+				   			"listener":"graph2",
+				   			"method":"interactionClick",
+				   			"type":"afterRequest"
+				   		},
+				   		{	"source":"graph2",
+				   			"object":"graph",
+				   			"event":"sizeChanged",
+				   			"listener":"context2",
+				   			"method":"afterRequest",
+				   			"type":"afterRequest"
+				   		},
+				   		{	"source":"graph2",
+				   			"object":"graph",
+				   			"event":"sizeChanged",
+				   			"listener":"events",
+				   			"method":"afterRequest",
+				   			"type":"afterRequest"
+				   		}
+				   	]
+
+			}
+		}
+	]
+}

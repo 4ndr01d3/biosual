@@ -1,0 +1,8 @@
+{
+    "name": "Current Search",
+    "description": "A way to display the current search parameters",
+    "dependencies":[],
+    "js": "CurrentSearchWidget.js",
+    "html": "CurrentSearchWidget.html",
+    "css": "CurrentSearchWidget.css"
+}
