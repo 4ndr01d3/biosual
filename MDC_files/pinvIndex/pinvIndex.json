@@ -3,22 +3,43 @@
 		"name":"template3",
 		"tags":{
 			"title":"Protein Interaction Network Visualizer",
-			"logoURL":"../../MDC_files/pinvIndex/images/PINV_240.png"
+			"logoURL":"MDC_files/pinvIndex/images/PINV_240.png"
 		}
 	},
-	"css":	["tests/pinv/pinvIndex.css"],
 	"server":"http://biosual.cbio.uct.ac.za/solr/", 
+	"servlet":"admin/cores",
+	"ajaxsolr_parameters":{
+		"json.nl": "map",
+		"rows": 300,
+		"Explicit":"True",
+		"wt":"json"
+	},
 	"widgets": [
 		{	"widget": "ListOfCoresWidget",
 			"parameters": {
 				"id": "listofcores",
 				"target": "listofcores",
-				"url":"./pinvNew.html",
+				"url":"./pinViewer.html",
 				"header": "List of Datasets:",
 				"filter":true
 			},
 			"templateTarget":"center",
 			"tags":{"id":"listofcores"}
+		},
+		{	"widget": "NetworkLoader",
+			"parameters": {
+				"id": "loader",
+				"targetN": "coreName",
+				"targetI": "interactionsLoader",
+				"targetF": "featuresLoader",
+				"url":"./pinViewer.html"
+			},
+			"templateTarget":"center",
+			"tags":{"id":"loader","formTarget":"http://biosual.cbio.uct.ac.za/uploader/upload"}
+		},
+		{	"widget": "IFrameWidget",
+			"templateTarget":"center",
+			"tags":{"id":"documentation","url":"docs.html" }
 		},
 		{	"widget": "InvertedTabsWidget",
 			"parameters": {
@@ -30,22 +51,15 @@
 				       "selected":true
 				     },
 				     { "title": "Load Data",
-				       "target":"graph2",
+				       "target":"loader",
 				       "selected":false
 				     },
 				     { "title": "Documentation",
-				       "target":"table",
+				       "target":"documentation",
 				       "selected":false
 				     }
 				],
 				"sideEffects":[
-				     { "target":"size",
-				       "visibleWith":["Network","Circle"] 
-				     },
-				     { "target":"info",
-					       "visibleWith":["Network","Circle"] 
-					 }
-
 				]
 			},
 			"templateTarget":"optionbar",

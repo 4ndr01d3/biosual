@@ -112,6 +112,7 @@ switch ($_GET['type']){
 		echo "var json = ".json_encode($json->widgets).";\n";
 		echo "var params = ".json_encode($json->ajaxsolr_parameters).";\n\n";
 		echo "var server = ".json_encode($json->server).";\n";
+		if ($json->servlet) echo "var servlet = ".json_encode($json->servlet).";\n";
 		echo "var events = ".json_encode($json->events).";\n";
 		
 		echo "//pre-loader script".$json->preloader;

@@ -1,0 +1,23 @@
+						
+						<div id="{id}" class="networkLoader">
+							<header></header>
+							<form action="{formTarget}" method="POST" enctype="multipart/form-data">
+								<ul>
+									<li id="coreName" class="textField2Validate">
+										<span class="label">Data Set Name: </span> 
+										<input type="text" class="textField2Validate" name="network_name" /><br /> 
+										<output class="coreValidation"></output>
+									</li>
+									<li id="interactionsLoader"></li>
+									<li id="featuresLoader"></li>
+								</ul>
+								<div class="buttonHolder">
+									<button class="inactive" disabled="disabled">Create Data Set</button>
+								</div>
+							</form>
+							<div class="progress">
+								<div class="bar"> </div>
+								<div class="percent">0%</div>
+							</div>
+							<div id="status"></div>
+						</div>

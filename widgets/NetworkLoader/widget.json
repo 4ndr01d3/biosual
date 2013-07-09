@@ -1,0 +1,8 @@
+{
+    "name": "Network File loader",
+    "description": "a widget to load files to create a new network data set",
+    "dependencies":["Biojs.FileLoader.js","jquery.form.js"],
+    "js": "NetworkLoader.js",
+    "css": "NetworkLoader.css",
+    "html": "NetworkLoader.html"
+}

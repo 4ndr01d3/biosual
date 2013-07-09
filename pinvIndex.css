@@ -1,0 +1,23 @@
+body {
+	background-image:url('MDC_files/pinvIndex/images/Connections_by_MT_y2.jpg');
+	background-repeat:no-repeat;
+	background-position:top center;
+}
+.invertedshiftdown {
+	border-top:0px;
+}
+.invertedshiftdown a{
+	-moz-border-radius-topleft: 5px;
+	border-top-left-radius: 5px;
+	-moz-border-radius-topright: 5px;
+	border-top-right-radius: 5px;
+	margin: 0 4px 0 0;
+}
+
+.invertedshiftdown ul {
+	margin-left: 340px;
+}
+body>footer {
+	text-align: center;
+	font-size: 0.8em;
+}
