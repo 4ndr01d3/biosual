@@ -65,7 +65,7 @@
 				"sDom": 'T<"clear">lfrtip',
 				"oTableTools": {
 					"aButtons": [ "copy", "csv" ],
-					"sSwfPath": "../../widgets/TableWidget/copy_csv_xls_pdf.swf"
+					"sSwfPath": "widgets/TableWidget/copy_csv_xls_pdf.swf"
 				}
 		    });
 			self.oTable= oTable;

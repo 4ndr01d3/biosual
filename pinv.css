@@ -1,0 +1,13 @@
+header.main{
+	background-image:url("images/pinv/PINV_50.png");
+	background-repeat:no-repeat;
+	height:50px;
+}
+.item {
+	text-align:right;
+	font-size: 70%;
+}
+.item a {
+	color: #1f77b4;
+	text-decoration: none;
+}
