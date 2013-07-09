@@ -1,0 +1,229 @@
+.networkLoader { 
+	float:left;
+	width:960px;
+	padding: 5px;
+	font-family: Calibri, Arial;
+	font-size:20px;
+}
+.networkLoader header{
+	font-weight: bold;
+	font-size:	18px;
+	float: left;
+} 
+
+
+.networkLoader .button-link { 
+	display:none;
+}
+.networkLoader .fake-file{
+	padding-left:32px;
+	padding-top:16px;
+	vertical-align:middle;
+	background-image:url('images/open-exp.png');
+}
+.networkLoader .exp-edit{
+	background-image:url('images/pencil-exp.png');
+}
+.networkLoader .exp-remove{
+	background-image:url('images/off-exp.png');
+}
+
+.networkLoader .fake-file:hover{
+	cursor: pointer;
+	font-weight:bold;
+	background-color: #FDD;
+}
+.networkLoader output {
+	text-decoration: none;
+	font-size: 75%;
+	color: #55F;
+}
+.networkLoader label[for=color] {
+	font-size: 75%;
+	text-decoration: none;
+	padding-top: 10px;
+	
+}
+.networkLoader output {
+	text-decoration: none;
+	font-size: 75%;
+   	color: #D10000;
+}
+.networkLoader ul {
+	margin-left: 0;
+	padding-left: 0;
+	list-style-type: none;
+/*	height:350px; 
+*/ 
+}
+.networkLoader li {
+	display: block;
+	padding: 20px;
+	width: 870px;
+	background-color: rgba(150,200,250,0.7);
+	margin-bottom: 5px;
+	border-radius: 40px; /* half of button size + padding */
+	-moz-border-radius: 40px;
+}
+.networkLoader .fakefile{
+	display: inline;
+	text-decoration: underline;
+	cursor:pointer;
+	color: #22e;
+}
+.networkLoader input[type=text]{
+	font-size:1.2em;
+	padding-left: 10px;
+}
+.networkLoader span.index {
+    display: inline-block;
+    *display: inline;/* for IE7*/
+    *zoom:1;/* for IE7*/
+   	background-color: #D10000;
+	color: white;
+	text-align: center;
+	font-size:2em;
+	min-width:45px;
+	min-height:40px;
+	border-radius: 40px; /* half of button size + padding */
+	-moz-border-radius: 40px;
+	margin-right: 20px;
+	
+}
+.networkLoader table{
+	border-collapse:collapse;
+	padding: 0 8px 0 8px;
+}
+.networkLoader th{
+	padding: 0 8px 0 8px;
+	background-color: #fff;
+	border: 1px solid #ddd;
+}
+.networkLoader td{
+	padding: 0 8px 0 8px;
+	border: 1px solid #ddd;
+	background-color: rgba(250,250,250,0.5);
+	color: #F44;
+}
+.networkLoader div.sample{
+	position: relative; 
+	top: -215px;; 
+	font-weight: bold; 
+	font-size:80px;
+	text-shadow: -2px -2px 2px #fff, 2px 2px 2px #000;
+	color: #9c8468;
+	opacity: 0.4;
+	-webkit-transform: rotate(-9deg);
+	-moz-transform: rotate(-9deg);
+	-ms-transform: rotate(-9deg);
+	-o-transform: rotate(-9deg);
+	height: 0px;
+}
+.networkLoader .error {
+	position: relative;
+	top: -26px;
+	left: 800px;
+	font-size: 60px;
+	color: #D00;	
+	display: block;
+}
+.networkLoader .ok {
+	position: relative;
+	top: -26px;
+	left: 800px;
+	font-size: 60px;
+	color: #0D0;	
+}
+.networkLoader div.buttonHolder {
+	text-align:right;
+	width:800px;
+}
+.networkLoader button.active {
+	font-size: 1.3em;
+	font-size: 1.3em;
+	color: #ffffff;
+	padding: 10px 20px;
+	background: -moz-linear-gradient(
+		top,
+		#d10000 0%,
+		#d16666);
+	background: -webkit-gradient(
+		linear, left top, left bottom, 
+		from(#d10000),
+		to(#d16666));
+	-moz-border-radius: 30px;
+	-webkit-border-radius: 30px;
+	border-radius: 30px;
+	border: 2px solid #d10000;
+	-moz-box-shadow:
+		0px 1px 3px rgba(000,000,000,0.5),
+		inset 0px 0px 1px rgba(255,255,255,0.7);
+	-webkit-box-shadow:
+		0px 1px 3px rgba(000,000,000,0.5),
+		inset 0px 0px 1px rgba(255,255,255,0.7);
+	box-shadow:
+		0px 1px 3px rgba(000,000,000,0.5),
+		inset 0px 0px 1px rgba(255,255,255,0.7);
+	text-shadow:
+		0px -1px 0px rgba(000,000,000,0.4),
+		0px 1px 0px rgba(255,255,255,0.3);
+}
+.networkLoader button.inactive {
+
+	font-size: 1.3em;
+	color: #bbb;
+	padding: 10px 20px;
+	background-color: #eee;
+	-moz-border-radius: 30px;
+	-webkit-border-radius: 30px;
+	border-radius: 30px;
+	border: 0px;
+	-moz-box-shadow:
+		0px 1px 3px rgba(000,000,000,0.5),
+		inset 0px 0px 1px rgba(255,255,255,0.7);
+	-webkit-box-shadow:
+		0px 1px 3px rgba(000,000,000,0.5),
+		inset 0px 0px 1px rgba(255,255,255,0.7);
+	box-shadow:
+		0px 1px 3px rgba(000,000,000,0.5),
+		inset 0px 0px 1px rgba(255,255,255,0.7);
+	text-shadow:
+		0px -1px 0px rgba(000,000,000,0.4),
+		0px 1px 0px rgba(255,255,255,0.3);
+}
+.networkLoader button.active:active {
+        position:relative;
+        top:1px;
+}
+.networkLoader button.active:hover {
+	background: -moz-linear-gradient(
+		top,
+		#d16666 0%,
+		#d10000);
+	background: -webkit-gradient(
+		linear, left top, left bottom, 
+		from(#d16666),
+		to(#d10000));
+	cursor: pointer;
+}
+
+.progress { 
+	position:relative; 
+	width:400px; 
+	border: 1px solid #d10000; 
+	padding: 1px; 
+	border-radius: 3px;
+}
+.bar { 
+	background-color: #fff; 
+	width:0%; 
+	height:20px; 
+	border-radius: 3px;
+}
+.percent { 
+	font-size:0.8em;
+	position:absolute; 
+	display:inline-block; 
+	top:3px; 
+	left:48%; 
+}

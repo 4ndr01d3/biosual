@@ -1,0 +1,8 @@
+{
+    "name": "iframe widget",
+    "description": "Widget to embbed another web",
+    "dependencies":[],
+    "js": "IFrameWidget.js",
+    "html": "IFrameWidget.html",
+    "css": "IFrameWidget.css"
+}

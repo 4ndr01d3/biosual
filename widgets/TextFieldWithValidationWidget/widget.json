@@ -1,0 +1,8 @@
+{
+    "name": "Text Field With Validation Widget",
+    "description": "Simple textfield form that allows validation of invalid names",
+    "dependencies":[], 
+    "js": "TextFieldWithValidationWidget.js",
+    "html": "TextFieldWithValidationWidget.html",
+    "css": "TextFieldWithValidationWidget.css"
+}

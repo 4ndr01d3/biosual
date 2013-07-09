@@ -1,0 +1,8 @@
+{
+    "name": "List of Cores",
+    "description": "a widget to display links based on the available cores of a solr instance",
+    "dependencies":[],
+    "js": "ListOfCoresWidget.js",
+    "html": "ListOfCoresWidget.html",
+    "css": "ListOfCoresWidget.css"
+}

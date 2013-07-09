@@ -1,0 +1,35 @@
+body {
+	background-color:#dadae0;
+	font-family: Jura, Monaco, Arial;
+	font-size:	16px;
+ }
+.wrap {
+    margin: 0;
+    padding: 0;
+    text-align:center;
+}
+.container, .optionbar { 
+	overflow:auto; 
+    margin: 0 auto;
+    text-align: left;
+    width: 1000px;
+ 	overflow-x: hidden;
+ }
+
+.sidebar { 
+	float:left; 
+	width:6px; 
+	background-color:#D10000; 
+	min-height:400px; 
+	border-radius: 3px; /* half of button size + padding */
+	-moz-border-radius: 3px;
+}
+.sbleft {
+	background: -webkit-gradient(linear, left top, right top, from(#D10000), to(#FFF));
+	background: -moz-linear-gradient(left, #D10000, #FF);
+}
+.sbright {
+	background: -webkit-gradient(linear, left top, right top, from(#FFF), to(#D10000));
+	background: -moz-linear-gradient(left, #FFF, #D10000);
+}
+
