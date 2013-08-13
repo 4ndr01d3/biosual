@@ -100,7 +100,7 @@
 				"id": "svggraph",
 				"target": "#graph",
 				"formats":["PNG","SVG"],
-				"css":".figure {fill: #89B; stroke: #fff;} text {font: 10px sans-serif; font-weight:normal; stroke: #000; stroke-width: 0px;}"
+				"css":".figure {fill: #89B; stroke: #fff;} text {font: 10px sans-serif; font-weight:normal; stroke: #000; stroke-width: 0px;  stroke: transparent;}"
 			}
 		},
 		{	"widget": "CircleGraphWidget",

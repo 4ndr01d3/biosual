@@ -504,6 +504,7 @@ Biojs.InteractionsD3 = Biojs.extend (
 			self.interactions=[];
 			self.restart();
 		},
+		_figuresOrder:[0,3,2,5,4,1],
 		/**
 		 * Restart the graphic to materialize the changes don on it(e.g. add/remove proteins)
 		 * 
@@ -558,7 +559,7 @@ Biojs.InteractionsD3 = Biojs.extend (
 				.attr("d", d3.svg.symbol()
 						.size(self.opt.radius*40)
 						.type(function(d) {
-							return d3.svg.symbolTypes[self.organisms[d.organism]];
+							return d3.svg.symbolTypes[self._figuresOrder[self.organisms[d.organism]]];
 						})
 					)
 				.attr("id", function(d) { return "figure_"+d.id; })

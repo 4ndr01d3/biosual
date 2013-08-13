@@ -35,7 +35,8 @@
 				target: self.targetI,
 				minCols:3,
 				label: "Load Interactions File",
-				name:"network_file"
+				name:"network_file",
+				checkNLines:100
 			});
 			self.loaderI.onFileLoaded(function( objEvent ) {
 				$("#"+self.targetI+" output").html(self.loaderI.getFormatedTable(5));
@@ -54,7 +55,8 @@
 				target: self.targetF,
 				minCols:2,
 				label: "Load Features File",
-				name:"annotations_file"
+				name:"annotations_file",
+				checkNLines:100
 			});
 			self.loaderF.onFileLoaded(function( objEvent ) {
 				$("#"+self.targetF+" output").html(self.loaderF.getFormatedTable(5));
@@ -93,6 +95,12 @@
 			        bar.width(percentVal);
 			        percent.html(percentVal);
 					//console.log(percentVal, position, total);
+			        if (percentComplete==100){
+						status.html("<p>File Loaded to our servers. Now the content is been proccess it.</p>");
+				        bar.width("0%");
+				        percent.html("0% (0/"+self.loaderI.numberOfLines+")");
+				        self.checkInteractionsLoaded();
+			        }
 			    },
 			    success: function() {
 			        var percentVal = '100%';
@@ -105,12 +113,18 @@
 			    },
 				complete: function(xhr) {
 					if (fail){
-						status.html("<p>Error loading the files. please try again.</p>");
-						$("#"+self.id+" form").show();
+						if (xhr.responseText=="")
+							status.html("<p>The HTTP connection has been lost, however if your file has been succefully loaded it keep loading, check the progress bar above.</p>");
+						else{							
+							status.html("<p>Error loading the files. please try again.</p>");
+							status.append("<p>Server Response:</p><pre>"+xhr.responseText+"</pre>");
+							$("#"+self.id+" form").show();
+						}
 					}else{
 						status.html("<p>Your Files have been updated to our servers.</p>");
 						status.append('<p>You can see your data set on PINV by clicking <a href="'+self.url+'?core='+$('#'+self.targetN+ " .textField2Validate").val()+'">HERE</a>.</p>');
-						status.append('<p><b>WARNING:</b> Although we receive your files, we are busy processing them, therefore the link above might not containt all the information yet.</p>');
+//						status.append('<p><b>WARNING:</b> Although we receive your files, we are busy processing them, therefore the link above might not containt all the information yet.</p>');
+						//TODO: Check the response to report about skipped interactions. 
 					}
 				}
 			}); 
@@ -121,8 +135,30 @@
 			for (var facet in self.manager.response.status) {
 				self.excludeNames.push(facet);
 			}
+			var val =$('#'+self.targetN+ " .textField2Validate").val();
+			if (val!="" && self.excludeNames.indexOf(val)!=-1){
+				var per=(100*(self.manager.response.status[val].index.numDocs/self.loaderI.numberOfLines)).toFixed(1);
+				if(per>99){
+					self.checkingProgress=false;
+					per=100;
+				}
+				$('.bar').width(per+"%");
+				$('.percent').html(per+"% ("+self.manager.response.status[val].index.numDocs+"/"+self.loaderI.numberOfLines+")");
+			}
+			if(self.checkingProgress)
+				self.checkInteractionsLoaded();
+
 		},
-		
+		checkingProgress:false,
+		checkInteractionsLoaded: function(){
+			var self = this;
+			self.checkingProgress=true;
+			var timeoutReference=0;
+	        if (timeoutReference) clearTimeout(timeoutReference);
+	        timeoutReference = setTimeout(function() {
+	        	self.manager.doRequest(0);
+	        },2000);			
+		},
 
 		onFileLoaded: function( objEvent ) {
 			var self=this;

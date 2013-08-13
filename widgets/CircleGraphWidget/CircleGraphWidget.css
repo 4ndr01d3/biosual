@@ -49,3 +49,6 @@
   stroke: transparent;
   pointer-events: none;
 }
+.graphCircle .mainLegend{
+	font-size: 70%;
+}

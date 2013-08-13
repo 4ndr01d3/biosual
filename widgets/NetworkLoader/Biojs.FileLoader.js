@@ -71,7 +71,8 @@ Biojs.FileLoader = Biojs.extend (
 			target: "YourOwnDivId",
 			label: "Load File...",
 			minCols:2,
-			name: "files[]"
+			name: "files[]",
+			checkNLines:null
 		},
 
 		/**
@@ -129,10 +130,11 @@ Biojs.FileLoader = Biojs.extend (
 					"onError",
 					
 				], 
+		numberOfLines:null,
 		_handleFileSelect: function(evt){
 			var self = this;
 			var files = evt.target.files; // FileList object
-			
+			$("#"+self.opt.target+" output").html("<img src='widgets/NetworkLoader/workingbar.gif' />");
 			// files is a FileList of File objects. List some properties.
 			for (var i = 0, f; f = files[i]; i++) {
 				if (!f.type.match('text.*')) {
@@ -171,7 +173,10 @@ Biojs.FileLoader = Biojs.extend (
 
 			var lines = text.split("\n");
 			var columns =-1;
-			for (var i=0; i< lines.length; i++){
+			self.numberOfLines=lines.length;
+			self.opt.checkNLines = (typeof self.opt.checkNLines=='undefined' || self.opt.checkNLines>lines.length)?lines.length:self.opt.checkNLines;
+
+			for (var i=0; i< self.opt.checkNLines; i++){
 				if (lines[i].indexOf("#")==0)
 					self.parseHeader(lines[i]);
 				else{

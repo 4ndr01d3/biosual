@@ -89,6 +89,7 @@
 			var self=this;
 			var s=size.split("x");
 			self.graph.setSize(s[0],s[1]);
+			self.graph.restart();
 			self.executeStylers();
 
 		},
@@ -197,10 +198,13 @@
 				}
 				self.graph.proteins[i].group=g;
 			}
-			if (typeof type != "undefined" && type=="color")
+			if (typeof type != "undefined" && type=="color"){
 				self.colorBy(self,selector);
-			else
+				self.graph.addLegends(classes,"Color By");
+			}else{
 				self.borderBy(self,selector);
+				self.graph.addLegends(classes,"Border By");
+			}
 		},
 		colorBySeed: function(self,selector,type){
 			selector = (typeof selector=="undefined")?".figure":selector;
@@ -217,10 +221,13 @@
 					}
 				}
 			}
-			if (typeof type != "undefined" && type=="color")
+			if (typeof type != "undefined" && type=="color"){
 				self.colorBy(self,selector);
-			else
+				self.graph.addLegends(proteins,"Color By");
+			}else{
 				self.borderBy(self,selector);
+				self.graph.addLegends(proteins,"Border By");
+			}
 		},
 		colorBy:function(self,selector){
 			self.graph.vis.selectAll(selector).style("fill", function(d) {       	
@@ -238,6 +245,7 @@
 		},
 		executeStylers: function(){
 			var self = this;
+			self.graph.addLegends(null);
 			self.graph.setFillColor(".figure",null);
 			self.graph.setColor(".figure",null);
 			self.graph.vis.selectAll(".node").attr("visibility", 'visible').style("stroke","#fff");
@@ -247,6 +255,7 @@
 //				console.debug("styler:"+i);
 				self.stylers[i]();
 			}
+			self.graph.restart();
 		},
 		removeStyler:function(name){
 			var self = this;

@@ -327,8 +327,12 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 			if (radious<self.opt.width) radious=self.opt.width;
 			self.cluster.size([360, radious/2 - self.opt.textLength] );
 			d3.select("#innergroup")
-	    		.attr("transform", "translate(" + self.opt.width/2 + "," + self.opt.height/2 + ")")
-
+	    		.attr("transform", "translate(" + self.opt.width/2 + "," + self.opt.height/2 + ")");
+	    			
+			self.svg.selectAll("path.link").remove();
+			self.svg.selectAll("g.node").remove();
+			self.svg.selectAll("circle.figure").remove();
+			
 			self.restart();
 			self.raiseEvent('sizeChanged', {
 				width:width,
@@ -601,10 +605,10 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 			
 			self.splines = self.bundle(links);
 
-			self.svg.selectAll("path.link").remove();
 			var path = self.svg.selectAll("path.link")
-				.data(links)
-				.enter().append("svg:path")
+				.data(links);
+			
+			path.enter().append("svg:path")
 				.attr("id", function(d) { return "link-" + d.source.key + "-" + d.target.key; })
 				.attr("class", function(d) { return "link source-" + d.source.key + " target-" + d.target.key; })
 				.attr("d", function(d, i) { return self.line(self.splines[i]); })
@@ -624,31 +628,33 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 						interaction: d
 					});
 				});
-;
 
-			self.svg.selectAll("g.node").remove();
-			self.svg.selectAll("g.node .figure").remove();
-			self.svg.selectAll("g.node")
-				.data(nodes.filter(function(n) { return !n.children; }))
-				.enter().append("svg:g")
+			path.exit().remove();
+
+			var gnodes=self.svg.selectAll("g.node")
+				.data(nodes.filter(function(n) { return !n.children; }));
+			
+			var svgNode=gnodes.enter().append("svg:g")
 					.attr("class", "node")
 					.attr("id", function(d) { return "node-" + d.key; })
-					.attr("transform", function(d) { return "rotate(" + (d.x - 90) + ")translate(" + d.y + ")"; })
-					.append("svg:text")
+					.attr("transform", function(d) { return "rotate(" + (d.x - 90) + ")translate(" + d.y + ")"; });
+			
+			svgNode.append("svg:text")
 						.attr("class", "legend")
 						.attr("dx", function(d) { return d.x < 180 ? 8 : -8; })
 						.attr("dy", ".31em")
 						.attr("text-anchor", function(d) { return d.x < 180 ? "start" : "end"; })
 						.attr("transform", function(d) { return d.x < 180 ? null : "rotate(180)"; })
+						.attr("visibility",function(d) { return (d.showLegend)?"visible":"hidden";})
 						.text(function(d) { return d.key; });
 
-			self.svg.selectAll("g.node").append("circle")
+			svgNode.append("circle")
 				.attr("class", "figure")
 				.attr("id", function(d) { return "figure_"+d.id; })
 				.attr("r", self.opt.radius)
 				.attr("stroke-width",self.opt.radius*0.3);
 			
-			self.svg.selectAll("g.node")
+			gnodes
 				.on("mouseover",  function(d){ 
 					self.raiseEvent('proteinMouseOver', {
 						protein: d
@@ -664,9 +670,107 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 						protein: d
 					});
 				});
+			gnodes.exit().remove();
 
-			self.hide("g.node .legend");
+//			self.hide("g.node .legend");
+			self.svg.selectAll(".legendBlock").remove();
+			if (typeof self.legends!="undefined" && self.legends!=null)
+				self._paintLegends();
 		},
+		
+		_sortLegends:function(){
+			var self = this;
+			self.legends.sort(function(a,b){
+				if (a[1]==b[1]){
+					if (a[0]=="label") return -1;
+					if (b[0]=="label") return 1;
+				}else if (a[1]>b[1]){
+					return -1;
+				}else
+					return 1;
+				return 0;
+			});
+		},
+		_paintLegend:function(legend,type){
+			var self = this;
+			legend.filter(function(d) { return d[0]== "label" && d[1]==type; }).append("text")
+				.attr("x", self.opt.width/2 - 6)
+				.attr("y", 7-self.opt.height/2)
+				.attr("dy", ".35em")
+				.style("text-anchor", "end")
+				.style("font-size", "1.2em")
+				.text(type+":");
+			
+			legend.filter(function(d) { return d[0]!="label" && d[1]==type; }).append("rect")
+				.attr("x", self.opt.width/2 - 18) 
+				.attr("y", -self.opt.height/2)
+				.attr("width", 13)
+				.attr("height", 13)
+				.style("fill", function(d,i) {
+					if (typeof d[2]== "undefined")
+						return self.color(i);
+					return d[2];
+				});
+			legend.filter(function(d) { return d[0]!="label" && d[1]== type; }).append("text")
+				.attr("x", self.opt.width/2 - 24)
+				.attr("y", 7-self.opt.height/2)
+				.attr("dy", ".35em")
+				.style("text-anchor", "end")
+				.text(function(d) { return d[0]; });
+		},
+		_paintLegends: function(){
+			var self = this;
+			var w=18 + self.longestLegend*7 + 10;
+			var legendBlock = self.svg.insert("g",".link")
+				.attr("class", "legendBlock");
+			self._sortLegends();
+			legendBlock.append("rect")
+				.attr("x", self.opt.width/2 -w)
+				.attr("y", -self.opt.height/2)
+				.attr("height", 6 + self.legends.length *16)
+				.attr("width", w)
+				.style("fill", "#ddd")
+				.style("fill-opacity","0.4");
+
+			var legend = legendBlock.selectAll(".mainLegend") 
+				.data(self.legends)
+				.enter().insert("g")
+				.attr("class", "mainLegend")
+				.attr("transform", function(d, i) { return "translate(0," + (3 + i * 16) + ")"; });
+			for (var i=0; i< self.legendTypes.length; i++)
+				self._paintLegend(legend,self.legendTypes[i]);
+
+		},
+		longestLegend:4,
+		legendTypes:[],
+		addLegends:function(legends,type,color){
+			var self = this;
+			if (self.legends==null) self.legends=[],self.legendTypes=[];
+			
+			if (legends==null) {
+				self.legends = null;
+				self.legendTypes=[];
+				self.longestLegend=4;
+				return;
+			}
+			if (self.legendTypes.indexOf(type)==-1) {
+				self.legends.push(["label",type]);
+				self.legendTypes.push(type);
+				if (type.length>self.longestLegend)
+					self.longestLegend=type.length;
+			}
+			
+			for (var i=0;i<legends.length;i++){
+				if (typeof color=="undefined")
+					self.legends.push([legends[i],type]);
+				else
+					self.legends.push([legends[i],type,color]);
+				
+				if (legends[i].length>self.longestLegend)
+					self.longestLegend=legends[i].length;
+			}
+		},
+		
 		/**
 		 * Hides the elements on the graphic that match the selector. 
 		 * Check the <a href="http://www.w3.org/TR/css3-selectors/">CSS3 selectors documentation</a> to build a selector string 
