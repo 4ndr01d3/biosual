@@ -1,0 +1,9 @@
+{
+    "name": "Search with Autocomplete on a Text Area ",
+    "description": "a text based widget to start a search of multiple entries",
+    "dependencies":["jquery.autocomplete.js"],
+    "dependenciesCSS":["jquery.autocomplete.css"],
+    "js": "AutocompleteWidgetTextArea.js",
+    "html": "AutocompleteWidgetTextArea.html",
+    "css": "AutocompleteWidgetTextArea.css"
+}

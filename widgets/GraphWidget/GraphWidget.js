@@ -31,8 +31,12 @@
 
 		afterRequest: function () {
 			var self =this;
-			if(self.manager.store.get('q').val()=="*:*")
+			var currentQ=this.manager.response.responseHeader.params.q;
+			if(currentQ=="*:*")
 				self.resetGraphic();
+			else
+				currentQ=currentQ.substr(5);
+			
 			if (self.previousRequest!=null && self.previousRequest=="*:*"){
 				$("#"+this.target).empty();
 				self.graph.resetGraphic();
@@ -46,48 +50,119 @@
 				
 			self.interactions = Array(); 
 			
-			var singleProt = (this.manager.response.responseHeader.params.rows=="1");
+			var type = (currentQ=="*:*")?"normal":self.manager.widgets["requester"].requestedProteins[currentQ].type;
 
 			for (var i = 0, l = this.manager.response.response.docs.length; i < l; i++) {
 				var doc = this.manager.response.response.docs[i];
 				doc.organism1 = (typeof self.fields["organism1"] == 'undefined' || typeof doc[self.fields["organism1"]] == 'undefined')?'undefined':doc[self.fields["organism1"]];
 				doc.organism2 = (typeof self.fields["organism2"] == 'undefined' || typeof doc[self.fields["organism2"]] == 'undefined')?'undefined':doc[self.fields["organism2"]];
-				
-				self.addProtein(doc,self.fields["p1"], self.prefixes["p1"],self.fields["organism1"],singleProt);
-				self.addProtein(doc,self.fields["p2"], self.prefixes["p2"],self.fields["organism2"],singleProt);
-
-				if (!singleProt){
+				if (type=="normal" || type=="recursive"){
+					
+					self.addProtein(doc,self.fields["p1"], self.prefixes["p1"],self.fields["organism1"]);
+					self.addProtein(doc,self.fields["p2"], self.prefixes["p2"],self.fields["organism2"]);
+	
 					doc.id=doc[self.fields["p1"]] +" - "+ doc[self.fields["p2"]];
 					self.graph.addInteraction(doc[self.fields["p1"]] ,doc[self.fields["p2"]] ,{score:doc[self.fields["score"]],doc:self._getInteractionFeaturesFromDoc(doc)});
+				}else{
+					var queried=this.manager.response.responseHeader.params.q;
+					if (queried.indexOf(doc[self.fields["p1"]])!=-1){
+						self.addProtein(doc,self.fields["p1"], self.prefixes["p1"],self.fields["organism1"]);
+						if (typeof self.graph.proteinsA[doc[self.fields["p2"]]] != "undefined"){
+							doc.id=doc[self.fields["p1"]] +" - "+ doc[self.fields["p2"]];
+							self.graph.addInteraction(doc[self.fields["p1"]] ,doc[self.fields["p2"]] ,{score:doc[self.fields["score"]],doc:self._getInteractionFeaturesFromDoc(doc)});
+						}
+					} else if (queried.indexOf(doc[self.fields["p2"]])!=-1){
+						self.addProtein(doc,self.fields["p2"], self.prefixes["p2"],self.fields["organism2"]);
+						if (typeof self.graph.proteinsA[doc[self.fields["p1"]]] != "undefined"){
+							doc.id=doc[self.fields["p1"]] +" - "+ doc[self.fields["p2"]];
+							self.graph.addInteraction(doc[self.fields["p1"]] ,doc[self.fields["p2"]] ,{score:doc[self.fields["score"]],doc:self._getInteractionFeaturesFromDoc(doc)});
+						}
+					}
 				}
 			}
 
 			self.graph.restart();
-			self.previousRequest=self.manager.store.get('q').val();
+			self.previousRequest=currentQ;
 			self.visibleProteins = Object.keys(self.graph.proteinsA);
 			self.executeStylers();
 		},	
-
-		addProtein:function(doc,id,prefix,orgfield,singleProt){
+		addProtein:function(doc,id,prefix,orgfield){
 			var self = this;
-			var queried=this.manager.response.responseHeader.params.q;
 			var n1=0;
-			if (!singleProt || queried.indexOf(doc[id])!=-1){
-				if (typeof self.graph.proteinsA[doc[id]] == "undefined"){
-					var feats = self._getProteinFeaturesFromDoc(doc, prefix);
-					feats.organism =doc[orgfield];
-					n1 = self.graph.addProtein({
-						"id":doc[id],
-						"name":doc[id],
-						"showLegend":false,
-						"typeLegend":"id",
-						"organism":doc[orgfield],
-						"features":feats}) -1;
-				}else
-					n1 = self.graph.proteinsA[doc[id]];
-			}
+			if (typeof self.graph.proteinsA[doc[id]] == "undefined"){
+				var feats = self._getProteinFeaturesFromDoc(doc, prefix);
+				feats.organism =doc[orgfield];
+				n1 = self.graph.addProtein({
+					"id":doc[id],
+					"name":doc[id],
+					"showLegend":false,
+					"typeLegend":"id",
+					"organism":doc[orgfield],
+					"features":feats}) -1;
+			}else
+				n1 = self.graph.proteinsA[doc[id]];
 			return n1;
-		},
+		},		
+//		afterRequestOld: function () {
+//			var self =this;
+//			if(self.manager.store.get('q').val()=="*:*")
+//				self.resetGraphic();
+//			if (self.previousRequest!=null && self.previousRequest=="*:*"){
+//				$("#"+this.target).empty();
+//				self.graph.resetGraphic();
+//				self.graph = new Biojs.InteractionsD3({
+//					target: self.target,
+//					radius: 10,
+//					width: (typeof self.width == "undefined")?"800":self.width,
+//					height: (typeof self.height == "undefined")?"800":self.height 
+//				});			
+//			}
+//				
+//			self.interactions = Array(); 
+//			
+//			var singleProt = (this.manager.response.responseHeader.params.rows=="1");
+//
+//			for (var i = 0, l = this.manager.response.response.docs.length; i < l; i++) {
+//				var doc = this.manager.response.response.docs[i];
+//				doc.organism1 = (typeof self.fields["organism1"] == 'undefined' || typeof doc[self.fields["organism1"]] == 'undefined')?'undefined':doc[self.fields["organism1"]];
+//				doc.organism2 = (typeof self.fields["organism2"] == 'undefined' || typeof doc[self.fields["organism2"]] == 'undefined')?'undefined':doc[self.fields["organism2"]];
+//				
+//				self.addProtein(doc,self.fields["p1"], self.prefixes["p1"],self.fields["organism1"],singleProt);
+//				self.addProtein(doc,self.fields["p2"], self.prefixes["p2"],self.fields["organism2"],singleProt);
+//
+//				if (!singleProt){
+//					doc.id=doc[self.fields["p1"]] +" - "+ doc[self.fields["p2"]];
+//					self.graph.addInteraction(doc[self.fields["p1"]] ,doc[self.fields["p2"]] ,{score:doc[self.fields["score"]],doc:self._getInteractionFeaturesFromDoc(doc)});
+//				}
+//			}
+//
+//			self.graph.restart();
+//			self.previousRequest=self.manager.store.get('q').val();
+//			self.visibleProteins = Object.keys(self.graph.proteinsA);
+//			self.executeStylers();
+//		},	
+
+//		addProteinOld:function(doc,id,prefix,orgfield,singleProt){
+//			var self = this;
+//			var queried=this.manager.response.responseHeader.params.q;
+//			var n1=0;
+//			if (!singleProt || queried.indexOf(doc[id])!=-1){
+//				if (typeof self.graph.proteinsA[doc[id]] == "undefined"){
+//					var feats = self._getProteinFeaturesFromDoc(doc, prefix);
+//					feats.organism =doc[orgfield];
+//					n1 = self.graph.addProtein({
+//						"id":doc[id],
+//						"name":doc[id],
+//						"showLegend":false,
+//						"typeLegend":"id",
+//						"organism":doc[orgfield],
+//						"features":feats}) -1;
+//				}else
+//					n1 = self.graph.proteinsA[doc[id]];
+//			}
+//			return n1;
+//		},
+
 		setSize: function(size){
 			var self=this;
 			var s=size.split("x");

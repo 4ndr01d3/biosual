@@ -49,7 +49,6 @@ header.main h2{
 	padding: 0 0 10px 10px;
 	text-align: right;
     height: 8em;
-    overflow: auto;
 }
 .middle {
 	float: left;

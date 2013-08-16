@@ -39,8 +39,9 @@
 					"score":"score_"
 				},
 				"queries":{
-					"basic":"interactions",
-					"filter":"protein"
+					"basic":"normal",
+					"filter":"explicit",
+					"advanced":"recursive"
 				}
 			}
 		},
@@ -170,13 +171,26 @@
 			"tags":{"id":"table"}
 		},
 		
-		{	"widget": "AutocompleteWidget",
+		{	"widget": "AutocompleteTextAreaWidget",
 			"parameters": {
 				"id": "text",
 				"target": "#search",
 				"multiple":true,
 				"facet":"value",
-				"checkbox":"Include all interactions"
+				"modes":[{	"label":"Explicit",
+							"img":"MDC_files/pinvNew/images/explicit.png",
+							"description":"Protein queried + Interactions with any protein already in the graphic"
+						 },{
+							"label":"Normal",
+							"img":"MDC_files/pinvNew/images/normal.png",
+							"description":"Protein queried + Interactors",
+							"selected":true
+						 },{
+							"label":"Extended",
+							"img":"MDC_files/pinvNew/images/extended.png",
+							"description":"Protein queried + Interactors + All interactions among them. <br/><b>Note:</b> This requires multiple queries."
+						 }
+						]
 			},
 			"templateTarget":"left",
 			"tags":{"title":"Proteins","subtitle":"(press ESC to close suggestions)","id":"search"}

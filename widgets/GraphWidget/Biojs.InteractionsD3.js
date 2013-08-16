@@ -518,8 +518,8 @@ Biojs.InteractionsD3 = Biojs.extend (
 			self.force
 			    .nodes(self.proteins)
 			    .links(self.interactions)
-				.charge(-self.opt.radius*20)
-				.linkDistance(self.opt.radius*5).start();
+				.charge(-self.opt.radius*(3+self.proteins.length))
+				.linkDistance(self.opt.radius*(3+self.proteins.length*0.05)).start();
 
 			var link =self.vis.selectAll(".graphNetwork line.link")
 				.data(self.interactions, function(d) { return d.source.id + "-" + d.target.id; });
