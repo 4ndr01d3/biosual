@@ -53,11 +53,11 @@
 				"tabs": [
 				     { "title": "Network",
 				       "target":"graph",
-				       "selected":true
+				       "selected":false
 				     },
 				     { "title": "Circle",
 				       "target":"graph2",
-				       "selected":false
+				       "selected":true
 				     },
 				     { "title": "Table",
 				       "target":"table",

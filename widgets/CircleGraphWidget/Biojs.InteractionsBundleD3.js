@@ -568,6 +568,12 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 			self.interactions=[];
 			self.restart();
 		},
+		clearAndRestartGraphic:function(){
+			var self=this;
+			self.svg.selectAll("path.link").remove();
+			self.svg.selectAll("g.node").remove();
+			self.restart();
+		},
 	    imports: function(nodes) {
 	    	var self =this;
 	        var map = {},
@@ -582,7 +588,7 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 	        nodes.forEach(function(d) {
 	          if (d.imports) d.imports.forEach(function(i) {
 	        	var int =self.getInteraction(map[d.name].id,map[i].id)
-	            if (int!=null)
+	            if (int!=null && imports.indexOf(int)==-1)
 	            	imports.push(int);
 	          });
 	        });
@@ -652,9 +658,7 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 				.attr("class", "figure")
 				.attr("id", function(d) { return "figure_"+d.id; })
 				.attr("r", self.opt.radius)
-				.attr("stroke-width",self.opt.radius*0.3);
-			
-			gnodes
+				.attr("stroke-width",self.opt.radius*0.3)
 				.on("mouseover",  function(d){ 
 					self.raiseEvent('proteinMouseOver', {
 						protein: d

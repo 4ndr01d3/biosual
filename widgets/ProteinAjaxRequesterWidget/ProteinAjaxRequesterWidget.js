@@ -3,7 +3,7 @@
 		proteins: Array(), 
 		proteinsInGraphic: Array(), 
 		numOfInteracts:{},
-		previousRequest:null,ids:[],responses:[],
+		previousRequest:null,ids:[],
 		features:["id"],
 		scores:[],
 		
@@ -31,7 +31,6 @@
 
 			if(self.manager.store.get('q').val()=="*:*"){
 				self.ids=[];
-				self.responses=[];
 			}else if (response !=null && typeof response.responseHeader.params.q != 'undefined'){
 				var protein =response.responseHeader.params.q.substr(5);
 				self.requestedProteins[protein].numOfInteracts=response.response.docs.length;
@@ -94,17 +93,7 @@
 		},
 		afterRemove: function (facet) {
 			var self=this; 
-			self.ids=[];
-			for (var i=0; i< self.responses.length; i++){
-			    var doc = self.responses[i];
-			    if (doc.responseHeader.params.q.indexOf(facet)!=-1){
-			    	self.responses.splice(i--,1);
-			    }
-			}
-			for (var i=0; i< self.responses.length; i++){
-			    var doc = self.responses[i];
-			    self.processJson(doc);
-			}
+			self.requestedProteins[facet].type="removed";
 		},
 		
 		requestInteractionsByProtein: function(protein){
@@ -201,7 +190,7 @@
 			if (protein in self.requestedProteins) {
 				if (self.requestedProteins[protein].type=="normal" || self.requestedProteins[protein].type=="recursive")
 					return false;
-				else if (self.requestedProteins[protein].type=="explicit"){
+				else if (self.requestedProteins[protein].type=="explicit" || self.requestedProteins[protein].type=="removed"){
 					self.requestedProteins[protein].type ="normal";
 					self.manager.handleResponse(self.requestedProteins[protein].doc);
 					return false;
@@ -225,6 +214,10 @@
 					//TODO: execute the widgets to process the preloaded document in the normal way and start the recursion
 				}else if (self.requestedProteins[protein].type=="recursive"){
 					return false;
+				}else if (self.requestedProteins[protein].type=="removed"){
+					self.requestedProteins[protein].type ="recursive";
+					self.manager.handleResponse(self.requestedProteins[protein].doc);
+					return false;
 				}
 			}
 			var q = 'text:'+protein;
@@ -236,8 +229,13 @@
 		},
 		requestExplicit: function(protein){
 			var self =this;
-			if (protein in self.requestedProteins) 
+			if (protein in self.requestedProteins){ 
+				if (self.requestedProteins[protein].type=="removed"){
+					self.requestedProteins[protein].type ="explicit";
+					self.manager.handleResponse(self.requestedProteins[protein].doc);
+				}
 				return false;
+			}
 			
 			var q = 'text:'+protein;
 			if (self.manager.store.addByValue('q', q)) {
