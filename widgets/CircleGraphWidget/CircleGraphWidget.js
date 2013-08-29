@@ -321,6 +321,17 @@
 			self.visibleProteins = Object.keys(self.graph.proteins);
 			self.executeStylers();
 		},
-		stylers:{}
+		stylers:{},
+		
+		initTest: function(){
+			var self = this;
+			ok($("#"+self.target).html()!="", "Widget("+self.id+"-CircleGraphWidget): The target element has been loaded and its not empty");
+			ok(self.graph!=null, "Widget("+self.id+"-CircleGraphWidget): The BioJs component has been initializated");
+			equal(Object.keys(self.stylers).length,self.predefined_stylers.length,"Widget("+self.id+"-CircleGraphWidget): the number of stylers is according to the json");
+			equal($("#"+self.target).hasClass( "graphCircle" ),true,"Widget("+self.id+"-CircleGraphWidget): the target has now the CSS class of the widget");
+			ok($("#"+self.target+" svg").length>0,"Widget("+self.id+"-CircleGraphWidget): The target contains at least a SVG element");
+			ok(self.graph.cluster!=null, "Widget("+self.id+"-CircleGraphWidget): The BioJs component has an attribute force that has been initializated");
+
+		}
 	});
 })(jQuery);

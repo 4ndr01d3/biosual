@@ -34,6 +34,26 @@
 				}
 			}
 			self.previousRequest=self.manager.store.get('q').val();
+		},
+		initTest: function(){
+			var self = this;
+			ok($("#"+self.target+" ul").length>0,"Widget("+self.id+"-FewOptionsWidget): The target contains at least a UL element");
+			var tabsLI=$("#"+self.target+ " ul li");
+			equal(tabsLI.length,self.options.length,"Widget("+self.id+"-FewOptionsWidget): the number of options is according to the json");
+			var tabSelected=null,tabUnselected=null;
+			for (var j=0;j<tabsLI.length;j++){
+				if ($(tabsLI[j]).hasClass( "current" ))
+					tabSelected = $(tabsLI[j]);
+				else
+					tabUnselected = $(tabsLI[j]);
+				equal($(tabsLI[j]).hasClass( "current" ),self.options[j].selected,"Widget("+self.id+"-FewOptionsWidget): The option "+self.options[j].title+" has been well initialized");
+			}
+			ok(tabSelected!=null,"Widget("+self.id+"-FewOptionsWidget): There is at least one tab selected");
+			ok(tabUnselected!=null,"Widget("+self.id+"-FewOptionsWidget): There is at least one tab no selected");
+			tabUnselected.find("a").click();
+			equal(tabUnselected.hasClass( "current" ),true,"Widget("+self.id+"-FewOptionsWidget): the unselected tab has change its class once has been click");
+			equal(tabSelected.hasClass( "current" ),false,"Widget("+self.id+"-FewOptionsWidget): the selected tab has change its class once has been click");
+			
 		}
 	});
 })(jQuery);

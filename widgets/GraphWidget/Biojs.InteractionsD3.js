@@ -87,9 +87,9 @@ Biojs.InteractionsD3 = Biojs.extend (
 			self.color = function() {
 			    return d3.scale.ordinal().range(self.colors);
 			}();
-			self.color2 = function() {
-			    return d3.scale.ordinal().range(self.colors);
-			}();
+//			self.color2 = function() {
+//			    return d3.scale.ordinal().range(self.colors);
+//			}();
 			self.vis = d3.select("#"+self.opt.target).append("svg")
 			    .attr("width", width)
 			    .attr("height", height)

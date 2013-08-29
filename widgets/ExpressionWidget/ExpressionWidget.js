@@ -23,6 +23,11 @@
 		onFileRemoved: function( objEvent ) {
 			var self=this;
 			self.active=false;
+		},
+		initTest: function(){
+			var self = this;
+			ok(self.loader!=null, "Widget("+self.id+"-ExpressionWidget): The BioJs component has been initializated");
+			ok($("#"+self.target+" input.button-link").length>0,"Widget("+self.id+"-ExpressionWidget): The target contains at least a INPUT.button-link element");
 		}
 	});
 })(jQuery);

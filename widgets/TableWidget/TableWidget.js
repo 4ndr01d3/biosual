@@ -342,6 +342,18 @@
 			}
 		},
 		stylers:{},
+		initTest: function(){
+			var self = this;
+			ok($("#"+self.target).html()!="", "Widget("+self.id+"-TableWidget): The target element has been loaded and its not empty");
+			ok($("#"+self.target+" table").length>0,"Widget("+self.id+"-TableWidget): The target contains at least a TABLE element");
+			var oTable=$("#"+self.target+"_table");
+			ok(typeof oTable != "undefined","Widget("+self.id+"-TableWidget): The jquery plugin datatable has been initializated in the expected element");
+			var oSettings = oTable.dataTable().fnSettings();
+			ok(typeof oSettings != "undefined","Widget("+self.id+"-TableWidget): The settings datatable have been recovered");
+			equal(oSettings.sPaginationType, "full_numbers","Widget("+self.id+"-TableWidget): The setting value for sPaginationType is as expected");
+			equal( $("#"+self.target+" th[role=columnheader]").length ,model.length,"Widget("+self.id+"-TableWidget): Number of visible columns equal to the number of main fields");
+			equal(Object.keys(self.stylers).length,self.predefined_stylers.length,"Widget("+self.id+"-TableWidget): the number of stylers is according to the json");
+		},
 		colors: [ "#1f77b4", "#aec7e8", "#ff7f0e", "#ffbb78", "#2ca02c", "#98df8a", "#d62728", "#ff9896", "#9467bd", "#c5b0d5", 
 		          "#8c564b", "#c49c94", "#e377c2", "#f7b6d2", "#7f7f7f", "#c7c7c7", "#bcbd22", "#dbdb8d", "#17becf", "#9edae5",
 		          '#3399FF', '#99FF66', '#66FF99', '#CCFF00', '#6699CC', '#99CC00', '#99FFCC', '#993399', '#33FFFF', '#33CC33', 

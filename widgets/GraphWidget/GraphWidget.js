@@ -331,6 +331,21 @@
 			self.visibleProteins = Object.keys(self.graph.proteinsA);
 			self.executeStylers();
 		},
-		stylers:{}
+		stylers:{},
+		
+		initTest: function(){
+			var self = this;
+			ok($("#"+self.target).html()!="", "Widget("+self.id+"-GraphWidget): The target element has been loaded and its not empty");
+			ok(self.graph!=null, "Widget("+self.id+"-GraphWidget): The BioJs component has been initializated");
+			equal(Object.keys(self.stylers).length,self.predefined_stylers.length,"Widget("+self.id+"-GraphWidget): the number of stylers is according to the json");
+			equal($("#"+self.target).hasClass( "graphNetwork" ),true,"Widget("+self.id+"-GraphWidget): the target has now the CSS class of the widget");
+			ok($("#"+self.target+" svg").length>0,"Widget("+self.id+"-GraphWidget): The target contains at least a SVG element");
+			ok(self.graph.force!=null, "Widget("+self.id+"-GraphWidget): The BioJs component has an attribute force that has been initializated");
+		},
+		afterRequestTest:function(){
+			var self = this;
+			var test= Manager.widgets["qunit"].test;
+			//TODO
+		}
 	});
 })(jQuery);

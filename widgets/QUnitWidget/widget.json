@@ -1,0 +1,9 @@
+{
+    "name": "QUnit Widget",
+    "description": "Unity testing using QUnit",
+    "dependencies":["qunit-1.12.0.js"],
+    "js": "QUnitWidget.js",
+    "html": "QUnitWidget.html",
+    "css": "QUnitWidget.css",
+    "dependenciesCSS":["qunit-1.12.0.css"]
+}

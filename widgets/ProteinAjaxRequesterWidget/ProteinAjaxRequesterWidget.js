@@ -93,7 +93,8 @@
 		},
 		afterRemove: function (facet) {
 			var self=this; 
-			self.requestedProteins[facet].type="removed";
+			if (facet!="*:*" && facet in self.requestedProteins)
+				self.requestedProteins[facet].type="removed";
 		},
 		
 		requestInteractionsByProtein: function(protein){
@@ -285,6 +286,19 @@
 				self.manager.facetRemoved(protein);
 				return false;
 			};
+		},
+		initTest:function() {
+			var self = this;
+			ok($("header.main h2").html().indexOf("Core")!=-1, "Widget("+self.id+"-ProteinAjaxRequesterWidget): The header has been replaced for "+$("header.main h2").html());
+		},
+		afterRequestTest:function(){
+			var self = this;
+			var protein= Manager.widgets["qunit"].test.value;
+			ok( protein in self.requestedProteins, "Widget("+self.id+"-ProteinAjaxRequesterWidget): The requested protein is now in the requester cache" );
+			ok(self.requestedProteins[protein].type==Manager.widgets["qunit"].test.type,"Widget("+self.id+"-ProteinAjaxRequesterWidget): The type of the document on the cache is normal, as requested");
+			ok(self.proteins.indexOf(protein)!=-1, "Widget("+self.id+"-ProteinAjaxRequesterWidget): The requested protein is now in the array of ids ");
+			ok(self.requestedProteins[protein].numOfInteracts==Manager.response.response.docs.length,"Widget("+self.id+"-ProteinAjaxRequesterWidget): The number of interactions in the requester cache is the same as in the reponse");
+			
 		}
 	});
 })(jQuery);

@@ -14,7 +14,7 @@
 				}(key);
 			}
 			html +=	'</ul></div>';
-			$("body").append(html);
+			$("#"+self.target).append(html);
 		},
 		afterRequest: function() {
 			var self=this;
@@ -33,6 +33,14 @@
 				itemStyle:self.itemStyle,
 				itemHoverStyle:self.itemHoverStyle,
 			});
+		},
+		initTest: function(){
+			var self = this;
+			ok($("#"+self.target+" div.contextMenu").length>0,"Widget("+self.id+"-ContextMenuWidget): The target contains at least a DIV.contextMenu element");
+			for (var key in self.menu){
+				ok($("#context_"+self.id+" li#"+key).length==1,"Widget("+self.id+"-ContextMenuWidget): There is one and only one context element with id "+key);
+			}
+			equal(Object.keys(self.bindings).length,Object.keys(self.menu).length,"Widget("+self.id+"-ContextMenuWidget): the number of binders is equal to the number of menu items");
 		}
 	});
 })(jQuery);

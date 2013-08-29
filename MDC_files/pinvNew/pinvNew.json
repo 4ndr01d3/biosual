@@ -3,10 +3,10 @@
 		"name":"template2",
 		"tags":{
 			"title":"Protein Interaction Network Visualizer",
-			"subtitle":"Core:"
+			"subtitle":""
 		}
 	},
-	"js":	["ruleExecuter.js","contextMenuFunctions.js","expressionExecuter.js"],
+	"js":	["ruleExecuter.js","contextMenuFunctions.js","expressionExecuter.js","pinvUnitTests.js"],
 	"server":"http://biosual.cbio.uct.ac.za/solr/",
 	"url_parameters":["core","proteins"],
 	"preloader":"prepinv.js",
@@ -53,11 +53,11 @@
 				"tabs": [
 				     { "title": "Network",
 				       "target":"graph",
-				       "selected":false
+				       "selected":true
 				     },
 				     { "title": "Circle",
 				       "target":"graph2",
-				       "selected":true
+				       "selected":false
 				     },
 				     { "title": "Table",
 				       "target":"table",
@@ -174,7 +174,7 @@
 		{	"widget": "AutocompleteTextAreaWidget",
 			"parameters": {
 				"id": "text",
-				"target": "#search",
+				"target": "search",
 				"multiple":true,
 				"facet":"value",
 				"modes":[{	"label":"Explicit",
@@ -209,7 +209,7 @@
 		{	"widget": "RulerWidget",
 			"parameters": {
 				"id": "ruler",
-				"target": "#ruler",
+				"target": "ruler",
 				"dynamicRuleField":[ 
 					{	"target": 0,
 						"condition":1,
@@ -331,7 +331,7 @@
 		{	"widget": "ContextMenuWidget",
 			"parameters": {
 				"id": "context",
-				"target": "body",
+				"target": "here",
 				"triggerer":".graphNetwork .node",
 				"menuStyle": 		{"width" :		"150px"},
 				"itemStyle": 		{"font-size" :	"0.7em"},
@@ -351,7 +351,7 @@
 		{	"widget": "ContextMenuWidget",
 			"parameters": {
 				"id": "context2",
-				"target": "body",
+				"target": "here",
 				"triggerer":".graphCircle .node",
 				"menuStyle":		{"width": "150px"},
 				"itemStyle":		{"font-size": "0.7em"},
@@ -391,6 +391,7 @@
 			"tags":{"id":"info"}
 		},
 		
+
 		{	"widget": "EventManagerWidget",
 			"parameters": {
 				"id": "events",

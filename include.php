@@ -48,6 +48,9 @@ if ($_GET['id'] != ''){
 	return;
 }
 
+if ($_GET['test'] != '' && $_GET['test'] == 'true'){
+	array_push($json->widgets, JsonHandler::decode('{	"widget": "QUnitWidget", "parameters": { "id": "qunit"}, "templateTarget":"center"}'));
+}
 
 switch ($_GET['type']){
 	case "json":
@@ -64,8 +67,6 @@ switch ($_GET['type']){
 
 		//Adding all the mandatory dependencies that are local files
 		foreach ($mandatoryLocal as $path){
-			if ($useMinify==true)
-				echo "\n//".$path."\n".getFile($path);
 						
 			echo "\n//".$path."\n".getFile($path);
 		}
@@ -107,6 +108,7 @@ switch ($_GET['type']){
 				echo "\n//Error loading the widget: ".$widgetObj->widget."\n";
 			}
 		}
+		
 		
 		//creating a variable with the json to be read inside the JS
 		echo "var json = ".json_encode($json->widgets).";\n";

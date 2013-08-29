@@ -7,7 +7,7 @@
 			self.fields=self.manager.widgets["requester"].fields;
 			self.prefixes=self.manager.widgets["requester"].prefixes;
 			self.ruler = new Biojs.Ruler({
-				target: "ruler",
+				target: self.target,
 				allowOrdering:true,
 				rules: self.rules
 			});	
@@ -34,6 +34,11 @@
 		    	else if (typeof drf.action != 'undefined')
 		    		self.rules.target[drf.target].action[drf.action].options=values;
 		    }			
+		},
+		initTest:function(){
+			var self = this;
+			ok(self.ruler!=null, "Widget("+self.id+"-RulerWidget): The BioJs component has been initializated");
+			ok($("#"+self.target+" section.ruler").length>0,"Widget("+self.id+"-RulerWidget): The target contains at least a SECTION.ruler element");
 		}
 	});
 })(jQuery);

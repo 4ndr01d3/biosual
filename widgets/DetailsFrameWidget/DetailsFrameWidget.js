@@ -52,6 +52,11 @@
 					objtemp=objtemp[part];
 			}
 			return objtemp;
+		},
+		initTest: function(){
+			var self = this;
+			ok(self.info!=null, "Widget("+self.id+"-DetailsFrameWidget): The BioJs component has been initializated");
+			ok($("#"+self.target+" ul").length>0,"Widget("+self.id+"-DetailsFrameWidget): The target contains at least a UL element");
 		}
 	});
 })(jQuery);
