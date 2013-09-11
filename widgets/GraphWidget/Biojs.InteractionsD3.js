@@ -96,7 +96,7 @@ Biojs.InteractionsD3 = Biojs.extend (
 			    .attr("height", height)
 			    .attr("pointer-events", "all")
 			    .call(d3.behavior.zoom().
-			    		scaleExtent([(self.opt.enableEdges)?1:0.1, Infinity])
+			    		scaleExtent([(self.opt.enableEdges)?1:0.1, 10])
 			    		.on("zoom", redraw))
 			    .append('svg:g');
 			
