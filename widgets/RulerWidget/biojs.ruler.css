@@ -46,6 +46,17 @@
 .ruler .rights {
 	text-align:right;
 }
+.ruler .close {
+	width:20px;
+	height:20px;
+	text-align:right;
+	background-image:url('images/close.png');
+	opacity:0.7;
+}
+.ruler .close:hover{
+	opacity:1.0;
+	cursor:pointer;
+	}
 .ruler .affected {
 	width:9%;
 	text-align:center;

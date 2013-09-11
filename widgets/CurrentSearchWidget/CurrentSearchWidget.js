@@ -14,7 +14,7 @@ AjaxSolr.CurrentSearchWidget = AjaxSolr.AbstractWidget.extend({
     var qs= self.manager.widgets["requester"].getQueries();
     if (qs.length>0) {
 		for (var i = 0, l = qs.length; i < l; i++) {
-			links.push($('<a href="#"  />').html(' <img src="images/delete.png" />').click(
+			links.push($('<a href="#"  />').html(' <img src="biosual/images/delete.png" />').click(
 				self.manager.widgets["requester"].removeQuery(qs[i])
 			));
 		}

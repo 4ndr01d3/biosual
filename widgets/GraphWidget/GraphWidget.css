@@ -17,7 +17,9 @@
 	stroke: #999;
 	stroke-opacity: .6;
 }
-
+.graphNetwork  svg{
+	background-color: #FBFBFB;
+}
 .graphNetwork  {
 	border: 1px solid #000;
 	background-color: #E5E5EF;

@@ -16,6 +16,7 @@
 			self.graph = new Biojs.InteractionsD3({
 				target: self.target,
 				radius: 10,
+				enableEdges:self.enableEdges,
 				width: (typeof self.width == "undefined")?"800":self.width,
 				height: (typeof self.height == "undefined")?"800":self.height 
 			});			
@@ -43,13 +44,12 @@
 				self.graph = new Biojs.InteractionsD3({
 					target: self.target,
 					radius: 10,
+					enableEdges:self.enableEdges,
 					width: (typeof self.width == "undefined")?"800":self.width,
 					height: (typeof self.height == "undefined")?"800":self.height 
 				});			
 			}
 				
-			self.interactions = Array(); 
-			
 			var type = (currentQ=="*:*")?"normal":self.manager.widgets["requester"].requestedProteins[currentQ].type;
 
 			for (var i = 0, l = this.manager.response.response.docs.length; i < l; i++) {
@@ -103,65 +103,6 @@
 				n1 = self.graph.proteinsA[doc[id]];
 			return n1;
 		},		
-//		afterRequestOld: function () {
-//			var self =this;
-//			if(self.manager.store.get('q').val()=="*:*")
-//				self.resetGraphic();
-//			if (self.previousRequest!=null && self.previousRequest=="*:*"){
-//				$("#"+this.target).empty();
-//				self.graph.resetGraphic();
-//				self.graph = new Biojs.InteractionsD3({
-//					target: self.target,
-//					radius: 10,
-//					width: (typeof self.width == "undefined")?"800":self.width,
-//					height: (typeof self.height == "undefined")?"800":self.height 
-//				});			
-//			}
-//				
-//			self.interactions = Array(); 
-//			
-//			var singleProt = (this.manager.response.responseHeader.params.rows=="1");
-//
-//			for (var i = 0, l = this.manager.response.response.docs.length; i < l; i++) {
-//				var doc = this.manager.response.response.docs[i];
-//				doc.organism1 = (typeof self.fields["organism1"] == 'undefined' || typeof doc[self.fields["organism1"]] == 'undefined')?'undefined':doc[self.fields["organism1"]];
-//				doc.organism2 = (typeof self.fields["organism2"] == 'undefined' || typeof doc[self.fields["organism2"]] == 'undefined')?'undefined':doc[self.fields["organism2"]];
-//				
-//				self.addProtein(doc,self.fields["p1"], self.prefixes["p1"],self.fields["organism1"],singleProt);
-//				self.addProtein(doc,self.fields["p2"], self.prefixes["p2"],self.fields["organism2"],singleProt);
-//
-//				if (!singleProt){
-//					doc.id=doc[self.fields["p1"]] +" - "+ doc[self.fields["p2"]];
-//					self.graph.addInteraction(doc[self.fields["p1"]] ,doc[self.fields["p2"]] ,{score:doc[self.fields["score"]],doc:self._getInteractionFeaturesFromDoc(doc)});
-//				}
-//			}
-//
-//			self.graph.restart();
-//			self.previousRequest=self.manager.store.get('q').val();
-//			self.visibleProteins = Object.keys(self.graph.proteinsA);
-//			self.executeStylers();
-//		},	
-
-//		addProteinOld:function(doc,id,prefix,orgfield,singleProt){
-//			var self = this;
-//			var queried=this.manager.response.responseHeader.params.q;
-//			var n1=0;
-//			if (!singleProt || queried.indexOf(doc[id])!=-1){
-//				if (typeof self.graph.proteinsA[doc[id]] == "undefined"){
-//					var feats = self._getProteinFeaturesFromDoc(doc, prefix);
-//					feats.organism =doc[orgfield];
-//					n1 = self.graph.addProtein({
-//						"id":doc[id],
-//						"name":doc[id],
-//						"showLegend":false,
-//						"typeLegend":"id",
-//						"organism":doc[orgfield],
-//						"features":feats}) -1;
-//				}else
-//					n1 = self.graph.proteinsA[doc[id]];
-//			}
-//			return n1;
-//		},
 
 		setSize: function(size){
 			var self=this;
@@ -345,7 +286,37 @@
 		afterRequestTest:function(){
 			var self = this;
 			var test= Manager.widgets["qunit"].test;
-			//TODO
+			ok(typeof self.graph.proteinsA[test.value] != "undefined","Widget("+self.id+"-GraphWidget): The graph object contains an entry of "+test.value);
+			equal(self.graph.proteinsA[test.value].showLegend,false,"Widget("+self.id+"-GraphWidget): The attribute showLegend si false.");
+			ok(self.graph.proteins.indexOf(self.graph.proteinsA[test.value]) != -1,"Widget("+self.id+"-GraphWidget): The graph object contains an entry of the id "+test.value);
+			ok(typeof self.graph.organisms[self.graph.proteinsA[test.value].organism]!= "undefined","Widget("+self.id+"-GraphWidget): The organism of the requested protein is now in the array of organisms.");
+			equal(Object.keys(self.graph.organisms).length,Object.keys(self.graph.foci).length,"Widget("+self.id+"-GraphWidget): There are as many foci defined as organisms");
+			if (test.type=="normal" || test.type=="recursive"){
+				ok(typeof self.graph.interactionsA[test.value] != "undefined","Widget("+self.id+"-GraphWidget): There is an entry for the id "+test.value+" to record its interactions");
+				equal(self.graph.interactionsA[test.value].length, self.manager.response.response.docs.length,"Widget("+self.id+"-GraphWidget): There number of interactions for the id "+test.value+" is equal to the number of documents returned on the response");
+			}
+			// This tests only work if is the first request (i.e. the current view is *:*) 
+			equal($("#"+self.target+ ".graphNetwork line.link").length,self.manager.response.response.docs.length,"Widget("+self.id+"-GraphWidget): the number of lines in the SVG correspont o the number of ducoments in the response");
+			equal($("#"+self.target+ ".graphNetwork .node").length,self.manager.response.response.docs.length+1,"Widget("+self.id+"-GraphWidget): the number of nodes in the SVG correspont o the number of documents in the response(one interactor per doc) plus one(the queried protein)");
+			equal($("#"+self.target+ ".graphNetwork .node .figure").length,self.manager.response.response.docs.length+1,"Widget("+self.id+"-GraphWidget): the number of figures in the SVG correspont o the number of documents in the response(one interactor per doc) plus one(the queried protein)");
+			equal($("#"+self.target+ ".graphNetwork .node .legend").length,self.manager.response.response.docs.length+1,"Widget("+self.id+"-GraphWidget): the number of labels(hidden) in the SVG correspont o the number of documents in the response(one interactor per doc) plus one(the queried protein)");
+			equal($("#"+self.target+ ".legendBlock").length,0,"Widget("+self.id+"-GraphWidget): the legend block is not present");
+			
+			equal(self.previousRequest,test.value,"Widget("+self.id+"-GraphWidget): the id queried has been saved as the previous request");
+			equal(self.visibleProteins.length,self.manager.response.response.docs.length+1,"Widget("+self.id+"-GraphWidget): the number of visible proteins is equal to the number of documents in the response(one interactor per doc) plus one(the queried protein)");
+			var painted=0;
+			$("#"+self.target+ ".graphNetwork .node").each(function(i,d){
+				if ($(d).css("stroke")=="#ffffff")
+					painted++;
+			});
+			equal(self.visibleProteins.length,painted,"Widget("+self.id+"-GraphWidget): alll the visible proteins are the same color, because there are not stylers defined.");
+			painted=0;
+			$("#"+self.target+ ".graphNetwork line").each(function(i,d){
+				if ($(d).css("stroke")=="#999999")
+					painted++;
+			});
+			equal(self.graph.interactions.length,painted,"Widget("+self.id+"-GraphWidget): all the visible interactions are the same color, because there are not stylers defined.");
+			
 		}
 	});
 })(jQuery);

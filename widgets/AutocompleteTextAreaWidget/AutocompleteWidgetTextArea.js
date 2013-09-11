@@ -42,14 +42,18 @@
 
 			var gotOptions = function (response) {
 				var list = [];
+				var facets=[];
 				for (var i = 0; i < self.fields.length; i++) {
 					var field = self.fields[i];
 					for (var facet in response.facet_counts.facet_fields[field]) {
-						list.push({
-							field: field,
-							value: facet,
-							text: facet + ' (' + response.facet_counts.facet_fields[field][facet] + ') - ' + field
-						});
+						if (facets.indexOf(facet)==-1){
+							list.push({
+								field: field,
+								value: facet,
+								text: facet + ' (' + response.facet_counts.facet_fields[field][facet] + ') - ' + field
+							});
+							facets.push(facet);
+						}
 					}
 				}
 

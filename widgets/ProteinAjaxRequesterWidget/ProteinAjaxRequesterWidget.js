@@ -32,6 +32,8 @@
 			if(self.manager.store.get('q').val()=="*:*"){
 				self.ids=[];
 			}else if (response !=null && typeof response.responseHeader.params.q != 'undefined'){
+				if (self.previousRequest!=null && self.previousRequest=="*:*")
+					self.ids=[];
 				var protein =response.responseHeader.params.q.substr(5);
 				self.requestedProteins[protein].numOfInteracts=response.response.docs.length;
 				self.requestedProteins[protein].doc=response;
@@ -91,11 +93,11 @@
 				self.requestExplicit(doc[self.fields["p2"]]);
 			}
 		},
-		afterRemove: function (facet) {
-			var self=this; 
-			if (facet!="*:*" && facet in self.requestedProteins)
-				self.requestedProteins[facet].type="removed";
-		},
+//		afterRemove: function (facet) {
+//			var self=this; 
+//			if (facet!="*:*" && facet in self.requestedProteins)
+//				self.requestedProteins[facet].type="removed";
+//		},
 		
 		requestInteractionsByProtein: function(protein){
 			var self =this;
@@ -193,6 +195,7 @@
 					return false;
 				else if (self.requestedProteins[protein].type=="explicit" || self.requestedProteins[protein].type=="removed"){
 					self.requestedProteins[protein].type ="normal";
+					self.manager.store.add("q",AjaxSolr.Parameter({"name":"q","value":protein}));
 					self.manager.handleResponse(self.requestedProteins[protein].doc);
 					return false;
 					//TODO: execute the widgets to process the preloaded document in the normal way
@@ -256,6 +259,8 @@
 				if (self.manager.store.addByValue('q', "*:*")) {
 			        self.manager.store.remove('fq');
 					self.manager.doRequest(0);
+					for (prot in self.requestedProteins)
+						self.requestedProteins[prot].type="removed";
 				}
 				return false;
 			};
@@ -277,6 +282,7 @@
 				var index = jQuery.inArray(facet,self.proteins);
 				if (index==-1) return;
 				self.proteins.splice(index, 1);
+				self.requestedProteins[facet].type="removed";
 
 				
 				// if is the last protein then call the random query
@@ -295,8 +301,9 @@
 			var self = this;
 			var protein= Manager.widgets["qunit"].test.value;
 			ok( protein in self.requestedProteins, "Widget("+self.id+"-ProteinAjaxRequesterWidget): The requested protein is now in the requester cache" );
-			ok(self.requestedProteins[protein].type==Manager.widgets["qunit"].test.type,"Widget("+self.id+"-ProteinAjaxRequesterWidget): The type of the document on the cache is normal, as requested");
-			ok(self.proteins.indexOf(protein)!=-1, "Widget("+self.id+"-ProteinAjaxRequesterWidget): The requested protein is now in the array of ids ");
+			ok(self.requestedProteins[protein].type==Manager.widgets["qunit"].test.type,"Widget("+self.id+"-ProteinAjaxRequesterWidget): The type of the document on the cache is as requested");
+			var onlist=(Manager.widgets["qunit"].test.type=="explicit")?"*"+protein:protein;
+			ok(self.proteins.indexOf(onlist)!=-1, "Widget("+self.id+"-ProteinAjaxRequesterWidget): The requested protein is now in the array of ids ");
 			ok(self.requestedProteins[protein].numOfInteracts==Manager.response.response.docs.length,"Widget("+self.id+"-ProteinAjaxRequesterWidget): The number of interactions in the requester cache is the same as in the reponse");
 			
 		}

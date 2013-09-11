@@ -7,7 +7,7 @@
 			var html ='<div id="'+self.id+'" class="svgexporter">';
 			for (var i=0;i<self.formats.length;i++){
 				if (self.supportedFormats.indexOf(self.formats[i])!=-1)
-					html += '<a class="'+self.formats[i]+'"><img src="widgets/SvgExporter/images/File_'+self.formats[i]+'_64.png" /></a>';
+					html += '<a class="'+self.formats[i]+'"><img src="biosual/widgets/SvgExporter/images/File_'+self.formats[i]+'_64.png" /></a>';
 			}
 			html += '</div>';
 			$(self.target).append(html);

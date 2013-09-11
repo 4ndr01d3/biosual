@@ -90,13 +90,13 @@ Biojs.InteractionsD3 = Biojs.extend (
 //			self.color2 = function() {
 //			    return d3.scale.ordinal().range(self.colors);
 //			}();
+
 			self.vis = d3.select("#"+self.opt.target).append("svg")
 			    .attr("width", width)
 			    .attr("height", height)
 			    .attr("pointer-events", "all")
-			    .append('svg:g')
 			    .call(d3.behavior.zoom().
-			    		scaleExtent([1, Infinity])
+			    		scaleExtent([(self.opt.enableEdges)?1:0.1, Infinity])
 			    		.on("zoom", redraw))
 			    .append('svg:g');
 			
@@ -108,19 +108,60 @@ Biojs.InteractionsD3 = Biojs.extend (
 			    .attr('stroke','grey')
 			    .attr("stroke-dasharray","5,5");
 
+
+			self.perspective=d3.select("#"+self.opt.target + " svg").append('svg:g');
+			
+			self.plines= self.perspective.selectAll("line")
+				.data([0,1,2,3]);
+			
+			self.plines.enter().append("line")
+			 	.attr("x1", function(d) { 
+			 		return (d%2==0)?0:width;
+			 	})
+			 	.attr("y1", function(d) {return (d<2)?0:height;})
+			 	.attr("x2", function(d) { 
+			 		return (d%2==0)?0:width;
+			 	})
+			 	.attr("y2", function(d) {return (d<2)?0:height;})
+			 	.style("stroke", "#DDD")
+				.style("stroke-dasharray","5,5");
+
+			 
+			
 			function redraw() {
 				  trans=d3.event.translate;
 				  scale=d3.event.scale;
-				  if (trans[0]>0)trans[0]=0;
-				  if (trans[1]>0)trans[1]=0;
-
-				  var W = self.rect[0][0].width.animVal.value, H= self.rect[0][0].height.animVal.value;
-				  var Ws = W*scale, Hs = H*scale;
-				  if (Ws<W-trans[0]) trans[0]=W-Ws;
-				  if (Hs<H-trans[1]) trans[1]=H-Hs;
+				if (self.opt.enableEdges) {
+					if(scale<1)scale=1;
+					d3.behavior.zoom().scaleExtent([1, Infinity]);
+					  if (trans[0]>0)trans[0]=0;
+					  if (trans[1]>0)trans[1]=0;
+	
+					  var W = self.rect[0][0].width.animVal.value, H= self.rect[0][0].height.animVal.value;
+					  var Ws = W*scale, Hs = H*scale;
+					  if (Ws<W-trans[0]) trans[0]=W-Ws;
+					  if (Hs<H-trans[1]) trans[1]=H-Hs;
+				}
 				  self.vis.attr("transform",
 				      "translate(" + trans + ")"
 				      + " scale(" + scale + ")");
+				  self.plines
+				 	.attr("x2", function(d) { 
+				 		switch(d){
+					 		case 0: case 2:
+					 			return trans[0];
+					 		case 1:case 3:
+					 			return trans[0]+self.rect.attr('width')*scale;
+				 		}
+				 	})
+				 	.attr("y2", function(d) { 
+				 		switch(d){
+				 		case 0:case 1:
+				 			return trans[1];
+				 		case 2: case 3:
+				 			return trans[1]+self.rect.attr('height')*scale;
+			 		}
+			 	});
 			};
 			
 			self.force = d3.layout.force()
@@ -151,7 +192,6 @@ Biojs.InteractionsD3 = Biojs.extend (
 				tick(d3.event);
 				self.force.resume();
 			}
-			
 			self.force.on("tick", tick);
 			function tick(e) {
 				if (e.type=="tick"){
@@ -161,25 +201,34 @@ Biojs.InteractionsD3 = Biojs.extend (
 						o.x += (self.foci[self.organisms[o.organism]].x - o.x) * k;
 					});
 				}
-//				self.vis.selectAll("circle.figure")
-//					.attr("cx", function(d) { return d.x = Math.max(r, Math.min(self.opt.width - r, d.x)); })
-//					.attr("cy", function(d) { return d.y = Math.max(r, Math.min(self.opt.height - r, d.y)); });
-//				self.vis.selectAll("rect.figure")
-//					.attr("x", function(d) { return d.x = Math.max(r, Math.min(self.opt.width - r, d.x)); })
-//					.attr("y", function(d) { return d.y = Math.max(r, Math.min(self.opt.height - r, d.y)); });
 				self.vis.selectAll("path.figure")
 						.attr("transform", function(d) { 
-							return "translate(" + Math.max(r, Math.min(self.opt.width , d.x+r)) + "," + Math.max(r, Math.min(self.opt.height, d.y+r)) + ")"; 
+							if (self.opt.enableEdges)
+								return "translate(" + Math.max(r, Math.min(self.opt.width , d.x+r)) + "," + Math.max(r, Math.min(self.opt.height, d.y+r)) + ")";
+							else
+								return "translate(" + d.x + "," +  d.y + ")"; 
 						});
 
-				self.vis.selectAll(".legend")
-					.attr("x", function(d) { return d.x = Math.max(r, Math.min(self.opt.width - r, d.x)); })
-					.attr("y", function(d) { return d.y = Math.max(r, Math.min(self.opt.height - r, d.y)); });
-				self.vis.selectAll("line.link")
-					.attr("x1", function(d) { return d.source.x+r; })
-					.attr("y1", function(d) { return d.source.y+r; })
-					.attr("x2", function(d) { return d.target.x+r; })
-					.attr("y2", function(d) { return d.target.y+r; });
+				if (self.opt.enableEdges) 
+					self.vis.selectAll(".legend")
+						.attr("x", function(d) { return d.x = Math.max(r, Math.min(self.opt.width - r, d.x)); })
+						.attr("y", function(d) { return d.y = Math.max(r, Math.min(self.opt.height - r, d.y)); });
+				else
+					self.vis.selectAll(".legend")
+						.attr("x", function(d) { return d.x; })
+						.attr("y", function(d) { return d.y; });
+				if (self.opt.enableEdges) 
+					self.vis.selectAll("line.link")
+						.attr("x1", function(d) { return d.source.x+r; })
+						.attr("y1", function(d) { return d.source.y+r; })
+						.attr("x2", function(d) { return d.target.x+r; })
+						.attr("y2", function(d) { return d.target.y+r; });
+				else
+					self.vis.selectAll("line.link")
+						.attr("x1", function(d) { return d.source.x; })
+						.attr("y1", function(d) { return d.source.y; })
+						.attr("x2", function(d) { return d.target.x; })
+						.attr("y2", function(d) { return d.target.y; });
 			};
 			//Binding the _resize method when resizing the window! 
 			//d3.select(window).on("resize", function(){self._resize(self);});
@@ -194,7 +243,8 @@ Biojs.InteractionsD3 = Biojs.extend (
 			target: "YourOwnDivId",
 			width: "100%",
 			height: "500", 
-			radius: 10
+			radius: 10,
+			enableEdges:false
 		},
 
 		/**
@@ -350,6 +400,8 @@ Biojs.InteractionsD3 = Biojs.extend (
 			var n = self.proteins.indexOf(self.proteinsA[protein.id]);
 			if (n!=-1)
 				return n;
+			protein.x=Math.floor((Math.random()*self.opt.width));
+			protein.y=Math.floor((Math.random()*self.opt.width));
 			n= self.proteins.push(protein);
 			self.proteinsA[protein.id]=protein;
 			if (typeof self.organisms[protein.organism] == 'undefined'){
@@ -577,22 +629,7 @@ Biojs.InteractionsD3 = Biojs.extend (
 				.attr("height", self.opt.radius*2)
 				.attr("stroke-width",self.opt.radius*0.3);
 			
-//			node.filter(function(d) { return self.organisms[d.organism] == 0; }).append("circle")
-//				.attr("class", "figure")
-//				.attr("id", function(d) { return "figure_"+d.id; })
-//				.on("click", function(d){ 
-//					self.raiseEvent('proteinClick', {
-//						protein: d
-//					});
-//				})
-//				.on("mouseover", function(d){ 
-//					self.raiseEvent('proteinMouseOver', {
-//						protein: d
-//					});
-//				})
-//				.attr("r", self.opt.radius)
-//				.attr("stroke-width",self.opt.radius*0.3);
-				
+
 			node
 				.append("svg:text")
 				.attr("class", "legend")
@@ -612,7 +649,7 @@ Biojs.InteractionsD3 = Biojs.extend (
 
 			nodes.exit().remove();
 			
-			self.vis.selectAll(".legendBlock").remove();
+			self.perspective.selectAll(".legendBlock").remove();
 			if (typeof self.legends!="undefined" && self.legends!=null)
 				self._paintLegends();
 		},
@@ -658,7 +695,7 @@ Biojs.InteractionsD3 = Biojs.extend (
 		_paintLegends: function(){
 			var self = this;
 			var w=18 + self.longestLegend*7 + 10;
-			var legendBlock = self.vis.insert("g",".link")
+			var legendBlock = self.perspective.insert("g",".link")
 				.attr("class", "legendBlock");
 			self._sortLegends();
 			legendBlock.append("rect")

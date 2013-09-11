@@ -280,7 +280,7 @@ Biojs.Ruler = Biojs.extend (
 		var self=this;
 		var rules= new Array();
 		$("#"+self.opt.target+'_list > li').each(function () {
-			rules.push($(this).data("rule"))
+			rules.push($(this).data("rule"));
 		});
 		return rules;
 	},
@@ -294,7 +294,6 @@ Biojs.Ruler = Biojs.extend (
 	  * instance.setAffectedByRule('YourOwnDivId_rule_1',58);
 	  */
 	setAffectedByRule:function(ruleId,affected){
-		var self=this;
 		$("#"+ruleId+" .affected").html(affected);
 	},
 
@@ -375,12 +374,16 @@ Biojs.Ruler = Biojs.extend (
 		}
 		code_rule+=	'	</td> ';
 		code_rule+=	'		<td><span class="action" id="'+target+'_apply_rule_'+number+'">APPLY</span></td> ';
+		code_rule+=	'		<td class="rights"><div class="close" /></td>';
 		code_rule+=	'</tr></table></li>';
 		$("#"+target+'_list_to_add').append(code_rule);
 		
 		
 		$( "#"+target+"_apply_rule_"+number ).click(function(){
 			self._applyRule($(this));
+		});
+		$( "#"+target+" .close" ).click(function(){
+			$(this).parent().parent().parent().parent().parent().remove();
 		});
 		
 		
@@ -418,6 +421,7 @@ Biojs.Ruler = Biojs.extend (
 			});
 		}
 		self._number++;		
+		
 	},
 	/**
 	  * Add a rule to the active rules' set. this method can be invoked from an external script, be careful when using by 

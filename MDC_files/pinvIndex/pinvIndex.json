@@ -3,7 +3,7 @@
 		"name":"template3",
 		"tags":{
 			"title":"Protein Interaction Network Visualizer",
-			"logoURL":"MDC_files/pinvIndex/images/PINV_240.png"
+			"logoURL":"biosual/MDC_files/pinvIndex/images/PINV_240.png"
 		}
 	},
 	"server":"http://biosual.cbio.uct.ac.za/solr/", 

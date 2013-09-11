@@ -84,6 +84,7 @@
 				"target": "graph",
 				"width":"1400",
 				"height":"600",
+				"enableEdges":false,
 				"predefined_stylers":[	{
 						"id":"ruler",
 						"method":"applyRules"
@@ -178,16 +179,16 @@
 				"multiple":true,
 				"facet":"value",
 				"modes":[{	"label":"Explicit",
-							"img":"MDC_files/pinvNew/images/explicit.png",
+							"img":"biosual/MDC_files/pinvNew/images/explicit.png",
 							"description":"Protein queried + Interactions with any protein already in the graphic"
 						 },{
 							"label":"Normal",
-							"img":"MDC_files/pinvNew/images/normal.png",
+							"img":"biosual/MDC_files/pinvNew/images/normal.png",
 							"description":"Protein queried + Interactors",
 							"selected":true
 						 },{
 							"label":"Extended",
-							"img":"MDC_files/pinvNew/images/extended.png",
+							"img":"biosual/MDC_files/pinvNew/images/extended.png",
 							"description":"Protein queried + Interactors + All interactions among them. <br/><b>Note:</b> This requires multiple queries."
 						 }
 						]
