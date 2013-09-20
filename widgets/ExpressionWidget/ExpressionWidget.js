@@ -28,6 +28,21 @@
 			var self = this;
 			ok(self.loader!=null, "Widget("+self.id+"-ExpressionWidget): The BioJs component has been initializated");
 			ok($("#"+self.target+" input.button-link").length>0,"Widget("+self.id+"-ExpressionWidget): The target contains at least a INPUT.button-link element");
+		},
+		status2JSON:function(){
+			var self = this;
+			return {"expressions":self.expressions,
+					"colorData":self.colorData,
+					"column":self.column,
+					"active":self.active};
+		},
+		uploadStatus:function(json){
+			var self=this;
+			if (json.expressions==null) return;
+			self.loader.expressions =json.expressions;
+			self.loader.colorData=json.colorData;
+			self.loader.column=json.column;
+			self.loader.applyValues();
 		}
 	});
 })(jQuery);

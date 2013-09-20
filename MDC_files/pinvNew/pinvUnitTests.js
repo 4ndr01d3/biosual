@@ -68,4 +68,21 @@ function unitTests() {
 //					};
 //				}(widget4test) );
 //				break;
+	test( "Checking status saving/loading of all the widgets" ,function(){ 
+		for (var i = 0; i < json.length; i++) {
+			var widget4test = Manager.widgets[json[i].parameters.id];
+			ok( typeof widget4test.status2JSON !="undefined", "the widget "+json[i].parameters.id+" has a 'status2JSON' method" );
+			ok( typeof widget4test.uploadStatus !="undefined", "the widget "+json[i].parameters.id+" has a 'uploadStatus' method" );
+			//ok( typeof widget4test.resetStatus !="undefined", "the widget "+json[i].parameters.id+" has a 'resetStatus' method" );
+//			if (typeof widget4test.statusTest != "undefined")
+//				widget4test.statusTest();
+//			var status =widget4test.status2JSON();
+//			if (status!=STATUS.NO_APPLICABLE){
+//				widget4test.resetStatus();
+//				widget4test.uploadStatus(status);
+//				equal(status, widget4test.status2JSON(),"STATUS test: saving->reseting->relaoding->comparing the widget "+json[i].parameters.id );
+//			}
+				
+		};
+	});
 }

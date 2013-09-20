@@ -167,14 +167,6 @@
 			var self=this;
 			type= (typeof type=="undefined")?"normal":type;
 			switch (type){
-				case "interactions":
-					self.requestInteractionsByProtein(parameters[0]);
-					break;
-				case "protein":
-					self.requestSingleProtein(parameters[0]);
-					self.requestInteractionsBetweenProteins(parameters[0],parameters[1]);
-					break;
-					
 				case "normal":
 					self.requestNormal(parameters[0]);
 					break;
@@ -306,6 +298,61 @@
 			ok(self.proteins.indexOf(onlist)!=-1, "Widget("+self.id+"-ProteinAjaxRequesterWidget): The requested protein is now in the array of ids ");
 			ok(self.requestedProteins[protein].numOfInteracts==Manager.response.response.docs.length,"Widget("+self.id+"-ProteinAjaxRequesterWidget): The number of interactions in the requester cache is the same as in the reponse");
 			
+		},
+		getURL:function(){
+			var self = this;
+			var strN="",strExp="",strExt="";
+			for (var protein in self.requestedProteins){
+				switch (self.requestedProteins[protein].type){
+					case "normal":
+						strN += protein+",";
+						break;
+					case "explicit":
+						strExp += protein+",";
+						break;
+					case "recursive":
+						strExt += protein+",";
+						break;
+				}
+			}
+			if (strN!="") strN = "&prtNor="+strN.substring(0,strN.length-1);
+			if (strExp!="") strExp = "&prtExp="+strExp.substring(0,strExp.length-1);
+			if (strExt!="") strExt = "&prtExt="+strExt.substring(0,strExt.length-1);
+			return window.location.href.toString().split("?")[0]+"?core="+coreURL+strN+strExp+strExt;
+		},
+		status2JSON:function(){
+			var self = this;
+			var nor=[],exp=[],ext=[];
+			for (var protein in self.requestedProteins){
+				switch (self.requestedProteins[protein].type){
+					case "normal":
+						nor.push(protein);
+						break;
+					case "explicit":
+						exp.push(protein);
+						break;
+					case "recursive":
+						ext.push(protein);
+						break;
+				}
+			}
+			return { 
+				"queried":{
+					"normal":nor,
+					"explicit":exp,
+					"recursive":ext
+				}
+			};
+		},
+		uploadStatus:function(json){
+			var self = this;
+			for (var type in json.queried)
+				for (var i=0;i<json.queried[type].length;i++)
+					self.request([json.queried[type][i]],type);
+		},
+		resetStatus:function(){
+			var self = this;
+			self.removeAll();
 		}
 	});
 })(jQuery);

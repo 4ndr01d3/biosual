@@ -98,7 +98,8 @@
 					"showLegend":false,
 					"typeLegend":"id",
 					"organism":doc[orgfield],
-					"features":feats}) -1;
+					"features":feats,
+					"size":1}) -1;
 			}else
 				n1 = self.graph.proteinsA[doc[id]];
 			return n1;
@@ -252,6 +253,7 @@
 			self.graph.addLegends(null);
 			self.graph.setFillColor(".figure",null);
 			self.graph.setColor(".figure",null);
+			self.graph.setSizeScale(".figure",1);
 			self.graph.vis.selectAll(".node").attr("visibility", 'visible').style("stroke","#fff");
 			self.graph.vis.selectAll("line").attr("visibility", 'visible').style("stroke","#999");
 			self.graph.vis.selectAll(".legend").attr("visibility",function(d) { return (d.showLegend)?"visible":"hidden";});
@@ -317,6 +319,33 @@
 			});
 			equal(self.graph.interactions.length,painted,"Widget("+self.id+"-GraphWidget): all the visible interactions are the same color, because there are not stylers defined.");
 			
+		},
+		status2JSON:function(){
+			var self = this;
+			var translate=(self.graph.tTranslate==null)?[0,0]:self.graph.tTranslate;
+			var scale=(self.graph.tTranslate==null)?1:self.graph.tScale;
+			var fixed = self.graph.getFixedProteins();
+			return {"translateX":translate[0],
+					"translateY":translate[1],
+					"scale":scale,
+					"fixed":fixed,
+					"selected":self.selected};
+		},
+		uploadStatus:function(json){
+			var self = this;
+			self.graph.redraw(json.translateX,json.translateY,json.scale);
+			self.graph.zoom.translate([json.translateX,json.translateY]).scale(json.scale);
+			
+			for (var i=0;i<json.fixed.length;i++){
+				self.graph.fixProteinAt(json.fixed[i].protein,json.fixed[i].x,json.fixed[i].y);
+			}
+			if (json.selected.indexOf("_")==-1){ // the selection is a node
+				self.graph.setColor('[id="node_'+json.selected+'"] .figure',"#000");
+				self.selected=json.selected;
+			}else{
+				self.graph.setColor('[id="link_'+json.selected+'"]',"#000");
+				self.selected=json.selected;
+			}
 		}
 	});
 })(jQuery);

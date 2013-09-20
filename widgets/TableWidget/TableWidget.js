@@ -59,13 +59,12 @@
 			var oTable=$("#"+self.target+"_table").dataTable( {
 		        "sPaginationType": "full_numbers",
 				"bFilter": true,
-				"iDisplayLength": 30,
 				"bSortClasses": false,
 				"bAutoWidth": false,
 				"sDom": 'T<"clear">lfrtip',
 				"oTableTools": {
 					"aButtons": [ "copy", "csv" ],
-					"sSwfPath": "widgets/TableWidget/copy_csv_xls_pdf.swf"
+					"sSwfPath": "biosual/widgets/TableWidget/copy_csv_xls_pdf.swf"
 				}
 		    });
 			self.oTable= oTable;
@@ -85,6 +84,7 @@
 						$(this).text(self.textLess);
 					else
 						$(this).text(self.textMore);
+					//self.refreshButtons();
 				});
 			}
 			var colnum=0;
@@ -106,6 +106,12 @@
 
 		},
 		responses:[],
+		refreshButtons:function(){
+			var self = this; //div#table vs table#table_table
+			var table= (self instanceof AjaxSolr.TableWidget)?$(self.target)[0]:$(self).find("table")[0];
+			var oTableTools = TableTools.fnGetInstance( table );
+			if (oTableTools!=null) oTableTools.fnResizeButtons();
+		},
 		afterRequest: function () {
 			var self=this;
 			if(self.manager.store.get('q').val()=="*:*"){
@@ -353,6 +359,32 @@
 			equal(oSettings.sPaginationType, "full_numbers","Widget("+self.id+"-TableWidget): The setting value for sPaginationType is as expected");
 			equal( $("#"+self.target+" th[role=columnheader]").length ,model.length,"Widget("+self.id+"-TableWidget): Number of visible columns equal to the number of main fields");
 			equal(Object.keys(self.stylers).length,self.predefined_stylers.length,"Widget("+self.id+"-TableWidget): the number of stylers is according to the json");
+		},
+		status2JSON:function(){
+			var self = this;
+			var visible=[];
+			$("#"+self.target+" th.more span").each(function(i,v){
+				if ($(v).text()==self.textLess)
+					visible.push($(v).attr("class"));
+			});
+			return {"visibleClasses":visible,
+					"numberOfRows":self.oTable.fnSettings()._iDisplayLength,
+					"startsAt":self.oTable.fnSettings()._iDisplayStart};
+		},
+		uploadStatus:function(json){
+			var self = this;
+			for(var i=0;i<json.visibleClasses.length;i++)
+				$("#"+self.target+" th.more span."+json.visibleClasses[i]).click();
+			self.oTable.fnSettings()._iDisplayLength = json.numberOfRows;
+			self.oTable.fnSettings()._iDisplayStart = json.startsAt;
+			$("#"+self.target+" .dataTables_length select option").each(function(){
+				 if ($(this).text() == json.numberOfRows) {
+				        $(this).attr("selected",true);
+			    } else {
+			        $(this).removeAttr("selected");
+			    }
+			});
+			self.oTable.fnPageChange( json.startsAt/json.numberOfRows );
 		},
 		colors: [ "#1f77b4", "#aec7e8", "#ff7f0e", "#ffbb78", "#2ca02c", "#98df8a", "#d62728", "#ff9896", "#9467bd", "#c5b0d5", 
 		          "#8c564b", "#c49c94", "#e377c2", "#f7b6d2", "#7f7f7f", "#c7c7c7", "#bcbd22", "#dbdb8d", "#17becf", "#9edae5",

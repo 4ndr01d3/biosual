@@ -52,6 +52,10 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 		interactionsA:[],
 		svg:null,
 		
+		//Transformation values
+		tTranslate:null,
+		tScale:null,
+
 //		proteinsA:[],
 //		node_drag:null,
 //		color: null,
@@ -103,30 +107,13 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 			    return d3.scale.ordinal().range(self.colors);
 			  }();
 			
-//			var	width = $(this._container).width(),
-//				height = $(this._container).height(),
-//				r=self.opt.radius;
-//
-//			if (self.opt.width.indexOf("%")!=-1)
-//				width = width*(self.opt.width.substring(0, self.opt.width.length-1)*1)/100.0;
-//			else
-//				width=self.opt.width*1;
-//			self.opt.width=width;
-//			
-//			if (self.opt.height.indexOf("%")!=-1)
-//				height = height*(self.opt.height.substring(0, self.opt.height.length-1)*1)/100.0;
-//			else
-//				height=self.opt.height*1;
-//			self.opt.height=height;
-//			
-//			self.color = function() {
-//			    return d3.scale.ordinal().range(self.colors);
-//			  }();
-			
 			self.vis = d3.select("#"+self.opt.target).insert("div", "h2")
 			    .style("width", w + "px")
 			    .style("height", h + "px");
 
+			self.zoom=d3.behavior.zoom().
+    		scaleExtent([1, 10])
+    		.on("zoom", redraw);
 			self.svg=self.vis.append('svg:svg')
 				    .attr("width", w)
 				    .attr("height", h)
@@ -134,9 +121,7 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 				    	.attr("id", "innergroup")
 				    	.attr("transform", "translate(" + rx + "," + ry + ")")
 				    .attr("pointer-events", "all")
-				    .call(d3.behavior.zoom().
-				    		scaleExtent([1, Infinity])
-				    		.on("zoom", redraw))
+				    .call(self.zoom)
 				    .append('svg:g');
 		
 			self.rect=self.svg.append('svg:rect')
@@ -152,9 +137,17 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 			    .attr("class", "arc")
 			    .attr("d", d3.svg.arc().outerRadius(ry - 120).innerRadius(0).startAngle(0).endAngle(2 * Math.PI));
 
-			function redraw() {
-				  trans=d3.event.translate;
-				  scale=d3.event.scale;
+			function redraw(x,y,scaleP) {
+				var trans=null,scale=null;
+				if (typeof x!="undefined" && typeof y!="undefined"){
+					trans=[x,y];
+					scale = scaleP;
+				}else{
+					trans=d3.event.translate;
+					scale = d3.event.scale;
+				}
+				self.tTranslate=trans;
+				self.tScale=scale;
 				  var W = self.rect[0][0].width.animVal.value, H= self.rect[0][0].height.animVal.value;
 				  var Ws = W*scale, Hs = H*scale;
 				  if (Ws/2<W/2+trans[0]) trans[0]=(Ws-W)/2;
@@ -165,6 +158,7 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 				      "translate(" + trans + ")"
 				      + " scale(" + scale + ")");
 			};
+			self.redraw=redraw;
 		    
 			self.restart();
 		},

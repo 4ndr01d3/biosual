@@ -3,11 +3,21 @@ function getURLParameter(name) {
         (location.search.match(RegExp("[?|&]"+name+'=(.+?)(&|$)'))||[,null])[1]
     );  
 }
-var proteins=getURLParameter("proteins");
-var URLrequests=[];
-if (proteins!=null && proteins!="null" && jQuery.trim(proteins)!=""){
-	URLrequests=proteins.split(",");
+function includeProteinsFromURLParameter(array,parameter,type){
+	var proteins=getURLParameter(parameter);
+	if (proteins!=null && proteins!="null" && jQuery.trim(proteins)!=""){
+		var prs=proteins.split(",");
+		for (var i=0;i<prs.length;i++){
+			array.push({"id":prs[i],"type":type});
+		}
+	}
 }
+var URLrequests=[];
+includeProteinsFromURLParameter(URLrequests,"proteins","normal");
+includeProteinsFromURLParameter(URLrequests,"prtNor","normal");
+includeProteinsFromURLParameter(URLrequests,"prtExp","explicit");
+includeProteinsFromURLParameter(URLrequests,"prtExt","extended");
+
 var coreURL=getURLParameter("core");
 if (coreURL!=null && coreURL!="null" && jQuery.trim(coreURL)!="")
 	server += coreURL+"/";

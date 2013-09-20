@@ -311,46 +311,50 @@ Biojs.ExpressionLoader = Biojs.extend (
 								colorCenter:$("#colorCenter").val(), 
 								colorMax:	$("#colorMax").val()
 						};
-						self.calculateExtrapolingData(self.colorData);
-						$("#colorCenter").miniColors('destroy');
-						$("#colorMin").miniColors('destroy');
-						$("#colorMax").miniColors('destroy');
-						$( this ).dialog( "destroy" );
-						$(" .dialog-modal" ).remove();
-						$("#"+self.opt.target+" .fake-file").html("Change File...");
-						$("#"+self.opt.target+" .exp-edit").remove();
-						$("#"+self.opt.target+" .exp-remove").remove();
-						$("#"+self.opt.target+" .fake-file").after("<div class='exp-remove'></div>");
-						$("#"+self.opt.target+" .exp-remove").click(function() {
-							self.expressions =null;
-							self.min =99999;
-							self.max = -99999;
-							self.column=-1;
-							self.colorData=null;
-
-							$("#"+self.opt.target+" .exp-edit").remove();
-							$("#"+self.opt.target+" .exp-remove").remove();
-							$("#"+self.opt.target+" .fake-file").html(self.opt.label);
-							$("#"+self.opt.target+" .button-link").val('');
-							self.raiseEvent('onFileRemoved', {});
-						});
-						$("#"+self.opt.target+" .fake-file").after("<div class='exp-edit'></div>");
-						$("#"+self.opt.target+" .exp-edit").click(function() {
-							self.startWizzard();
-						});
-
-						self.raiseEvent('onFileLoaded', {
-							expressions: self.expressions,
-							column: self.column,
-							colorData: self.colorData
-						});
+						self.applyValues();
 					}
 				}
 			});
 		},
+		applyValues:function(){
+			var self = this;
+			self.calculateExtrapolingData(self.colorData);
+			$("#colorCenter").miniColors('destroy');
+			$("#colorMin").miniColors('destroy');
+			$("#colorMax").miniColors('destroy');
+			$( this ).dialog( "destroy" );
+			$(" .dialog-modal" ).remove();
+			$("#"+self.opt.target+" .fake-file").html("Change File...");
+			$("#"+self.opt.target+" .exp-edit").remove();
+			$("#"+self.opt.target+" .exp-remove").remove();
+			$("#"+self.opt.target+" .fake-file").after("<div class='exp-remove'></div>");
+			$("#"+self.opt.target+" .exp-remove").click(function() {
+				self.expressions =null;
+				self.min =99999;
+				self.max = -99999;
+				self.column=-1;
+				self.colorData=null;
+
+				$("#"+self.opt.target+" .exp-edit").remove();
+				$("#"+self.opt.target+" .exp-remove").remove();
+				$("#"+self.opt.target+" .fake-file").html(self.opt.label);
+				$("#"+self.opt.target+" .button-link").val('');
+				self.raiseEvent('onFileRemoved', {});
+			});
+			$("#"+self.opt.target+" .fake-file").after("<div class='exp-edit'></div>");
+			$("#"+self.opt.target+" .exp-edit").click(function() {
+				self.startWizzard();
+			});
+
+			self.raiseEvent('onFileLoaded', {
+				expressions: self.expressions,
+				column: self.column,
+				colorData: self.colorData
+			});
+		},
 		_hexToR: function (h) {
 			var self=this;
-			return parseInt((self._cutHex(h)).substring(0,2),16)
+			return parseInt((self._cutHex(h)).substring(0,2),16);
 		},
 		_hexToG: function (h) {
 			var self=this;

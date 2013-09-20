@@ -18,8 +18,10 @@ var Manager;
 			Manager.store.addByValue('q', '*:*');
 		else
 			for (var i=0;i<URLrequests.length;i++)
-				Manager.widgets["requester"].request([URLrequests[i]]);
+				Manager.widgets["requester"].request([URLrequests[i].id],URLrequests[i].type);
 		Manager.doRequest();
 	});
 
 })(jQuery);
+var STATUS={};
+STATUS.NO_APPLICABLE=979223;

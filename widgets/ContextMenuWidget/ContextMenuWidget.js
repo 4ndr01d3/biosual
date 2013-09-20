@@ -41,6 +41,12 @@
 				ok($("#context_"+self.id+" li#"+key).length==1,"Widget("+self.id+"-ContextMenuWidget): There is one and only one context element with id "+key);
 			}
 			equal(Object.keys(self.bindings).length,Object.keys(self.menu).length,"Widget("+self.id+"-ContextMenuWidget): the number of binders is equal to the number of menu items");
+		},
+		status2JSON:function(){
+			return STATUS.NO_APPLICABLE;
+		},
+		uploadStatus:function(json){
+			return STATUS.NO_APPLICABLE;
 		}
 	});
 })(jQuery);

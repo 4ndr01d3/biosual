@@ -110,6 +110,7 @@
 .drop_menu_container li:hover .dropdown_5columns {
 	left:-1px;
 	top:auto;
+	z-index: 10;
 }
 
 .col_1,

@@ -54,6 +54,15 @@
 			equal(tabUnselected.hasClass( "current" ),true,"Widget("+self.id+"-FewOptionsWidget): the unselected tab has change its class once has been click");
 			equal(tabSelected.hasClass( "current" ),false,"Widget("+self.id+"-FewOptionsWidget): the selected tab has change its class once has been click");
 			
+		},
+		status2JSON:function(){
+			var self = this;
+			var element=$("#"+self.target+ " ul li.current a");
+			return {current:element.text()};
+		},
+		uploadStatus:function(json){
+			var self = this;
+			$("#"+self.target+ " ul li a[title="+json.current+"]").click();
 		}
 	});
 })(jQuery);

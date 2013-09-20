@@ -61,7 +61,8 @@
 				     },
 				     { "title": "Table",
 				       "target":"table",
-				       "selected":false
+				       "selected":false,
+				       "on_show":{"widget":"table","method":"refreshButtons"}
 				     }
 				],
 				"sideEffects":[
@@ -101,8 +102,8 @@
 			"parameters": {
 				"id": "svggraph",
 				"target": "#graph",
-				"formats":["PNG","SVG"],
-				"css":".figure {fill: #89B; stroke: #fff;} text {font: 10px sans-serif; font-weight:normal; stroke: #000; stroke-width: 0px;  stroke: transparent;}"
+				"formats":["PNG","SVG","Share"],
+				"css":"svg{background-color: #FBFBFB;} .figure {fill: #89B; stroke: #fff;} text {font: 10px sans-serif; font-weight:normal; stroke: #000; stroke-width: 0px;  stroke: transparent;}"
 			}
 		},
 		{	"widget": "CircleGraphWidget",
@@ -127,7 +128,7 @@
 			"parameters": {
 				"id": "svggraph2",
 				"target": "#graph2",
-				"formats":["PNG","SVG"],
+				"formats":["PNG","SVG","Share"],
 				"css": "path.arc {  fill: #fff;}  .node {  font-size: 10px;}  .node:hover {  fill: #1f77b4;}  .link {  fill: none;  stroke: #1f77b4;  stroke-opacity: .4;  pointer-events: none;}  .link.source,   .link.target {  stroke-opacity: 1;  stroke-width: 2px;}  .node.target {  fill: #d62728 !important;}  .link.source {  stroke: #d62728;}  .node.source {  fill: #2ca02c;}  .link.target {  stroke: #2ca02c;}  .figure { fill: #46D;}  .legend {  stroke: transparent;  pointer-events: none;}"
 			}
 		},
@@ -268,7 +269,8 @@
 									 {"name":"Color By","type":"select","options":["Protein Queried","Functional Class","Organism","Gene Name"]},
 									 {"name":"Border By","type":"select","options":["Protein Queried","Functional Class","Organism","Gene Name"]},
 									 {"name":"Show Label","type":"select","options":["ID","Functional Class","Organism","Gene Name"]},
-									 {"name":"Hide Label","type":"single"}
+									 {"name":"Hide Label","type":"single"},
+									 {"name":"Resize","type":"scale","options":[0,3.1,0.1]}
 							],
 							"conditions": [ 
 								{	"name": "no filters",
@@ -392,6 +394,20 @@
 			"tags":{"id":"info"}
 		},
 		
+		{	"widget": "EmbedderWidget",
+			"parameters": {
+				"id": "embedder",
+				"hide":[".main","div.top","#tabs",".center>br","#size","#info","#qunit"],
+				"cssChanges":[	{	"selectors":["html","body",".center"],
+									"changes":	[{	"attribute":"margin",
+													"value":"0px"},
+												 {	"attribute":"padding",
+													"value":"0px"},
+												 {	"attribute":"overflow",
+													"value":"hidden"}]
+								}]
+			}
+		},
 
 		{	"widget": "EventManagerWidget",
 			"parameters": {

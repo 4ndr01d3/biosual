@@ -1,0 +1,7 @@
+{
+    "name": "Embedder",
+    "description": "hides and redefine margins when the embedded parameter is set",
+    "dependencies":[],
+    "dependenciesCSS": [],
+    "js": "EmbedderWidget.js"
+}

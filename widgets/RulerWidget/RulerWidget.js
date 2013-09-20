@@ -39,6 +39,16 @@
 			var self = this;
 			ok(self.ruler!=null, "Widget("+self.id+"-RulerWidget): The BioJs component has been initializated");
 			ok($("#"+self.target+" section.ruler").length>0,"Widget("+self.id+"-RulerWidget): The target contains at least a SECTION.ruler element");
+		},
+		status2JSON:function(){
+			var self = this;
+			return {"rules":self.ruler.getActiveRules()};
+		},
+		uploadStatus:function(json){
+			var self = this;
+			for (var i=0;i<json.rules.length;i++){
+				self.ruler.addActiveRule(json.rules[i]);
+			}
 		}
 	});
 })(jQuery);

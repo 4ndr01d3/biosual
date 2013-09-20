@@ -11,8 +11,8 @@
 				selector ="";
 				var rule=rules[i];
 				if (rule.target==model.target[0].name){ //Proteins
-					var prefix =(rule.action.name=="Color" || rule.action.name=="Color By" || rule.action.name=="Border" || rule.action.name=="Border By")?"figure_":"node_";
-					var prefix2=(rule.action.name=="Color" || rule.action.name=="Color By" || rule.action.name=="Border" || rule.action.name=="Border By")?".figure":".node";
+					var prefix =(rule.action.name=="Resize" || rule.action.name=="Color" || rule.action.name=="Color By" || rule.action.name=="Border" || rule.action.name=="Border By")?"figure_":"node_";
+					var prefix2=(rule.action.name=="Resize" || rule.action.name=="Color" || rule.action.name=="Color By" || rule.action.name=="Border" || rule.action.name=="Border By")?".figure":".node";
 					switch (rule.condition){
 						case model.target[0].conditions[1].name: // interactions with
 							//TODO: Add validations in case proteins have been deleted
@@ -180,6 +180,10 @@
 						break;
 					case "Hide Label":
 						self.graph.hideLegend(selector);
+						break;
+					case "Resize":
+						self.graph.setSizeScale(selector,rule.actionParameters[0]);
+				//		self.graph.addLegends([rule.condition+" "+rule.parameters.join(" ")],"Color",rule.actionParameters[0]);
 						break;
 				}
 				var affected = (selector=="")?0:self.graph.vis.selectAll(selector)[0].length;

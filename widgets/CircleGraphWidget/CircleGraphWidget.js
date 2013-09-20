@@ -332,6 +332,20 @@
 			ok($("#"+self.target+" svg").length>0,"Widget("+self.id+"-CircleGraphWidget): The target contains at least a SVG element");
 			ok(self.graph.cluster!=null, "Widget("+self.id+"-CircleGraphWidget): The BioJs component has an attribute force that has been initializated");
 
+		},
+		status2JSON:function(){
+			var self = this;
+			var translate=(self.graph.tTranslate==null)?[0,0]:self.graph.tTranslate;
+			var scale=(self.graph.tTranslate==null)?1:self.graph.tScale;
+			return {"translateX":translate[0],
+					"translateY":translate[1],
+					"scale":scale};
+		},
+		uploadStatus:function(json){
+			var self = this;
+			self.graph.redraw(json.translateX,json.translateY,json.scale);
+			self.graph.zoom.translate([json.translateX,json.translateY]).scale(json.scale);
+			
 		}
 	});
 })(jQuery);

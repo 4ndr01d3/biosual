@@ -449,7 +449,7 @@ Biojs.Ruler = Biojs.extend (
 				parameter_span = '<span style="color: '+rule.actionParameters[0]+'; background-color: '+rule.actionParameters[0]+';">_</span>';
 				parameter_span += '<span style="color: '+rule.actionParameters[1]+'; background-color: '+rule.actionParameters[1]+';">_</span>';
 				break;
-			case "select":
+			case "select":case "scale":
 				parameter_span = '<i>'+rule.actionParameters[0]+'</i>';
 				break;
 		}
@@ -505,9 +505,9 @@ Biojs.Ruler = Biojs.extend (
 				actionPar.push($("#action_parameters_0_"+n).val());
 				actionPar.push($("#action_parameters_1_"+n).val());
 				break;
-			case "select":
+			case "select":case "scale":
 				actionPar.push($("#action_parameters_0_"+n).val());
-				break
+				break;
 		}
 		var rule = {location:location,action:action,actionParameters:actionPar,target:target1,condition:condition,parameters:parameters,id:target+'_rule_'+n};
 		self.addActiveRule(rule,n);
@@ -631,7 +631,17 @@ Biojs.Ruler = Biojs.extend (
 				$("#action_parameters_"+number).html(self._getSelect('action_parameters_0_'+number,action.options,"",
 						gotRule?rule.actionParameters[0]:rule
 				));
-				break
+				break;
+			case "scale":
+				var values=[];
+				if (action.options[0]<action.options[1] && (action.options[1]-action.options[0] -action.options[2])<(action.options[1]-action.options[0]))
+					for(var i=action.options[0];i<action.options[1];i+=action.options[2]){
+						values.push(i.toFixed(2));
+					}
+				$("#action_parameters_"+number).html(self._getSelect('action_parameters_0_'+number,values,"",
+						gotRule?rule.actionParameters[0]:rule
+				));
+				break;
 			case "single": default:
 				$("#action_parameters_"+number).html('');
 		}

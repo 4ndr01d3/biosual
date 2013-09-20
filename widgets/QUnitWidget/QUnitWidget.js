@@ -13,6 +13,12 @@
 		initTest: function(){
 			var self = this;
 			ok(true, "Widget("+self.id+"-QUnitWidget): Aren't you running the tests??");
+		},
+		status2JSON:function(){
+			return STATUS.NO_APPLICABLE;
+		},
+		uploadStatus:function(json){
+			return STATUS.NO_APPLICABLE;
 		}
 	});
 })(jQuery);

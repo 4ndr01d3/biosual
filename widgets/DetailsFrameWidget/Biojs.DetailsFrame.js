@@ -149,6 +149,7 @@ Biojs.DetailsFrame = Biojs.extend (
 	  */ 
 	updateFeatures: function(features,order){
 		var self=this;
+		self.order=order;
 		if (typeof features != "undefined")
 			self.opt.features = features;
 		$("#"+self.opt.target+" header").html(self.opt.features.id);

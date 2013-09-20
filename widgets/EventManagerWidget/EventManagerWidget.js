@@ -37,6 +37,12 @@
 						};
 					}(event)); 
 			}			
+		},
+		status2JSON:function(){
+			return STATUS.NO_APPLICABLE;
+		},
+		uploadStatus:function(json){
+			return STATUS.NO_APPLICABLE;
 		}
 	});
 })(jQuery);

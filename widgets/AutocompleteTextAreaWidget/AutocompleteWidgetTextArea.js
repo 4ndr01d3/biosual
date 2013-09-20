@@ -114,6 +114,13 @@
 			equal(modeSelected.hasClass( "selected" ),false,"Widget("+self.id+"-AutocompleteTextAreaWidget): the selected tab has change its class once has been click");
 			equal(self.mode,modeUnselected.find("h3").html().toLowerCase(),"Widget("+self.id+"-AutocompleteTextAreaWidget): The the mode has changed after clicking.");
 			
+		},
+		status2JSON:function(){
+			var self = this;
+			return {"mode":$("#"+self.target+ " .selected h3").text()};
+		},
+		uploadStatus:function(json){
+			$("#"+self.target+ " .option h3:contains(\""+json.mode+"\")").parent().click();
 		}
 	});
 

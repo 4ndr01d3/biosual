@@ -24,7 +24,11 @@
 					for (var i=0;i<self.tabs.length;i++){
 						$("#"+self.tabs[i].target).hide();
 						if ($(this).attr("title")==self.tabs[i].title){
-							$("#"+self.tabs[i].target).show();
+							if (typeof self.tabs[i].on_show == "undefined")
+								$("#"+self.tabs[i].target).show();
+							else{
+								$("#"+self.tabs[i].target).show(0,self.manager.widgets[self.tabs[i].on_show.widget][self.tabs[i].on_show.method]);
+							}
 							$(this).parent().addClass("current");
 						}
 					}
@@ -59,6 +63,24 @@
 			equal(tabSelected.hasClass( "current" ),false,"Widget("+self.id+"-InvertedTabsWidget): the selected tab has change its class once has been click");
 			tabSelected.find("a").click();
 			
+		},
+		status2JSON:function(){
+			var self = this;
+			var element=$("#"+self.target+ " ul li.current a");
+			return {current:element.text()};
+		},
+		uploadStatus:function(json){
+			var self = this;
+			$("#"+self.target+ " ul li a[title="+json.current+"]").click();
+		},
+		resetStatus:function(){
+			var self = this;
+			$("#"+self.target+ " ul li").removeClass("current");
+			for (var i=0;i<self.tabs.length;i++){
+				if (self.tabs[i].selected)
+					$("#"+self.target+ " ul li a[title:"+self.tabs[i].title+"]").click();
+			}			
 		}
+
 	});
 })(jQuery);
