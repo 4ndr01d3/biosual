@@ -11,6 +11,8 @@
 }
 .floater{
 	font-family: "Helvetica Neue", Helvetica, sans-serif;
+	font-size: 12px;
+	
 	display: inline-block;
 	position: relative;
 	vertical-align: text-top;
@@ -19,15 +21,15 @@
 	zoom: 1;
 	-webkit-font-smoothing: antialiased;
 		background: #E9EEEF;
-	width: 240px;
+	width: 200px;
 	border-radius: 10px;
 	-webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3),inset 0 1px 1px rgba(255, 255, 255, 0.8);
 	-moz-box-shadow: 0 1px 3px rgba(0,0,0,0.3),inset 0 1px 1px rgba(255,255,255,0.8);
 	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3),inset 0 1px 1px rgba(255, 255, 255, 0.8);
 	padding: 10px 10px 10px 10px;
 }
-header.protein-label {
-	font-size: 22px;
+header.protein-label,header.protein-label a{
+	font-size: 1.4em;
 	font-weight: bold;
 	font-style: normal;
 	color: #333;
@@ -52,6 +54,19 @@ header.protein-label {
 	margin: 0 auto 0 auto;
 	color: gray;
 }
+.floater li a{
+	padding: 0px;
+	margin: 0 auto 0 auto;
+	color: gray;
+}
+
+.floater li a .external_search{
+	width:16px;
+	height:16px;
+	display: inline-block;
+	background-repeat: no-repeat;
+}
+
 .floater .protein-description{
 	text-align: center;
 	margin: 0 0 0 auto;
@@ -61,7 +76,7 @@ header.protein-label {
 	font-variant: normal;
 	font-style:italic;
 	line-height: 1.5;
-	font-size: 14px;
+	font-size: 1.1em;
 	color: #888;
 	display: inline-block;
 	padding-bottom: 10px;

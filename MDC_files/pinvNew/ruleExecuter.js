@@ -7,12 +7,13 @@
 			var model = Manager.widgets["ruler"].rules;
 
 			var selector ="";
-			for (var i=0;i<rules.length;i++){
+			if (Object.keys(self.graph.interactionsA).length>0) //making sure there is anything in the graph to apply a rule
+			 for (var i=0;i<rules.length;i++){
 				selector ="";
 				var rule=rules[i];
 				if (rule.target==model.target[0].name){ //Proteins
-					var prefix =(rule.action.name=="Resize" || rule.action.name=="Color" || rule.action.name=="Color By" || rule.action.name=="Border" || rule.action.name=="Border By")?"figure_":"node_";
-					var prefix2=(rule.action.name=="Resize" || rule.action.name=="Color" || rule.action.name=="Color By" || rule.action.name=="Border" || rule.action.name=="Border By")?".figure":".node";
+					var prefix =(rule.action.name=="Resize" || rule.action.name=="Resize By" || rule.action.name=="Color" || rule.action.name=="Color By" || rule.action.name=="Border" || rule.action.name=="Border By")?"figure_":"node_";
+					var prefix2=(rule.action.name=="Resize" || rule.action.name=="Resize By" || rule.action.name=="Color" || rule.action.name=="Color By" || rule.action.name=="Border" || rule.action.name=="Border By")?".figure":".node";
 					switch (rule.condition){
 						case model.target[0].conditions[1].name: // interactions with
 							//TODO: Add validations in case proteins have been deleted
@@ -185,9 +186,25 @@
 						self.graph.setSizeScale(selector,rule.actionParameters[0]);
 				//		self.graph.addLegends([rule.condition+" "+rule.parameters.join(" ")],"Color",rule.actionParameters[0]);
 						break;
+					case "Resize By":
+						try{
+							self.resizeByFeature(self,rule.actionParameters[0],selector);
+						}catch(err){
+							selector="-1";
+							self.manager.widgets["ruler"].ruler.warningMessage(rule.id,"At least one of the values of the selected feature is not numeric");
+							self.manager.widgets["ruler"].ruler.setAffectedByRule(rule.id,affected);
+
+						}
+//						self.graph.setSizeScale(selector,rule.actionParameters[0]);
+				//		self.graph.addLegends([rule.condition+" "+rule.parameters.join(" ")],"Color",rule.actionParameters[0]);
+						break;
 				}
-				var affected = (selector=="")?0:self.graph.vis.selectAll(selector)[0].length;
+				var affected = 0;
+				if (selector!="" && selector!="-1")
+					affected=self.graph.vis.selectAll(selector)[0].length;
 				self.manager.widgets["ruler"].ruler.setAffectedByRule(rule.id,affected);
+				if (selector!="-1" && affected==0)
+					self.manager.widgets["ruler"].ruler.warningMessage(rule.id,"The filter is too restrictive. There were not proteins affected by it.");
 			}
 		};	  	
 		$.fn.ruler.applyRules2 = function(self){
@@ -195,7 +212,8 @@
 			var model = Manager.widgets["ruler"].rules;
 
 			var selector ="";
-			for (var i=0;i<rules.length;i++){
+			if (Object.keys(self.graph.interactionsA).length>0) //making sure there is anything in the graph to apply a rule
+			 for (var i=0;i<rules.length;i++){
 				selector ="";
 				var rule=rules[i];
 				if (rule.target==model.target[0].name){ //Proteins

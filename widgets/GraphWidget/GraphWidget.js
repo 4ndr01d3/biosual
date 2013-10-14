@@ -85,6 +85,10 @@
 			self.previousRequest=currentQ;
 			self.visibleProteins = Object.keys(self.graph.proteinsA);
 			self.executeStylers();
+			if (self.onceOffStatus!=null){
+				self.uploadStatus(self.onceOffStatus);
+				self.onceOffStatus=null;
+			}
 		},	
 		addProtein:function(doc,id,prefix,orgfield){
 			var self = this;
@@ -190,6 +194,36 @@
 			var self=this;
 			self.graph.resetGraphic();
 			self.graph.restart();
+		},
+		resizeByFeature: function(self,feature,selector){
+			selector = (typeof selector=="undefined")?".figure":selector;
+			var from = 0.5, to =5.0;
+			
+			
+			//get max and min
+			var max=-99999999,min=999999999;
+			for (var i=0;i<self.graph.proteins.length;i++){
+				var c=(feature!="organism")?self.graph.proteins[i].features[feature]:self.graph.proteins[i].organism;
+				if (c=="Unknown") break;
+				
+				if (typeof c=="undefined" || !isNumber(c))
+					throw "not a number"; 
+				if (c>max) max = c*1;
+				if (c<min) min = c*1;
+			}
+			var m=(from-to)/(min-max);
+			var b=to-m*max;
+			
+			for (var i=0;i<self.graph.proteins.length;i++){
+				var c=(feature!="organism")?self.graph.proteins[i].features[feature]:self.graph.proteins[i].organism;
+				if (c=="Unknown") 
+					self.graph.proteins[i].size= 1;
+				else
+					self.graph.proteins[i].size= m*c+b;
+			}
+			self.graph.refreshSizeScale(selector);
+			self.graph.addLegends([feature,(1-b)/m,1],"Resize By");
+			self.graph.addLegends([feature,max,to],"Resize By");
 		},
 		colorByFeature: function(self,feature,selector,type){
 			selector = (typeof selector=="undefined")?".figure":selector;
@@ -331,20 +365,27 @@
 					"fixed":fixed,
 					"selected":self.selected};
 		},
+		onceOffStatus:null,
 		uploadStatus:function(json){
 			var self = this;
+			if (self.previousRequest=="*:*"){
+				self.onceOffStatus=json;
+				return;
+			}
 			self.graph.redraw(json.translateX,json.translateY,json.scale);
 			self.graph.zoom.translate([json.translateX,json.translateY]).scale(json.scale);
 			
 			for (var i=0;i<json.fixed.length;i++){
 				self.graph.fixProteinAt(json.fixed[i].protein,json.fixed[i].x,json.fixed[i].y);
 			}
-			if (json.selected.indexOf("_")==-1){ // the selection is a node
-				self.graph.setColor('[id="node_'+json.selected+'"] .figure',"#000");
-				self.selected=json.selected;
-			}else{
-				self.graph.setColor('[id="link_'+json.selected+'"]',"#000");
-				self.selected=json.selected;
+			if (typeof json.selected != "undefined" && json.selected != null){
+				if (json.selected.indexOf("_")==-1){ // the selection is a node
+					self.graph.setColor('[id="node_'+json.selected+'"] .figure',"#000");
+					self.selected=json.selected;
+				}else{
+					self.graph.setColor('[id="link_'+json.selected+'"]',"#000");
+					self.selected=json.selected;
+				}
 			}
 		}
 	});

@@ -5,6 +5,9 @@
 			var self = this;
 
 			self.queries=self.manager.widgets["requester"].queries;
+			$("#"+this.target+ " textarea").remove();
+			$("#"+this.target+ " button").remove();
+			$("#"+this.target+ " #modes").remove();
 			$("#"+this.target).append('<textarea id="query" name="query" ></textarea><br/>');
 			
 			$("#"+this.target).append('<button type="button">Search</button>');

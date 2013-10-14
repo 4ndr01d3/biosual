@@ -1,0 +1,6 @@
+{
+    "name": "Status Widget",
+    "description": "Status recovery and saver",
+    "dependencies":["jquery.form.js"],
+    "js": "StatusWidget.js"
+}

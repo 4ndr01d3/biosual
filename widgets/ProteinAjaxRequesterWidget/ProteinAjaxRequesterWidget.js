@@ -14,7 +14,7 @@
 			}else
 				$("header.main h2").html("Core: Default");
 			
-			modelrequester.done(function(p){
+			if (modelrequester!=null) modelrequester.done(function(p){
 				for (var i=0;i<model[0].subcolumns.length;i++){
 					self.features.push(model[0].subcolumns[i].substring(prefix[0].length));
 				}

@@ -21,6 +21,7 @@
 				"rows": 300,
 				"Explicit":"True"
 	},
+	"version":"0.901",
 	"widgets": [
 		
 		{	"widget": "ProteinAjaxRequesterWidget",
@@ -103,7 +104,7 @@
 				"id": "svggraph",
 				"target": "#graph",
 				"formats":["PNG","SVG","Share"],
-				"css":"svg{background-color: #FBFBFB;} .figure {fill: #89B; stroke: #fff;} text {font: 10px sans-serif; font-weight:normal; stroke: #000; stroke-width: 0px;  stroke: transparent;}"
+				"css":"svg{background-color: #FFF;} .figure {fill: #89B; stroke: #fff;} text {font: 10px sans-serif; font-weight:normal; stroke: #000; stroke-width: 0px;  stroke: transparent;}"
 			}
 		},
 		{	"widget": "CircleGraphWidget",
@@ -254,6 +255,11 @@
 						"condition":4,
 						"widget":"requester",
 						"parameter":"scores"
+					},
+					{	"target": 0,
+						"action":10,
+						"widget":"requester",
+						"parameter":"features"
 					}
 				],
 				"rules": {
@@ -270,7 +276,8 @@
 									 {"name":"Border By","type":"select","options":["Protein Queried","Functional Class","Organism","Gene Name"]},
 									 {"name":"Show Label","type":"select","options":["ID","Functional Class","Organism","Gene Name"]},
 									 {"name":"Hide Label","type":"single"},
-									 {"name":"Resize","type":"scale","options":[0,3.1,0.1]}
+									 {"name":"Resize","type":"scale","options":[0,3.1,0.1]},
+									 {"name":"Resize By","type":"select","options":[]}
 							],
 							"conditions": [ 
 								{	"name": "no filters",
@@ -406,6 +413,14 @@
 												 {	"attribute":"overflow",
 													"value":"hidden"}]
 								}]
+			}
+		},
+		{	"widget": "StatusWidget",
+			"parameters": {
+				"id": "status",
+				"server_URL":"http://localhost/~4ndr01d3/biosual/saves/",
+				"uploader_URL":"http://biosual.cbio.uct.ac.za/uploader/",
+				"reinit":["requester","table","text"]
 			}
 		},
 

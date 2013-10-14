@@ -40,9 +40,9 @@ Biojs.InteractionsD3 = Biojs.extend (
 		force:null,
 		vis:null,
 		interactions:[],
-		interactionsA:[],
+		interactionsA:{},
 		proteins:[],
-		proteinsA:[],
+		proteinsA:{},
 		node_drag:null,
 		color: null,
 		foci: [],
@@ -57,9 +57,9 @@ Biojs.InteractionsD3 = Biojs.extend (
 			self.force	=null;
 			self.vis	=null;
 			self.interactions=[];
-			self.interactionsA=[];
+			self.interactionsA={};
 			self.proteins=[];
-			self.proteinsA=[];
+			self.proteinsA={};
 			self.node_drag=null;
 			self.color= null;
 			self.foci=[];
@@ -105,31 +105,39 @@ Biojs.InteractionsD3 = Biojs.extend (
 			    .call(self.zoom)
 			    .append('svg:g');
 			
+			self.vis.append('svg:rect')
+			    .attr('width', width*20)
+			    .attr('height', height*20)
+			    .attr('x', -width*10)
+			    .attr('y', -height*10)
+			    .attr('fill', 'white')
+			    .attr('stroke','white');
+
 			self.rect= self.vis.append('svg:rect')
 				.attr("class", "frame")
 			    .attr('width', width)
 			    .attr('height', height)
 			    .attr('fill', 'white')
-			    .attr('stroke','grey')
+			    .attr('stroke','white')
 			    .attr("stroke-dasharray","5,5");
 
 
 			self.perspective=d3.select("#"+self.opt.target + " svg").append('svg:g');
 			
-			self.plines= self.perspective.selectAll("line")
-				.data([0,1,2,3]);
+//			self.plines= self.perspective.selectAll("line")
+//				.data([0,1,2,3]);
 			
-			self.plines.enter().append("line")
-			 	.attr("x1", function(d) { 
-			 		return (d%2==0)?0:width;
-			 	})
-			 	.attr("y1", function(d) {return (d<2)?0:height;})
-			 	.attr("x2", function(d) { 
-			 		return (d%2==0)?0:width;
-			 	})
-			 	.attr("y2", function(d) {return (d<2)?0:height;})
-			 	.style("stroke", "#DDD")
-				.style("stroke-dasharray","5,5");
+//			self.plines.enter().append("line")
+//			 	.attr("x1", function(d) { 
+//			 		return (d%2==0)?0:width;
+//			 	})
+//			 	.attr("y1", function(d) {return (d<2)?0:height;})
+//			 	.attr("x2", function(d) { 
+//			 		return (d%2==0)?0:width;
+//			 	})
+//			 	.attr("y2", function(d) {return (d<2)?0:height;})
+//			 	.style("stroke", "#DDD")
+//				.style("stroke-dasharray","5,5");
 
 			 
 			
@@ -158,23 +166,23 @@ Biojs.InteractionsD3 = Biojs.extend (
 				  self.vis.attr("transform",
 				      "translate(" + trans + ")"
 				      + " scale(" + scale + ")");
-				  self.plines
-				 	.attr("x2", function(d) { 
-				 		switch(d){
-					 		case 0: case 2:
-					 			return trans[0];
-					 		case 1:case 3:
-					 			return trans[0]+self.rect.attr('width')*scale;
-				 		}
-				 	})
-				 	.attr("y2", function(d) { 
-				 		switch(d){
-				 		case 0:case 1:
-				 			return trans[1];
-				 		case 2: case 3:
-				 			return trans[1]+self.rect.attr('height')*scale;
-			 		}
-			 	});
+//				  self.plines
+//				 	.attr("x2", function(d) { 
+//				 		switch(d){
+//					 		case 0: case 2:
+//					 			return trans[0];
+//					 		case 1:case 3:
+//					 			return trans[0]+self.rect.attr('width')*scale;
+//				 		}
+//				 	})
+//				 	.attr("y2", function(d) { 
+//				 		switch(d){
+//				 		case 0:case 1:
+//				 			return trans[1];
+//				 		case 2: case 3:
+//				 			return trans[1]+self.rect.attr('height')*scale;
+//			 		}
+//			 	});
 			};
 			self.redraw=redraw;
 			
@@ -346,7 +354,20 @@ Biojs.InteractionsD3 = Biojs.extend (
 			for (var i=0; i<numberOfOrganism; i++){
 				self.foci.push({x: (self.opt.width/(numberOfOrganism+1))*(i+1), y:self.opt.height/2});
 			}
-
+//			self.plines
+//				.attr("x1", function(d) { 
+//					switch(d){
+//						case 0: case 2: return 0;
+//						case 1:case 3: return width;
+//					}
+//				})
+//				.attr("y1", function(d) { 
+//					switch(d){
+//						case 0:case 1: return 0;
+//					case 2: case 3:	return height;
+//					}
+//				});
+			if (self.tTranslate!=null) self.redraw(self.tTranslate[0], self.tTranslate[1], self.tScale);
 			self.restart();
 			self.raiseEvent('sizeChanged', {
 				width:width,
@@ -425,6 +446,8 @@ Biojs.InteractionsD3 = Biojs.extend (
 			}
 			n= self.proteins.push(protein);
 			self.proteinsA[protein.id]=protein;
+			if (typeof self.interactionsA[protein.id] == "undefined")
+				self.interactionsA[protein.id]=[];
 			if (typeof self.organisms[protein.organism] == 'undefined'){
 				var numberOfOrganism =Object.keys(self.organisms).length;
 				self.organisms[protein.organism] = numberOfOrganism++;
@@ -573,7 +596,7 @@ Biojs.InteractionsD3 = Biojs.extend (
 		resetGraphic: function(){
 			var self=this;
 			self.proteins=[];
-			self.proteinsA=[];
+			self.proteinsA={};
 			self.interactions=[];
 			self.restart();
 		},
@@ -631,7 +654,7 @@ Biojs.InteractionsD3 = Biojs.extend (
 				.attr("class", "figure")
 				.attr("d", d3.svg.symbol()
 						.size(function(d) {
-							return self.opt.radius*40*d.size;
+							return (2*self.opt.radius)*(2*self.opt.radius)*d.size*d.size;
 						})
 						.type(function(d) {
 							return d3.svg.symbolTypes[self._figuresOrder[self.organisms[d.organism]]];
@@ -647,12 +670,6 @@ Biojs.InteractionsD3 = Biojs.extend (
 					self.raiseEvent('proteinMouseOver', {
 						protein: d
 					});
-				})
-				.attr("width",function(d){
-					return self.opt.radius*2*d.size;
-				})
-				.attr("height",function(d){
-					return self.opt.radius*2*d.size;
 				})
 				.attr("stroke-width",self.opt.radius*0.3);
 			
@@ -702,22 +719,57 @@ Biojs.InteractionsD3 = Biojs.extend (
 				.style("text-anchor", "end")
 				.style("font-size", "1.2em")
 				.text(type+":");
-			
-			legend.filter(function(d) { return d[0]!="label" && d[1]==type; }).append("rect")
-				.attr("x", self.opt.width - 18) 
-				.attr("width", 13)
-				.attr("height", 13)
-				.style("fill", function(d,i) {
-					if (typeof d[2]== "undefined")
-						return self.color(i);
-					return d[2];
-				});
-			legend.filter(function(d) { return d[0]!="label" && d[1]== type; }).append("text")
-				.attr("x", self.opt.width - 24)
-				.attr("y", 7)
-				.attr("dy", ".35em")
-				.style("text-anchor", "end")
-				.text(function(d) { return d[0]; });
+			if (type.indexOf("Resize By")==0){
+
+				legend.filter(function(d) { return d[0]!="label" && d[1]==type; }).append("path")
+					.attr("class", "figure")
+					.attr("d", function(d) {
+							var h=2*self.opt.radius*Math.sqrt(d[0][2]);
+							return "M0,0L0,10M0,5L"+h+",5M"+h+",0L"+h+",10 ";
+					})
+					.attr("transform", function(d) { 
+						return "translate(" +  (self.opt.width - 18 - 2*self.opt.radius*Math.sqrt(d[0][2])) + "," +  0 + ")"; 
+					})
+					.style("fill", "transparent")
+					.style("stroke", "black");
+				legend.filter(function(d) { return d[0]!="label" && d[1]== type; }).append("text")
+					.attr("x", function(d) { 
+						return (self.opt.width - 22 - 5*self.opt.radius); 
+					})
+					.attr("y", 7)
+					.attr("dy", ".35em")
+					.style("text-anchor", "end")
+					.text(function(d) { return (d[0][1]*1.0).toFixed(2); });
+				
+//				legend.filter(function(d) { return d[0]!="label" && d[1]==type; }).append("rect")
+//					.attr("x", function(d) { return  self.opt.width - 18*2 - self.opt.radius*d[0][4]; }) 
+//					.attr("width", function(d) { return self.opt.radius*2*d[0][2]; })
+//					.attr("height", function(d) { return self.opt.radius*2*d[0][2]; })
+//					.style("fill", "transparent")
+//					.style("stroke", "black");
+//				legend.filter(function(d) { return d[0]!="label" && d[1]==type; }).append("rect")
+//					.attr("x", function(d) { return  self.opt.width - 18 - self.opt.radius*d[0][4]; }) 
+//					.attr("width", function(d) { return self.opt.radius*2*d[0][4]; })
+//					.attr("height", function(d) { return self.opt.radius*d[0][4]; })
+//					.style("fill", "transparent")
+//					.style("stroke", "black");
+			}else{
+				legend.filter(function(d) { return d[0]!="label" && d[1]==type; }).append("rect")
+					.attr("x", self.opt.width - 18) 
+					.attr("width", 13)
+					.attr("height", 13)
+					.style("fill", function(d,i) {
+						if (typeof d[2]== "undefined")
+							return self.color(i);
+						return d[2];
+					});
+				legend.filter(function(d) { return d[0]!="label" && d[1]== type; }).append("text")
+					.attr("x", self.opt.width - 24)
+					.attr("y", 7)
+					.attr("dy", ".35em")
+					.style("text-anchor", "end")
+					.text(function(d) { return d[0]; });
+			}
 		},
 		_paintLegends: function(){
 			var self = this;
@@ -736,7 +788,9 @@ Biojs.InteractionsD3 = Biojs.extend (
 				.data(self.legends)
 				.enter().insert("g")
 				.attr("class", "mainLegend")
-				.attr("transform", function(d, i) { return "translate(0," + (3 + i * 16) + ")"; });
+				.attr("transform", function(d, i) { 
+					return "translate(0," + (3 + i * 16) + ")"; 
+				});
 			for (var i=0; i< self.legendTypes.length; i++)
 				self._paintLegend(legend,self.legendTypes[i]);
 
@@ -753,6 +807,8 @@ Biojs.InteractionsD3 = Biojs.extend (
 				self.longestLegend=4;
 				return;
 			}
+			if (type=="Resize By") 
+				type = type+ " "+legends[0];
 			if (self.legendTypes.indexOf(type)==-1) {
 				self.legends.push(["label",type]);
 				self.legendTypes.push(type);
@@ -760,15 +816,19 @@ Biojs.InteractionsD3 = Biojs.extend (
 					self.longestLegend=type.length;
 			}
 			
-			for (var i=0;i<legends.length;i++){
-				if (typeof color=="undefined")
-					self.legends.push([legends[i],type]);
-				else
-					self.legends.push([legends[i],type,color]);
+			if (type.indexOf("Resize By")==0){ //is a size label
+				self.legends.push([legends,type]);
 				
-				if (legends[i].length>self.longestLegend)
-					self.longestLegend=legends[i].length;
-			}
+			} else //is a color label
+				for (var i=0;i<legends.length;i++){
+					if (typeof color=="undefined")
+						self.legends.push([legends[i],type]);
+					else
+						self.legends.push([legends[i],type,color]);
+					
+					if (legends[i].length>self.longestLegend)
+						self.longestLegend=legends[i].length;
+				}
 		},
 		/**
 		 * Hides the elements on the graphic that match the selector. 
@@ -889,10 +949,24 @@ Biojs.InteractionsD3 = Biojs.extend (
 			self.vis.selectAll(selector).attr("d", d3.svg.symbol()
 					.size(function(d) {
 						d.size=scale;
-						return self.opt.radius*40*d.size;
+						return (2*self.opt.radius)*(2*self.opt.radius)*scale;
+					})
+					.type(function(d) {
+						return d3.svg.symbolTypes[self._figuresOrder[self.organisms[d.organism]]];
 					})
 				);
 //			self.restart();
+		}, 
+		refreshSizeScale: function(selector){
+			var self=this;
+			self.vis.selectAll(selector).attr("d", d3.svg.symbol()
+					.size(function(d) {
+						return (2*self.opt.radius)*(2*self.opt.radius)*d.size;
+					})
+					.type(function(d) {
+						return d3.svg.symbolTypes[self._figuresOrder[self.organisms[d.organism]]];
+					})
+				);
 		}, 
 		/**
 		 * Shows/Hide the legend(id) of the protein

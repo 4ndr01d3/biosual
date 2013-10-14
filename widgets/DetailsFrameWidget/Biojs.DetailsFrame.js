@@ -152,20 +152,54 @@ Biojs.DetailsFrame = Biojs.extend (
 		self.order=order;
 		if (typeof features != "undefined")
 			self.opt.features = features;
-		$("#"+self.opt.target+" header").html(self.opt.features.id);
+		var re = new RegExp("[A-NR-Z][0-9][A-Z][A-Z0-9][A-Z0-9][0-9]|[OPQ][0-9][A-Z0-9][A-Z0-9][A-Z0-9][0-9]");
+		var m = re.exec(self.opt.features.id);
+		if (m == null)
+			$("#"+self.opt.target+" header").html(self.opt.features.id);
+		else if (m.index==0)
+			$("#"+self.opt.target+" header").html("<a href='http://www.uniprot.org/uniprot/"+self.opt.features.id+"' target='_new'>"+self.opt.features.id+"</a>");
 		var html = 	'';
 		if (typeof self.opt.features["description"] != "undefined")
 			html +=	'			<li class="protein-description"><h2>'+self.opt.features["description"]+'</h2></li>';
 		if (typeof order == "undefined")
 			for (var i in self.opt.features){
 				if ((i!="description") && (i!='id'))
-					html +=	'			<li><b>'+i+':</b>'+self.opt.features[i]+'</li>';
+					html +=	self._getListItem(i,self.opt.features[i],self.opt.features["organism"]);
 			}
 		else
 			for (var i=0; i<order.length; i++){
 				html +=	'			<li><b>'+order[i]+':</b>'+self.opt.features[order[i]]+'</li>';
 			}
+		var external = Object.keys(self._externalURL);
+		if (m != null && m.index==0)
+			html +=	self._getListItem("Search",external);
 		$("#"+self.opt.target+" ul").html(html);
+		for (var i=0;i<external.length;i++)
+			$("."+external[i]).css("background-image","url('biosual/images/"+external[i]+".png')");
 		self.raiseEvent('onFeaturesUpdated', {});
+	},
+	_externalURL:{
+		"EBI":"http://www.ebi.ac.uk/ebisearch/search.ebi?db=allebi&query=",
+		"NCBI":"http://www.ncbi.nlm.nih.gov/protein/",
+		"INTERPRO":"http://www.ebi.ac.uk/interpro/protein/",
+		"STRING":"http://string-db.org/newstring_cgi/show_network_section.pl?identifier=",
+		"SWISS-MODEL":"http://swissmodel.expasy.org/repository/smr.php?sptr_ac="},
+	_getListItem:function(key,value,organism){
+		var self = this;
+		organism=(typeof organism == "undefined")?"":organism;
+		organism= organism.replace("(", "").replace(")", "").replace(/strain /gi, "").replace(/ /gi, "_");
+		switch (key){
+			case "organism":
+				return '			<li><b>'+key+':</b> <a href="http://www.uniprot.org/taxonomy/?query='+value+'&sort=score" target="_new">'+value+'</a></li>';
+			case "gene_name":
+				return '			<li><b>'+key+':</b> <a href="http://ensemblgenomes.org/search/eg/'+value+" "+organism+'" target="_new">'+value+'</a></li>';
+			case "Search":
+				var html = '<li><b>'+key+':</b> ';
+				for (var i=0;i<value.length;i++)
+					html += '<a href="'+self._externalURL[value[i]]+self.opt.features.id+'" target="_new"><div class="external_search '+value[i]+'" ></div></a> ';
+				html += '</li>';
+				return html;
+		}
+		return '			<li><b>'+key+':</b> '+value+'</li>';
 	}
 });

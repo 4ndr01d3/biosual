@@ -295,6 +295,14 @@ Biojs.Ruler = Biojs.extend (
 	  */
 	setAffectedByRule:function(ruleId,affected){
 		$("#"+ruleId+" .affected").html(affected);
+		if (affected<1)
+			$("#"+ruleId).addClass("warning");
+		else
+			$("#"+ruleId).removeClass("warning");
+	},
+	warningMessage:function(ruleId,message){
+		$("#"+ruleId+" .tooltip").remove();
+		$("#"+ruleId).append('<span class="tooltip">'+message+'</span>');
 	},
 
 	/**

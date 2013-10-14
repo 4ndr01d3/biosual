@@ -49,7 +49,7 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 		organisms:{},
 		proteins:[],
 		interactions:[],
-		interactionsA:[],
+		interactionsA:{},
 		svg:null,
 		
 		//Transformation values
@@ -73,7 +73,7 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 			self.proteins=[];
 			self.interactions=[];
 			self.svg=null;
-			self.interactionsA=[];
+			self.interactionsA={};
 			
 			var w = 1280,
 			    h = 800;

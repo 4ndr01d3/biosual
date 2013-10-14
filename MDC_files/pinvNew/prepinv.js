@@ -1,8 +1,3 @@
-function getURLParameter(name) {
-    return decodeURIComponent(
-        (location.search.match(RegExp("[?|&]"+name+'=(.+?)(&|$)'))||[,null])[1]
-    );  
-}
 function includeProteinsFromURLParameter(array,parameter,type){
 	var proteins=getURLParameter(parameter);
 	if (proteins!=null && proteins!="null" && jQuery.trim(proteins)!=""){
@@ -19,8 +14,8 @@ includeProteinsFromURLParameter(URLrequests,"prtExp","explicit");
 includeProteinsFromURLParameter(URLrequests,"prtExt","extended");
 
 var coreURL=getURLParameter("core");
-if (coreURL!=null && coreURL!="null" && jQuery.trim(coreURL)!="")
-	server += coreURL+"/";
+if (coreURL==null || coreURL=="null" || jQuery.trim(coreURL)=="")
+	coreURL="";
 
 var model=[],
 	mainfields=["p1","p1_organism","p2","p1_organism","score"],
@@ -52,6 +47,16 @@ var callback = function (response) {
 			});
 	}
 };
-
-var modelrequester=jQuery.getJSON(server+ 'admin/luke?wt=json&numTerms=0&Explicit=True&json.wrf=?');
-modelrequester.done(callback);
+var modelrequester=null;
+var uploadModel =function(){
+	modelrequester=jQuery.getJSON(server+coreURL+'/admin/luke?wt=json&numTerms=0&Explicit=True&json.wrf=?');
+	modelrequester.done(callback);
+};
+var reloadModel =function(){
+	model=[],
+	mainfields=["p1","p1_organism","p2","p1_organism","score"],
+	prefix=["p1_",false,"p2_",false,"score_"];
+	uploadModel();
+};
+if (getURLParameter("status")=="null")
+	uploadModel();

@@ -12,7 +12,7 @@
 			self.prefixes=self.manager.widgets["requester"].prefixes;
 			$("#"+this.target).empty();
 			if (typeof self.columns =="undefined"){
-				modelrequester.done(function(p){
+				if (modelrequester!=null) modelrequester.done(function(p){
 					self.columns=model;
 					self.builtTable();
 				});
@@ -123,7 +123,7 @@
 			if (self.previousRequest!=null && self.previousRequest=="*:*")
 				self.afterRemove("*:*");
 			if (typeof self.columns =="undefined"){
-				modelrequester.done(function(p){
+				if (modelrequester!=null) modelrequester.done(function(p){
 					self.processJson( self.manager.response);
 				});
 			}else
@@ -132,6 +132,12 @@
 			self.responses.push(this.manager.response);
 
 			self.previousRequest=self.manager.store.get('q').val();
+			if (self.onceOffStatus!=null){
+				self.uploadStatus(self.onceOffStatus);
+				self.executeStylers();
+				self.onceOffStatus=null;
+			}
+
 		},
 		processJson: function(json){
 			var self=this;
@@ -335,6 +341,7 @@
 		},
 		executeStylers: function(){
 			var self = this;
+			if (self.oTable==null) return;
 			self.oTable.fnFilter('');		
 			self.oTable.$('tr', {"filter": "applied"}).css('backgroundColor', '');
 			self.oTable.$('td', {"filter": "applied"}).css('color', '');
@@ -371,8 +378,13 @@
 					"numberOfRows":self.oTable.fnSettings()._iDisplayLength,
 					"startsAt":self.oTable.fnSettings()._iDisplayStart};
 		},
+		onceOffStatus:null,
 		uploadStatus:function(json){
 			var self = this;
+			if (self.oTable==null){
+				self.onceOffStatus=json;
+				return;
+			} 
 			for(var i=0;i<json.visibleClasses.length;i++)
 				$("#"+self.target+" th.more span."+json.visibleClasses[i]).click();
 			self.oTable.fnSettings()._iDisplayLength = json.numberOfRows;

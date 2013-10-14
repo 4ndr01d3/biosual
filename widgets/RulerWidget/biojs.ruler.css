@@ -34,6 +34,12 @@
 .ruler .active_rules ul.sortable li{
 	padding-left: 40px; 
 }
+.ruler .active_rules ul.sortable li.warning{
+	background-color: #FFF0C0;
+}
+.ruler .active_rules ul.sortable li.warning:hover{
+	background-color: #FFCC00;
+}
 .ruler .active_rules ul.sortable li:hover{
 	background-color: #F3F8F3;
 	background-image:url('images/draggable.png');
@@ -124,4 +130,27 @@
 .ruler .add_rule a:hover {
 	color: #898;
 	cursor: pointer;
+}
+
+
+
+.ruler .active_rules ul.sortable li span.tooltip {
+    z-index:10;display:none; padding:14px 20px;
+    margin-top:-30px; margin-left:28px;
+    width:240px; line-height:16px;
+}
+.ruler .active_rules ul.sortable li:hover span.tooltip{
+    display:inline; position:absolute; color:#111;
+    border:1px solid #DCA; background:#fffAF0;}
+    
+/*CSS3 extras*/
+.ruler .active_rules ul.sortable li span.tooltip
+{
+    border-radius:4px;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+        
+    -moz-box-shadow: 5px 5px 8px #CCC;
+    -webkit-box-shadow: 5px 5px 8px #CCC;
+    box-shadow: 5px 5px 8px #CCC;
 }

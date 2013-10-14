@@ -67,31 +67,17 @@
 			if (self.formats.indexOf("Share")!=-1){
 				$(self.target+" .Share").click(function(){
 					$(self.target+" div.share").css("left","1px");
+					Manager.widgets["status"].fillElementsWithCodeToEmbed([$(self.target+" div.share textarea"),$(self.target+" div.share input")]);
 				});
 				$(self.target+" .share div.close").click(function(){
 					$(self.target+" div.share").css("left","-999px");
 				});
 				$(self.target+" #getStatus").click(function(){
-					self.status={};
-					for (var widg in Manager.widgets){
-						var widget = Manager.widgets[widg];
-						if ( typeof widget.status2JSON !="undefined"){
-							var st=widget.status2JSON();
-							if (st!=STATUS.NO_APPLICABLE)
-								self.status[widg]=st;
-						}
-					}
-					$(self.target+" textarea").html(JSON.stringify(self.status));
+
+					$(self.target+" textarea").html(Manager.widgets["status"].getStatus());
 				});
 				$(self.target+" #loadStatus").click(function(){
-					self.status=JSON.parse($(self.target+" textarea").val());
-					for (var widg in self.status){
-						var widget = Manager.widgets[widg];
-						if ( typeof widget.uploadStatus !="undefined"){
-							widget.uploadStatus(self.status[widg]);
-							
-						}
-					}
+					Manager.widgets["status"].loadStatus(JSON.parse($(self.target+" textarea").val()));
 				});
 			}
 		},
@@ -105,12 +91,14 @@
 			html += "	<div class='close'/>";
 			html += "	<ul>";
 			if (self.shareByURL) {
-				html += "		<li>URL (only proteins queried):<br/>" +
-						"			<input type='text' class='tocopy' onClick='$(this).select()' value='"+Manager.widgets["requester"].getURL()+"'/><br/>" +
+				html += "		<li><b>URL</b> (only proteins queried):<br/>" +
+						"			<input type='text' class='tocopy' onClick='$(this).select()' /><br/>" +
 						"		</li>";
 			}
 			if (self.shareByEmbed) {
-				html += "		<li><a id='getStatus'>GET</a> <a id='loadStatus'>LOAD</a><br/><textarea><iframe width=\"640\" height=\"480\" src=\""+Manager.widgets["requester"].getURL()+"&embedded=true\" frameborder=\"0\" allowfullscreen></iframe></textarea></li>";
+				html += "		<li><b>HTML to Embed</b>:<br/><textarea class='tocopy' onClick='$(this).select()'></textarea>";
+				//html += "<br/><a id='getStatus'>GET</a> <a id='loadStatus'>LOAD</a>";
+				html += "		</li>";
 			}
 			if (self.shareBySocialNetworks) {
 				html += "		<li>Social media</li>";
