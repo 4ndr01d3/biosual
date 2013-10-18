@@ -106,6 +106,24 @@ Biojs.DetailsFrame = Biojs.extend (
 			});
 		if (self.opt.draggable){
 			$("#"+target).draggable({cursor:"move",handle: ".dragger"});
+			$("#"+target+" .dragger").on('mousedown', function(e) {
+			    var $this = $(this);
+			    e.preventDefault();
+
+			    // Make every element on page unselectable
+			    $('.top').addClass('unselectable');
+			    $('.center').addClass('unselectable');
+
+			    // Some setup here, like remembering the original location, etc
+			    $(window).on('mousemove', function(e) {
+			       // Do the thing!
+			       $this.on('mouseup', function(e) {
+			           $('.top').removeClass('unselectable');
+			           $('.center').removeClass('unselectable');
+			           // Other clean-up tasks here
+			       });
+			    });
+			});
 		}
 	},
 

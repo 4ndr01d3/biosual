@@ -245,14 +245,14 @@ Biojs.FileLoader = Biojs.extend (
 		  */
 		getFormatedTable: function(rows){
 			var self=this;
-			var loadedText="<table>";
+			var loadedText="<div class='tablecontainer'><table>";
 			loadedText += "<tr><th>"+self.headers.join("</th><th>")+"</th></tr>";
 			for (var p in self.tabdata){
 				if (typeof rows != "undefined" && rows--==0)
 					break;
 				loadedText += "<tr><td>"+self.tabdata[p].join("</td><td>")+"</td></tr>";
 			}
-			loadedText += "</table>";
+			loadedText += "</table></div>";
 			return loadedText;
 		}
 	});

@@ -107,7 +107,7 @@
 }
 .networkLoader div.sample{
 	position: relative; 
-	top: -215px;; 
+	top: -135px;; 
 	font-weight: bold; 
 	font-size:80px;
 	text-shadow: -2px -2px 2px #fff, 2px 2px 2px #000;
@@ -118,6 +118,11 @@
 	-ms-transform: rotate(-9deg);
 	-o-transform: rotate(-9deg);
 	height: 0px;
+	max-width:750px;
+	left: 80px;
+}
+.networkLoader div.sample p{
+	margin:0px;
 }
 .networkLoader .error {
 	position: relative;
@@ -226,4 +231,9 @@
 	display:inline-block; 
 	top:3px; 
 	left:48%; 
+}
+.networkLoader .tablecontainer {
+	max-width:750px;
+	max-height: 400px;
+	overflow:auto;
 }

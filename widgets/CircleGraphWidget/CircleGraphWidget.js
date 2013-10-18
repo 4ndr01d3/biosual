@@ -131,7 +131,8 @@
 						"showLegend":false,
 						"typeLegend":"id",
 						"organism":doc[orgfield],
-						"features":feats}) -1;
+						"features":feats,
+						"size":1}) -1;
 			}else						
 				n1 = self.graph.proteins[doc[id]];
 		
@@ -239,6 +240,36 @@
 			self.graph.resetGraphic();
 			self.graph.restart();
 		},
+		resizeByFeature: function(self,feature,selector){
+			selector = (typeof selector=="undefined")?".figure":selector;
+			var from = 0.3, to =5.0;
+
+			//get max and min
+			var max=-99999999,min=999999999;
+			for (var i in self.graph.proteins){
+				var c=(feature!="organism")?self.graph.proteins[i].features[feature]:self.graph.proteins[i].organism;
+				if (c=="Unknown") break;
+				
+				if (typeof c=="undefined" || !isNumber(c))
+					throw "not a number"; 
+				if (c>max) max = c*1;
+				if (c<min) min = c*1;
+			}
+			var m=(from-to)/(min-max);
+			var b=to-m*max;
+			
+			for (var i in self.graph.proteins){
+				var c=(feature!="organism")?self.graph.proteins[i].features[feature]:self.graph.proteins[i].organism;
+				if (c=="Unknown") 
+					self.graph.proteins[i].size= 1;
+				else
+					self.graph.proteins[i].size= m*c+b;
+			}
+			self.graph.refreshSizeScale(selector);
+			self.graph.addLegends([feature,(1-b)/m,1],"Resize By");
+			self.graph.addLegends([feature,max,to],"Resize By");
+		},
+
 		colorByFeature: function(self,feature,selector,type){
 			selector = (typeof selector=="undefined")?".figure":selector;
 			var classes =[];
@@ -301,6 +332,7 @@
 			self.graph.addLegends(null);
 			self.graph.setFillColor(".figure",null);
 			self.graph.setColor(".figure",null);
+			self.graph.setSizeScale(".figure",1);
 			self.graph.vis.selectAll(".node").attr("visibility", 'visible').style("stroke","#fff");
 			self.graph.vis.selectAll(".link").attr("visibility", 'visible').style("stroke","#999");
 			self.graph.vis.selectAll(".legend").attr("visibility",function(d) { return (d.showLegend)?"visible":"hidden";});

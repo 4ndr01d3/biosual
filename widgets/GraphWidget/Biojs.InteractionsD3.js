@@ -543,18 +543,18 @@ Biojs.InteractionsD3 = Biojs.extend (
 							self.removeProtein(targetid);
 					}
 				}
-			}
-			if (self.interactionsA[proteinId].length==0){
-				delete self.interactionsA[proteinId];
-				for(var i=0; i<self.proteins.length; i++) {
-					if(self.proteins[i].id == proteinId) {
-						self.proteins.splice(i, 1);
-						break;
+				if (self.interactionsA[proteinId].length==0){
+					delete self.interactionsA[proteinId];
+					for(var i=0; i<self.proteins.length; i++) {
+						if(self.proteins[i].id == proteinId) {
+							self.proteins.splice(i, 1);
+							break;
+						}
 					}
+					delete self.proteinsA[proteinId];
+				}else{
+					self.proteinsA[proteinId].fixed=false;
 				}
-				delete self.proteinsA[proteinId];
-			}else{
-				self.proteinsA[proteinId].fixed=false;
 			}
 		},
 		/**
@@ -741,18 +741,6 @@ Biojs.InteractionsD3 = Biojs.extend (
 					.style("text-anchor", "end")
 					.text(function(d) { return (d[0][1]*1.0).toFixed(2); });
 				
-//				legend.filter(function(d) { return d[0]!="label" && d[1]==type; }).append("rect")
-//					.attr("x", function(d) { return  self.opt.width - 18*2 - self.opt.radius*d[0][4]; }) 
-//					.attr("width", function(d) { return self.opt.radius*2*d[0][2]; })
-//					.attr("height", function(d) { return self.opt.radius*2*d[0][2]; })
-//					.style("fill", "transparent")
-//					.style("stroke", "black");
-//				legend.filter(function(d) { return d[0]!="label" && d[1]==type; }).append("rect")
-//					.attr("x", function(d) { return  self.opt.width - 18 - self.opt.radius*d[0][4]; }) 
-//					.attr("width", function(d) { return self.opt.radius*2*d[0][4]; })
-//					.attr("height", function(d) { return self.opt.radius*d[0][4]; })
-//					.style("fill", "transparent")
-//					.style("stroke", "black");
 			}else{
 				legend.filter(function(d) { return d[0]!="label" && d[1]==type; }).append("rect")
 					.attr("x", self.opt.width - 18) 
@@ -818,7 +806,6 @@ Biojs.InteractionsD3 = Biojs.extend (
 			
 			if (type.indexOf("Resize By")==0){ //is a size label
 				self.legends.push([legends,type]);
-				
 			} else //is a color label
 				for (var i=0;i<legends.length;i++){
 					if (typeof color=="undefined")

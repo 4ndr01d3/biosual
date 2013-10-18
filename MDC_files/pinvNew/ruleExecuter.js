@@ -16,11 +16,14 @@
 					var prefix2=(rule.action.name=="Resize" || rule.action.name=="Resize By" || rule.action.name=="Color" || rule.action.name=="Color By" || rule.action.name=="Border" || rule.action.name=="Border By")?".figure":".node";
 					switch (rule.condition){
 						case model.target[0].conditions[1].name: // interactions with
-							//TODO: Add validations in case proteins have been deleted
-							for (var j=0;j<self.graph.interactionsA[rule.parameters[0]].length;j++){
-								selector +="[id ="+prefix+self.graph.interactionsA[rule.parameters[0]][j].name+"],";
+							if (typeof self.graph.interactionsA[rule.parameters[0]] == "undefined") 
+								selector="";
+							else{
+								for (var j=0;j<self.graph.interactionsA[rule.parameters[0]].length;j++){
+									selector +="[id ="+prefix+self.graph.interactionsA[rule.parameters[0]][j].name+"],";
+								}
+								selector = selector.substring(0, selector.length-1);
 							}
-							selector = selector.substring(0, selector.length-1);
 							break;
 						case model.target[0].conditions[2].name: // number of interactions
 							for (var interaction in self.graph.interactionsA){
@@ -184,7 +187,6 @@
 						break;
 					case "Resize":
 						self.graph.setSizeScale(selector,rule.actionParameters[0]);
-				//		self.graph.addLegends([rule.condition+" "+rule.parameters.join(" ")],"Color",rule.actionParameters[0]);
 						break;
 					case "Resize By":
 						try{
@@ -195,8 +197,6 @@
 							self.manager.widgets["ruler"].ruler.setAffectedByRule(rule.id,affected);
 
 						}
-//						self.graph.setSizeScale(selector,rule.actionParameters[0]);
-				//		self.graph.addLegends([rule.condition+" "+rule.parameters.join(" ")],"Color",rule.actionParameters[0]);
 						break;
 				}
 				var affected = 0;
@@ -217,15 +217,18 @@
 				selector ="";
 				var rule=rules[i];
 				if (rule.target==model.target[0].name){ //Proteins
-					var prefix=(rule.action.name=="Color" || rule.action.name=="Color By")?"figure_":"node-";
-					var prefix2=(rule.action.name=="Color" || rule.action.name=="Color By")?".figure":".node";
+					var prefix=(rule.action.name=="Resize" || rule.action.name=="Resize By" || rule.action.name=="Color" || rule.action.name=="Color By")?"figure_":"node-";
+					var prefix2=(rule.action.name=="Resize" || rule.action.name=="Resize By" || rule.action.name=="Color" || rule.action.name=="Color By")?".figure":".node";
 					switch (rule.condition){
 						case model.target[0].conditions[1].name: // interactions with
-							//TODO: Add validations in case proteins have been deleted
-							for (var j=0;j<self.graph.interactionsA[rule.parameters[0]].length;j++){
-								selector +="[id ="+prefix+self.graph.interactionsA[rule.parameters[0]][j].name+"],";
+							if (typeof self.graph.interactionsA[rule.parameters[0]] == "undefined") 
+								selector="";
+							else{
+								for (var j=0;j<self.graph.interactionsA[rule.parameters[0]].length;j++){
+									selector +="[id ="+prefix+self.graph.interactionsA[rule.parameters[0]][j].name+"],";
+								}
+								selector = selector.substring(0, selector.length-1);
 							}
-							selector = selector.substring(0, selector.length-1);
 							break;
 						case model.target[0].conditions[2].name: // number of interactions
 							for (var interaction in self.graph.interactionsA){
@@ -368,9 +371,11 @@
 						break;
 					case "Border":
 						self.graph.setColor(selector,rule.actionParameters[0]);
+						self.graph.addLegends([rule.condition+" "+rule.parameters.join(" ")],"Border ("+rule.target+")",rule.actionParameters[0]);
 						break;
 					case "Color":
 						self.graph.setFillColor(selector,rule.actionParameters[0]);
+						self.graph.addLegends([rule.condition+" "+rule.parameters.join(" ")],"Color",rule.actionParameters[0]);
 						break;
 					case "Color By":
 					case "Border By":
@@ -386,7 +391,16 @@
 					case "Hide Label":
 						self.graph.hideLegend(selector);
 						break;
-				}
+					case "Resize":
+						self.graph.setSizeScale(selector,rule.actionParameters[0]);
+						break;
+					case "Resize By":
+						try{
+							self.resizeByFeature(self,rule.actionParameters[0],selector);
+						}catch(err){
+							self.manager.widgets["ruler"].ruler.warningMessage(rule.id,"At least one of the values of the selected feature is not numeric");
+						}
+						break;				}
 			}
 		};
 		$.fn.ruler.applyRules3 = function(self){
@@ -423,48 +437,48 @@
 									case "equals":
 										if  (doc[p1key] == rule.parameters[2] )
 											if (added.indexOf(doc[self.columns[0].id])==-1){
-												selectorTD += " .cell_"+self.columns[0].id+"[content="+doc[self.columns[0].id]+"], .cell_"+self.columns[2].id+"[content="+doc[self.columns[0].id]+"],";
+												selectorTD += " .cell_"+self.columns[0].id+"[content=\""+doc[self.columns[0].id]+"\"], .cell_"+self.columns[2].id+"[content=\""+doc[self.columns[0].id]+"\"],";
 												added.push(doc[self.columns[0].id]);
 											}
 										if  (doc[p2key] == rule.parameters[2] )
 											if (added.indexOf(doc[self.columns[2].id])==-1){
-												selectorTD += " .cell_"+self.columns[0].id+"[content="+doc[self.columns[2].id]+"], .cell_"+self.columns[2].id+"[content="+doc[self.columns[2].id]+"],";
+												selectorTD += " .cell_"+self.columns[0].id+"[content=\""+doc[self.columns[2].id]+"\"], .cell_"+self.columns[2].id+"[content=\""+doc[self.columns[2].id]+"\"],";
 												added.push(doc[self.columns[2].id]);
 											}
 										break;
 									case "contains":
 										if  (doc[p1key].indexOf(rule.parameters[2])!=-1)
 											if (added.indexOf(doc[self.columns[0].id])==-1){
-												selectorTD += " .cell_"+self.columns[0].id+"[content="+doc[self.columns[0].id]+"], .cell_"+self.columns[2].id+"[content="+doc[self.columns[0].id]+"],";
+												selectorTD += " .cell_"+self.columns[0].id+"[content=\""+doc[self.columns[0].id]+"\"], .cell_"+self.columns[2].id+"[content=\""+doc[self.columns[0].id]+"\"],";
 												added.push(doc[self.columns[0].id]);
 											}
 										if  (doc[p2key].indexOf(rule.parameters[2])!=-1)
 											if (added.indexOf(doc[self.columns[2].id])==-1){
-												selectorTD += " .cell_"+self.columns[0].id+"[content="+doc[self.columns[2].id]+"], .cell_"+self.columns[2].id+"[content="+doc[self.columns[2].id]+"],";
+												selectorTD += " .cell_"+self.columns[0].id+"[content=\""+doc[self.columns[2].id]+"\"], .cell_"+self.columns[2].id+"[content=\""+doc[self.columns[2].id]+"\"],";
 												added.push(doc[self.columns[2].id]);
 											}
 										break;
 									case "different":
 										if  (doc[p1key] != rule.parameters[2] )
 											if (added.indexOf(doc[self.columns[0].id])==-1){
-												selectorTD += " .cell_"+self.columns[0].id+"[content="+doc[self.columns[0].id]+"], .cell_"+self.columns[2].id+"[content="+doc[self.columns[0].id]+"],";
+												selectorTD += " .cell_"+self.columns[0].id+"[content=\""+doc[self.columns[0].id]+"\"], .cell_"+self.columns[2].id+"[content=\""+doc[self.columns[0].id]+"\"],";
 												added.push(doc[self.columns[0].id]);
 											}
 										if  (doc[p2key] != rule.parameters[2] )
 											if (added.indexOf(doc[self.columns[2].id])==-1){
-												selectorTD += " .cell_"+self.columns[0].id+"[content="+doc[self.columns[2].id]+"], .cell_"+self.columns[2].id+"[content="+doc[self.columns[2].id]+"],";
+												selectorTD += " .cell_"+self.columns[0].id+"[content=\""+doc[self.columns[2].id]+"\"], .cell_"+self.columns[2].id+"[content=\""+doc[self.columns[2].id]+"\"],";
 												added.push(doc[self.columns[2].id]);
 											}
 										break;
 									case "not contains":
 										if  (doc[p1key].indexOf(rule.parameters[2])==-1)
 											if (added.indexOf(doc[self.columns[0].id])==-1){
-												selectorTD += " .cell_"+self.columns[0].id+"[content="+doc[self.columns[0].id]+"], .cell_"+self.columns[2].id+"[content="+doc[self.columns[0].id]+"],";
+												selectorTD += " .cell_"+self.columns[0].id+"[content=\""+doc[self.columns[0].id]+"\"], .cell_"+self.columns[2].id+"[content=\""+doc[self.columns[0].id]+"\"],";
 												added.push(doc[self.columns[0].id]);
 											}
 										if  (doc[p2key].indexOf(rule.parameters[2])==-1)
 											if (added.indexOf(doc[self.columns[2].id])==-1){
-												selectorTD += " .cell_"+self.columns[0].id+"[content="+doc[self.columns[2].id]+"], .cell_"+self.columns[2].id+"[content="+doc[self.columns[2].id]+"],";
+												selectorTD += " .cell_"+self.columns[0].id+"[content=\""+doc[self.columns[2].id]+"\"], .cell_"+self.columns[2].id+"[content=\""+doc[self.columns[2].id]+"\"],";
 												added.push(doc[self.columns[2].id]);
 											}
 										break;
@@ -475,16 +489,16 @@
 						case model.target[0].conditions[3].name: // accession number
 							switch (rule.parameters[0]){
 								case "equals":
-									selectorTD = ".cell_"+self.columns[0].id+"[content="+rule.parameters[1]+"], .cell_"+self.columns[2].id+"[content="+rule.parameters[1]+"]";
+									selectorTD = ".cell_"+self.columns[0].id+"[content=\""+rule.parameters[1]+"\"], .cell_"+self.columns[2].id+"[content=\""+rule.parameters[1]+"\"]";
 									break;
 								case "contains":
 									selectorTD = ".cell_"+self.columns[0].id+"[content *=\""+rule.parameters[1]+"\"], .cell_"+self.columns[2].id+"[content *=\""+rule.parameters[1]+"\"]";
 									break;
 								case "different":
-									selectorTD = ".cell_"+self.columns[0].id+":not([content="+rule.parameters[1]+"]), .cell_"+self.columns[2].id+":not([content="+rule.parameters[1]+"])";
+									selectorTD = ".cell_"+self.columns[0].id+":not([content=\""+rule.parameters[1]+"\"]), .cell_"+self.columns[2].id+":not([content=\""+rule.parameters[1]+"\"])";
 									break;
 								case "not contains":
-									selectorTD =".cell_"+self.columns[0].id+":not([content *="+rule.parameters[1]+"]),.cell_"+self.columns[2].id+":not([content *="+rule.parameters[1]+"])";
+									selectorTD =".cell_"+self.columns[0].id+":not([content *=\""+rule.parameters[1]+"\"]),.cell_"+self.columns[2].id+":not([content *=\""+rule.parameters[1]+"\"])";
 									break;
 
 							}
@@ -498,23 +512,23 @@
 								switch (rule.parameters[0]){
 									case "==":
 										if (1*len==1*rule.parameters[1])
-											selectorTD +=" .cell_"+self.columns[0].id+"[content="+id+"], .cell_"+self.columns[2].id+"[content="+id+"],";
+											selectorTD +=" .cell_"+self.columns[0].id+"[content=\""+id+"\"], .cell_"+self.columns[2].id+"[content=\""+id+"\"],";
 										break;
 									case ">":
 										if (1*len>1*rule.parameters[1])
-											selectorTD +=" .cell_"+self.columns[0].id+"[content="+id+"], .cell_"+self.columns[2].id+"[content="+id+"],";
+											selectorTD +=" .cell_"+self.columns[0].id+"[content=\""+id+"\"], .cell_"+self.columns[2].id+"[content=\""+id+"\"],";
 										break;
 									case "<":
 										if (1*len<1*rule.parameters[1])
-											selectorTD +=" .cell_"+self.columns[0].id+"[content="+id+"], .cell_"+self.columns[2].id+"[content="+id+"],";
+											selectorTD +=" .cell_"+self.columns[0].id+"[content=\""+id+"\"], .cell_"+self.columns[2].id+"[content=\""+id+"\"],";
 										break;
 									case "<=":
 										if (1*len<=1*rule.parameters[1])
-											selectorTD +=" .cell_"+self.columns[0].id+"[content="+id+"], .cell_"+self.columns[2].id+"[content="+id+"],";
+											selectorTD +=" .cell_"+self.columns[0].id+"[content=\""+id+"\"], .cell_"+self.columns[2].id+"[content=\""+id+"\"],";
 										break;
 									case ">=":
 										if (1*len>=1*rule.parameters[1])
-											selectorTD +=" .cell_"+self.columns[0].id+"[content="+id+"], .cell_"+self.columns[2].id+"[content="+id+"],";
+											selectorTD +=" .cell_"+self.columns[0].id+"[content=\""+id+"\"], .cell_"+self.columns[2].id+"[content=\""+id+"\"],";
 										break;
 								}
 							}
@@ -544,6 +558,12 @@
 								self.colorBySeed(selectorTR,selectorTD,type);
 							else
 								self.colorByFeature(selectorTR,selectorTD,rule.actionParameters[0],type);
+							break;
+						case "Resize":
+							self.resizeCell(selectorTR,selectorTD,rule.actionParameters[0]);
+							break;
+						case "Resize By":
+							self.resizeByFeature(selectorTR,selectorTD,rule.actionParameters[0],type);
 							break;
 					}
 				} else if (rule.target==model.target[1].name) { //Interactions

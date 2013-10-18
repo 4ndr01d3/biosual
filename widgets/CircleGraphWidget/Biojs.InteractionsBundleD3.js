@@ -112,8 +112,8 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 			    .style("height", h + "px");
 
 			self.zoom=d3.behavior.zoom().
-    		scaleExtent([1, 10])
-    		.on("zoom", redraw);
+	    		scaleExtent([1, 10])
+	    		.on("zoom", redraw);
 			self.svg=self.vis.append('svg:svg')
 				    .attr("width", w)
 				    .attr("height", h)
@@ -417,6 +417,9 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 				self.proteins[protein.id].imports=[];
 				
 				self.organisms[protein.organism].children.push(self.proteins[protein.id]);
+				if (typeof self.interactionsA[protein.id] == "undefined")
+					self.interactionsA[protein.id]=[];
+				
 			}
 
 //			var n = self.proteins.indexOf(self.proteinsA[protein.id]);
@@ -651,7 +654,7 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 			svgNode.append("circle")
 				.attr("class", "figure")
 				.attr("id", function(d) { return "figure_"+d.id; })
-				.attr("r", self.opt.radius)
+				.attr("r", function(d) { return self.opt.radius*Math.sqrt(d.size); })
 				.attr("stroke-width",self.opt.radius*0.3)
 				.on("mouseover",  function(d){ 
 					self.raiseEvent('proteinMouseOver', {
@@ -698,23 +701,47 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 				.style("text-anchor", "end")
 				.style("font-size", "1.2em")
 				.text(type+":");
-			
-			legend.filter(function(d) { return d[0]!="label" && d[1]==type; }).append("rect")
-				.attr("x", self.opt.width/2 - 18) 
-				.attr("y", -self.opt.height/2)
-				.attr("width", 13)
-				.attr("height", 13)
-				.style("fill", function(d,i) {
-					if (typeof d[2]== "undefined")
-						return self.color(i);
-					return d[2];
-				});
-			legend.filter(function(d) { return d[0]!="label" && d[1]== type; }).append("text")
-				.attr("x", self.opt.width/2 - 24)
-				.attr("y", 7-self.opt.height/2)
-				.attr("dy", ".35em")
-				.style("text-anchor", "end")
-				.text(function(d) { return d[0]; });
+			if (type.indexOf("Resize By")==0){
+
+				legend.filter(function(d) { return d[0]!="label" && d[1]==type; }).append("path")
+					.attr("class", "figure")
+					.attr("d", function(d) {
+							var h=2*self.opt.radius*Math.sqrt(d[0][2]);
+							return "M0,0L0,10M0,5L"+h+",5M"+h+",0L"+h+",10 ";
+					})
+					.attr("transform", function(d) { 
+						return "translate(" +  (self.opt.width/2 - 18 - 2*self.opt.radius*Math.sqrt(d[0][2])) + ", -" +  self.opt.height/2 + ")"; 
+					})
+					.style("fill", "transparent")
+					.style("stroke", "black");
+				legend.filter(function(d) { return d[0]!="label" && d[1]== type; }).append("text")
+					.attr("x", function(d) { 
+						return (self.opt.width/2 - 22 - 5*self.opt.radius); 
+					})
+					.attr("y", 7-self.opt.height/2 )
+					.attr("dy", ".35em")
+					.style("text-anchor", "end")
+					.text(function(d) { return (d[0][1]*1.0).toFixed(2); });
+				
+			}else{
+				
+				legend.filter(function(d) { return d[0]!="label" && d[1]==type; }).append("rect")
+					.attr("x", self.opt.width/2 - 18) 
+					.attr("y", -self.opt.height/2)
+					.attr("width", 13)
+					.attr("height", 13)
+					.style("fill", function(d,i) {
+						if (typeof d[2]== "undefined")
+							return self.color(i);
+						return d[2];
+					});
+				legend.filter(function(d) { return d[0]!="label" && d[1]== type; }).append("text")
+					.attr("x", self.opt.width/2 - 24)
+					.attr("y", 7-self.opt.height/2)
+					.attr("dy", ".35em")
+					.style("text-anchor", "end")
+					.text(function(d) { return d[0]; });
+			}
 		},
 		_paintLegends: function(){
 			var self = this;
@@ -751,6 +778,8 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 				self.longestLegend=4;
 				return;
 			}
+			if (type=="Resize By") 
+				type = type+ " "+legends[0];
 			if (self.legendTypes.indexOf(type)==-1) {
 				self.legends.push(["label",type]);
 				self.legendTypes.push(type);
@@ -758,15 +787,18 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 					self.longestLegend=type.length;
 			}
 			
-			for (var i=0;i<legends.length;i++){
-				if (typeof color=="undefined")
-					self.legends.push([legends[i],type]);
-				else
-					self.legends.push([legends[i],type,color]);
-				
-				if (legends[i].length>self.longestLegend)
-					self.longestLegend=legends[i].length;
-			}
+			if (type.indexOf("Resize By")==0){ //is a size label
+				self.legends.push([legends,type]);
+			} else //is a color label
+				for (var i=0;i<legends.length;i++){
+					if (typeof color=="undefined")
+						self.legends.push([legends[i],type]);
+					else
+						self.legends.push([legends[i],type,color]);
+					
+					if (legends[i].length>self.longestLegend)
+						self.longestLegend=legends[i].length;
+				}
 		},
 		
 		/**
@@ -857,8 +889,25 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 				else
 					return d.features[d.typeLegend];
 				});
-//			self.restart();
 		}, 
+		
+		setSizeScale: function(selector,scale){
+			var self=this;
+			
+
+			self.vis.selectAll(selector).attr("r", function(d) { 
+				d.size=scale;
+				return self.opt.radius*Math.sqrt(d.size); 
+			});
+		}, 
+		refreshSizeScale: function(selector){
+			var self=this;
+			self.vis.selectAll(selector).attr("r", function(d) { 
+				return self.opt.radius*Math.sqrt(d.size); 
+			});
+		}, 
+
+		
 		/**
 		 * Shows/Hide the legend(id) of the protein
 		 * 

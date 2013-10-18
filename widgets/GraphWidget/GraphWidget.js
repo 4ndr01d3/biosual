@@ -197,7 +197,7 @@
 		},
 		resizeByFeature: function(self,feature,selector){
 			selector = (typeof selector=="undefined")?".figure":selector;
-			var from = 0.5, to =5.0;
+			var from = 0.3, to =5.0;
 			
 			
 			//get max and min

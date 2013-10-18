@@ -35,10 +35,19 @@
 		},
 		previousStatus:"",
 		previousID:"",
+		setSize: function(size){
+			var self=this;
+			var s=size.split("x");
+			self.iframe_w=s[0];
+			self.iframe_h=s[1];
+		},
+		iframe_w:640,
+		iframe_h:480,
 		_fillElements:function(elements,url){
+			var self = this;
 			for (var i=0;i<elements.length;i++){
 				if (elements[i][0].localName=="textarea")
-					elements[i].html ("<iframe width=\"640\" height=\"480\" src=\""+url+"&embedded=true\" frameborder=\"0\" allowfullscreen></iframe>");
+					elements[i].html ("<iframe width=\""+self.iframe_w+"\" height=\""+self.iframe_h+"\" src=\""+url+"&embedded=true\" frameborder=\"0\" allowfullscreen></iframe>");
 				if (elements[i][0].localName=="input")
 					elements[i].attr ("value",url);
 			}

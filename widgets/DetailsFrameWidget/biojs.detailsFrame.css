@@ -14,7 +14,7 @@
 	font-size: 12px;
 	
 	display: inline-block;
-	position: relative;
+	position: absolute;
 	vertical-align: text-top;
 	text-align: center;
 	margin: 10px 0 10px 0;
@@ -116,4 +116,13 @@ header.protein-label,header.protein-label a{
 }
 .floater .dragger:hover{
 	cursor: move;
+}
+
+*.unselectable {
+  user-select: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -o-user-select: none;
+  user-select: none;
 }

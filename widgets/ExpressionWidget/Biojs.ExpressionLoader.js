@@ -173,6 +173,7 @@ Biojs.ExpressionLoader = Biojs.extend (
 			self.expressions ={};
 			self.min =99999;
 			self.max = -99999;
+			self.center=0;
 			self.column=-1;
 			self.colorData=null;
 			
@@ -208,6 +209,7 @@ Biojs.ExpressionLoader = Biojs.extend (
 					if (self.max<(exps[j]*1)) self.max = exps[j]*1;
 				}
 			}
+			self.center=(self.max+self.min)/2;
 			return self.expressions;
 		},
 		 /**
@@ -273,10 +275,10 @@ Biojs.ExpressionLoader = Biojs.extend (
 			var self =this;
 			var min = (self.colorData!=null)?self.colorData.min:self.min,
 				max = (self.colorData!=null)?self.colorData.max:self.max,
-				center = (self.colorData!=null)?self.colorData.center:0,
+				center = (self.colorData!=null)?self.colorData.center:self.center,
 				colorMin = (self.colorData!=null)?self.colorData.colorMin:"#FF0000",
 				colorMax = (self.colorData!=null)?self.colorData.colorMax:"#00FF00",
-				colorCenter = (self.colorData!=null)?self.colorData.colorCenter:"#000000";
+				colorCenter = (self.colorData!=null)?self.colorData.colorCenter:"#FFFF00";
 			var loadedText = "<table><tr><th>Min:</th><td><input type='text' id='min' value='"+min+"'/></td><td>";
 			loadedText +='<input type="hidden" id="colorMin" name="colorMin" class="color-picker" size="6" />';
 			loadedText +="</td></tr><tr><th>Center:</th><td><input type='text' id='center' value='"+center+"'/></td><td>";

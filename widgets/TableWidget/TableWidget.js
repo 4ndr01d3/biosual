@@ -122,6 +122,16 @@
 			}
 			if (self.previousRequest!=null && self.previousRequest=="*:*")
 				self.afterRemove("*:*");
+			var currentQ=self.manager.response.responseHeader.params.q;
+			var type = "";
+			if(currentQ=="*:*")
+				type = "normal";
+			else{
+				currentQ=currentQ.substr(5);
+				type =self.manager.widgets["requester"].requestedProteins[currentQ].type;
+			}
+			this.manager.response.type=type;
+			this.manager.response.currentQ=currentQ;
 			if (typeof self.columns =="undefined"){
 				if (modelrequester!=null) modelrequester.done(function(p){
 					self.processJson( self.manager.response);
@@ -141,30 +151,91 @@
 		},
 		processJson: function(json){
 			var self=this;
-			for (var i = 0, l = json.response.docs.length; i < l; i++) {
-				var doc = json.response.docs[i];
-				var doc_array=[];
-				var id = "cell_"+doc[self.fields["p1"]]+"_"+doc[self.fields["p2"]];
-				if (self.trIds.indexOf(id)==-1)
-					self.trIds.push(id);
-				else
-					continue;
-				for (var j=0;j<self.columns.length;j++){
-					doc_array.push(doc[self.columns[j].id]);
-					if (typeof self.columns[j].subcolumns !="undefined")
-						for (var k=0;k<self.columns[j].subcolumns.length;k++)
-							doc_array.push(doc[self.columns[j].subcolumns[k]]);
-					if (self.ids.indexOf(doc[self.columns[j].id])==-1)
-						self.ids.push(doc[self.columns[j].id]);
+			var currentQ=json.currentQ;
+			var type =json.type;
+
+			if (type=="normal" || type=="recursive"){
+				for (var i = 0, l = json.response.docs.length; i < l; i++) 
+					self._addRow(json.response.docs[i]);
+			}else{
+				var recursiveAdded=false;
+				for (var i = 0, l = json.response.docs.length; i < l; i++) {
+					var doc=json.response.docs[i];
+					if ( (currentQ==doc[self.columns[0].id] && self.ids.indexOf(doc[self.columns[2].id])!=-1)||
+							 (currentQ==doc[self.columns[2].id] && self.ids.indexOf(doc[self.columns[0].id])!=-1)){
+							self._addRow(doc);
+							recursiveAdded=true;
+					}
 				}
-				self.oTable.fnAddData( doc_array,false);
-				var ntr = self.oTable.fnSettings().aoData.slice(-1)[0].nTr;
-				$(ntr).attr("id",id);
-				$(ntr.children).filter(".cell_"+self.columns[0].id).attr( "content", $(ntr.children).filter(".cell"+self.columns[0].id).text());
-				$(ntr.children).filter(".cell_"+self.columns[2].id).attr( "content", $(ntr.children).filter(".cell_"+self.columns[2].id).text());
-				$(ntr).data("doc",doc);
-			}			
+				if (recursiveAdded==false){
+					self._addSingleProteinRow(json.response.docs[0],json.currentQ);
+				}
+			}
 			self.oTable.fnDraw();
+		},
+		_addRow: function(doc){
+			var self = this;
+			var doc_array=[];
+			var id = "cell_"+doc[self.fields["p1"]]+"_"+doc[self.fields["p2"]];
+			if (self.trIds.indexOf(id)==-1)
+				self.trIds.push(id);
+			else
+				return;
+			for (var j=0;j<self.columns.length;j++){
+				doc_array.push(doc[self.columns[j].id]);
+				if (typeof self.columns[j].subcolumns !="undefined")
+					for (var k=0;k<self.columns[j].subcolumns.length;k++)
+						doc_array.push(doc[self.columns[j].subcolumns[k]]);
+				if (self.ids.indexOf(doc[self.columns[j].id])==-1)
+					self.ids.push(doc[self.columns[j].id]);
+			}
+			self.oTable.fnAddData( doc_array,false);
+			var ntr = self.oTable.fnSettings().aoData.slice(-1)[0].nTr;
+			$(ntr).attr("id",id);
+			$(ntr.children).filter(".cell_"+self.columns[0].id).attr( "content", $(ntr.children).filter(".cell_"+self.columns[0].id).text());
+			$(ntr.children).filter(".cell_"+self.columns[2].id).attr( "content", $(ntr.children).filter(".cell_"+self.columns[2].id).text());
+			$(ntr).data("doc",doc);
+			
+		},
+		_addSingleProteinRow:function(doc,currentQ){
+			var self=this;
+			var doc_array=[];
+
+			//if one id is the query and the other is already on the graphic
+			//add the line
+			var id = "cell_"+currentQ+"_";
+			if (self.trIds.indexOf(id)==-1)
+				self.trIds.push(id);
+			else
+				return;
+			
+			var index=0;
+			if (currentQ.indexOf(doc[self.fields["p2"]])!=-1)
+				index=2;
+			doc_array.push(doc[self.columns[index].id]);
+			if (typeof self.columns[index].subcolumns !="undefined")
+				for (var k=0;k<self.columns[index].subcolumns.length;k++)
+					doc_array.push(doc[self.columns[index].subcolumns[k]]);
+			if (self.ids.indexOf(doc[self.columns[index].id])==-1)
+				self.ids.push(doc[self.columns[index].id]);
+
+			doc_array.push(doc[self.columns[index+1].id]);
+			for (var j=2;j<self.columns.length;j++){
+				doc_array.push("");
+				if (typeof self.columns[j].subcolumns !="undefined")
+					for (var k=0;k<self.columns[j].subcolumns.length;k++)
+						doc_array.push("");
+				if (self.ids.indexOf(doc[self.columns[j].id])==-1)
+					self.ids.push("");
+			}
+
+
+			self.oTable.fnAddData( doc_array,false);
+			var ntr = self.oTable.fnSettings().aoData.slice(-1)[0].nTr;
+			$(ntr).attr("id",id);
+			$(ntr.children).filter(".cell_"+self.columns[0].id).attr( "content", $(ntr.children).filter(".cell_"+self.columns[0].id).text());
+			$(ntr.children).filter(".cell_"+self.columns[2].id).attr( "content", $(ntr.children).filter(".cell_"+self.columns[2].id).text());
+			$(ntr).data("doc",doc);
 		},
 		afterRemove: function (facet) {
 			var self=this;
@@ -191,6 +262,69 @@
 			self.oTable.fnFilter('');
 			self.oTable.$('tr', {"filter": "applied"}).filter(selectorTR).css('backgroundColor', color);
 			self.oTable.fnFilter('');		
+		},
+		resizeCell:function(selectorTR,selectorTD,size){ //paint protein
+			var self = this;
+			self.oTable.fnFilter("");
+			if (selectorTR==null ||selectorTR=="") {
+				self.oTable.$('td', {"filter": "applied"}).filter(selectorTD).each(function(i,td){
+					$(td).css('font-size', Math.sqrt(size)+"em");
+				});
+			}else{
+				self.oTable.$('tr', {"filter": "applied"}).filter(selectorTR).each(function(i,tr){
+					$(tr.children).filter(selectorTD).css('font-size', Math.sqrt(size)+"em");
+				});
+				
+			}
+			self.oTable.fnFilter('');		
+		},
+		resizeByFeature: function(selectorTR,selectorTD,feature,type){
+			var self = this;
+			selectorTR = (typeof selectorTR=="undefined")?"tr[id*=cell_]":selectorTR;
+			var classes =[];
+			var from = 0.3, to =5.0;
+			//get max and min
+			var max=-99999999,min=999999999;
+			for (var i=0;i<self.ids.length;i++){
+				//ignoring the scores that have id and have a '.'
+				var trs=[];
+				if (self.ids[i].indexOf(".")==-1) trs= self.oTable.$('tr', {"filter": "applied"}).filter("[id*='"+self.ids[i]+"']");
+				if (trs.length>0){
+					var doc = $(trs[0]).data("doc");
+					var c=""; 
+					if (doc.protein1==self.ids[i])
+						c=(feature=="organism")?doc["organism1"]:doc["p1_"+feature];
+					else
+						c=(feature=="organism")?doc["organism2"]:doc["p2_"+feature];
+					if (c=="Unknown") break;
+
+					if (typeof c=="undefined" || !isNumber(c))
+						throw "not a number"; 
+					if (c>max) max = c*1;
+					if (c<min) min = c*1;
+				}
+			}
+			var m=(from-to)/(min-max);
+			var b=to-m*max;
+			for (var i=0;i<self.ids.length;i++){
+				//ignoring the scores that have id and have a '.'
+				var trs=[];
+				if (self.ids[i].indexOf(".")==-1) trs= self.oTable.$('tr', {"filter": "applied"}).filter("[id*='"+self.ids[i]+"']");
+				if (trs.length>0){
+					var doc = $(trs[0]).data("doc");
+					var c=""; 
+					if (doc.protein1==self.ids[i])
+						c=(feature=="organism")?doc["organism1"]:doc["p1_"+feature];
+					else
+						c=(feature=="organism")?doc["organism2"]:doc["p2_"+feature];
+
+					if (c=="Unknown") 
+						trs.children().filter("[content="+self.ids[i]+"]").data("size",1);
+					else
+						trs.children().filter("[content="+self.ids[i]+"]").data("size",Math.sqrt(m*c+b));
+				}
+			}
+			self.resizeBy(selectorTR,selectorTD);
 		},
 		paintCell:function(selectorTR,selectorTD,color){ //paint protein
 			var self = this;
@@ -335,6 +469,24 @@
 			}
 			self.oTable.fnFilter('');		
 		},
+		resizeBy:function(selectorTR,selectorTD){
+			var self = this;
+			self.oTable.fnFilter("");
+			if (selectorTR==null ||selectorTR=="") {
+				self.oTable.$('td', {"filter": "applied"}).filter(selectorTD).each(function(i,td){
+					var size=$(td).data("size");
+					if(typeof size!="undefined" && size*1>-1) 
+						$(td).css('font-size', size+"em");
+				});
+			}else{
+				self.oTable.$('tr', {"filter": "applied"}).filter(selectorTR).children().filter(selectorTD).each(function(i,td){
+						var size=$(td).data("size");
+						if(typeof size!="undefined" && size*1>-1) 
+							$(td).css('font-size', size+"em");
+				});
+			}
+			self.oTable.fnFilter('');		
+		},
 		registerStyler:function(name,styler){
 			var self = this;
 			self.stylers[name]=styler;
@@ -346,6 +498,7 @@
 			self.oTable.$('tr', {"filter": "applied"}).css('backgroundColor', '');
 			self.oTable.$('td', {"filter": "applied"}).css('color', '');
 			self.oTable.$('td', {"filter": "applied"}).css('border', '');
+			self.oTable.$('td', {"filter": "applied"}).css('font-size', '1em');
 			//self.oTable.$('td', {"filter": "applied"}).css('border', 'border-left: 3px solid white;');
 			
 			//clean table

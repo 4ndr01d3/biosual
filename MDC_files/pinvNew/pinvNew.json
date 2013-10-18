@@ -3,7 +3,9 @@
 		"name":"template2",
 		"tags":{
 			"title":"Protein Interaction Network Visualizer",
-			"subtitle":""
+			"subtitle":"",
+			"logo":"biosual/images/pinv/PINV_50.png",
+			"parent_link":"http://biosual.cbio.uct.ac.za/pinv.html"
 		}
 	},
 	"js":	["ruleExecuter.js","contextMenuFunctions.js","expressionExecuter.js","pinvUnitTests.js"],
@@ -21,7 +23,7 @@
 				"rows": 300,
 				"Explicit":"True"
 	},
-	"version":"0.901",
+	"version":"0.902",
 	"widgets": [
 		
 		{	"widget": "ProteinAjaxRequesterWidget",
@@ -142,14 +144,17 @@
 				     { "title": "1200x600", "selected":false },
 				     { "title": "1000x600", "selected":false },
 				     { "title": "800x600",  "selected":false },
+				     { "title": "600x600",  "selected":false },
 				     { "title": "1400x800", "selected":false },
 				     { "title": "1200x800", "selected":false },
 				     { "title": "1000x800", "selected":false },
-				     { "title": "800x800",  "selected":false }
+				     { "title": "800x800",  "selected":false },
+				     { "title": "600x800",  "selected":false }
 				],
 				"trigger":[
 				    { "widget":"graph",  "method":"setSize" },
-					{ "widget":"graph2", "method":"setSize" }
+					{ "widget":"graph2", "method":"setSize" },
+					{ "widget":"status", "method":"setSize" }
 				]
 			},
 			"templateTarget":"center",
@@ -404,7 +409,7 @@
 		{	"widget": "EmbedderWidget",
 			"parameters": {
 				"id": "embedder",
-				"hide":[".main","div.top","#tabs",".center>br","#size","#info","#qunit"],
+				"hide":[".main","div.top","#tabs",".center>br","#size","#info","#qunit","footer"],
 				"cssChanges":[	{	"selectors":["html","body",".center"],
 									"changes":	[{	"attribute":"margin",
 													"value":"0px"},

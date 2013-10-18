@@ -274,13 +274,13 @@
 				var index = jQuery.inArray(facet,self.proteins);
 				if (index==-1) return;
 				self.proteins.splice(index, 1);
-				self.requestedProteins[facet].type="removed";
+				var protein = (facet[0]=="*")?facet.substring(1):facet;
+				self.requestedProteins[protein].type="removed";
 
 				
 				// if is the last protein then call the random query
 				if (self.proteins.length==0 && self.manager.store.addByValue('q', "*:*")) 
 					self.manager.doRequest(0);
-				var protein = (facet[0]=="*")?facet.substring(1):facet;
 				self.manager.facetRemoved(protein);
 				return false;
 			};
