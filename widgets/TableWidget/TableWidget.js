@@ -198,13 +198,16 @@
 			
 		},
 		_addSingleProteinRow:function(doc,currentQ){
+			//TODO: Check why is a null document coming here!
+			if (typeof doc=="undefined") return;
+			
 			var self=this;
 			var doc_array=[];
 
 			//if one id is the query and the other is already on the graphic
 			//add the line
 			var id = "cell_"+currentQ+"_";
-			if (self.trIds.indexOf(id)==-1)
+			if (currentQ!="*" && self.trIds.indexOf(id)==-1)
 				self.trIds.push(id);
 			else
 				return;

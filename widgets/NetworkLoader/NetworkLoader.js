@@ -96,7 +96,7 @@
 			        percent.html(percentVal);
 					//console.log(percentVal, position, total);
 			        if (percentComplete==100){
-						status.html("<p>File Loaded to our servers. Now the content is been proccess it.</p>");
+						status.html("<p>File Loaded to our servers. Now the content is being proccessed.</p>");
 				        bar.width("0%");
 				        percent.html("0% (0/"+self.loaderI.numberOfLines+")");
 				        self.checkInteractionsLoaded();
@@ -114,7 +114,7 @@
 				complete: function(xhr) {
 					if (fail){
 						if (xhr.responseText=="")
-							status.html("<p>The HTTP connection has been lost, however if your file has been succefully loaded it keep loading, check the progress bar above.</p>");
+							status.html("<p>The HTTP connection has been lost, however if your file has been succefully loaded the proccess will keep runnin, check the progress bar above.</p>");
 						else{							
 							status.html("<p>Error loading the files. please try again.</p>");
 							status.append("<p>Server Response:</p><pre>"+xhr.responseText+"</pre>");
@@ -128,6 +128,9 @@
 					}
 				}
 			}); 
+			self.addInfoTip($('#'+self.targetN+ " .textField2Validate"),'<b>Dataset Name:</b><br/>The name is required to be unique. <br/>Spaces are discouraged. ');
+			self.addInfoTip($("#"+self.targetI+" .fakefile"),'<b>Interactions File:</b><br/>It should be a tab separated file.<br/>The first line correspond to the headers and should start with the character "#", spaces(besides the tabs) are discouraged.<br/>The first two column of the file should have the accession numbers of the interacting proteins. We sugest to use UniProt IDs.<br/>Any following column is expected to be a float number and will represent an evidence score<br/>The final score should be an aggreagete and this one is the only mandatory score. This implies you can use as many partial scores as you wish, as long as all the interactions have the same amount');
+			self.addInfoTip($("#"+self.targetF+" .fakefile"),'<b>Features File:</b><br/>It should be a tab separated file.<br/>The first line correspond to the headers and should start with the character "#", spaces(besides the tabs) are discouraged.<br/>The first column of the file should have the accession number of the protein. <br/>This IDs should correspond to the ones added in the interaction file.<br/>The following column should be the organism of the protein.<br/>Any following column is a protein feature <br/>Categorical features are encourage to exploit the "Color By" functionality<br/>Numeric features can be used to resize nodes.');
 		},
 		afterRequest: function(){
 			var self =this;
@@ -186,6 +189,9 @@
 				self.formIsOK=false;
 			}
 
+		},
+		addInfoTip: function(selector,content){
+			selector.after('<span class="infoLink">i<span class="tooltip">'+content+'</span></span><br /> ');
 		}
 	});
 })(jQuery);

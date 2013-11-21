@@ -90,6 +90,53 @@
 	margin-right: 20px;
 	
 }
+.networkLoader .infoLink {
+   	background-color: #0040FD;
+   	display: inline-block;
+   	vertical-align:super;
+	color: white;
+	text-align: center;
+	margin-left: 10px;
+	font-family:Lucida,Times,Arial;
+	font-size: 16px;
+	font-weight:bold;
+	min-width: 20px;
+	min-height: 20px;
+	border-radius: 20px; /* half of button size + padding */
+	-moz-border-radius: 20px;
+	margin-right: 10px;
+	opacity: 0.6;
+	filter: alpha(opacity = 60);
+}
+.networkLoader .infoLink:hover {
+	opacity: 1;
+	filter: alpha(opacity = 100);
+	cursor:pointer;
+}
+.networkLoader .infoLink span.tooltip {
+    z-index:10;display:none; padding:14px 20px;
+    margin-top:-30px; margin-left:28px;
+    width:440px; line-height:16px;
+	font-family: Calibri, Arial;
+	font-weight: normal;
+	text-align: left;
+}
+.networkLoader .infoLink:hover span.tooltip{
+    display:inline; position:absolute; color:#111;
+    border:1px solid #DCA; background:#fffAF0;}
+    
+/*CSS3 extras*/
+.networkLoader .infoLink span.tooltip
+{
+    border-radius:4px;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+        
+    -moz-box-shadow: 5px 5px 8px #CCC;
+    -webkit-box-shadow: 5px 5px 8px #CCC;
+    box-shadow: 5px 5px 8px #CCC;
+}
+
 .networkLoader table{
 	border-collapse:collapse;
 	padding: 0 8px 0 8px;

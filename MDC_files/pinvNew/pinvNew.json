@@ -33,7 +33,7 @@
 					"p1":"p1",
 					"organism1":"p1_organism",
 					"p2":"p2",
-					"organism2":"p1_organism",
+					"organism2":"p2_organism",
 					"score":"score"
 				},
 				"prefixes":{
@@ -194,7 +194,7 @@
 							"description":"Protein queried + Interactors",
 							"selected":true
 						 },{
-							"label":"Extended",
+							"label":"Recursive",
 							"img":"biosual/MDC_files/pinvNew/images/extended.png",
 							"description":"Protein queried + Interactors + All interactions among them. <br/><b>Note:</b> This requires multiple queries."
 						 }
@@ -202,6 +202,62 @@
 			},
 			"templateTarget":"left",
 			"tags":{"title":"Proteins","subtitle":"(press ESC to close suggestions)","id":"search"}
+		},
+		
+		{	"widget": "QueryFilterWidget",
+			"parameters": {
+				"id": "queryfilter",
+				"target":"filter_ruler",
+				"dynamicRuleField":[ 
+					{	"target": 0,
+						"condition":0,
+						"widget":"requester",
+						"parameter":"features"
+					},
+					{	"target": 1,
+						"condition":1,
+						"widget":"requester",
+						"parameter":"scores"
+					}
+				],
+
+				"rules": {
+                    "location": [],
+                     "target": [
+                         {
+                             "name": "Proteins",
+                             "action": [
+                                 {"name":"Filter","type":"single"}
+                             ],
+                             "conditions": [
+								{	"name": "feature",
+									"type": "feature_comparison",
+									"values": []
+								} 
+                             ]
+                         },
+                         {
+                             "name": "Interactions",
+                             "action": [
+                                {"name":"Filter","type":"single"}
+                             ],
+                             "conditions": [
+								{	"name": "score",
+									"type": "numeric_comparison"
+								}, 
+								{	"name": "type of evidence",
+									"type": "selects",
+									"amount": 1,
+									"values": [ ]
+								} 
+
+                             ]
+                         }
+                     ]
+                 }
+			},
+			"templateTarget":"left",
+			"tags":{"id":"queryfilter"}
 		},
 		
 		{	"widget": "CurrentSearchWidget",

@@ -29,30 +29,18 @@
 				response=this.manager.response;
 			
 
-			if(self.manager.store.get('q').val()=="*:*"){
+			if(response.responseHeader.params.q=="*:*"){
 				self.ids=[];
 			}else if (response !=null && typeof response.responseHeader.params.q != 'undefined'){
 				if (self.previousRequest!=null && self.previousRequest=="*:*")
 					self.ids=[];
 				var protein =response.responseHeader.params.q.substr(5);
-				self.requestedProteins[protein].numOfInteracts=response.response.docs.length;
 				self.requestedProteins[protein].doc=response;
-				if (self.requestedProteins[protein].type=="explicit"){
-					var pos=jQuery.inArray("*"+protein,self.proteins);
-					if (pos==-1)
-						self.proteins.push("*"+protein);
-				}else{
-					var pos=jQuery.inArray(protein,self.proteins);
-					if (pos==-1){
-						pos=jQuery.inArray("*"+protein,self.proteins);
-						if (pos==-1)
-							self.proteins.push(protein);
-						else
-							self.proteins[pos]=protein;
-					}
-				}
-					
-
+				var pos=jQuery.inArray(protein,self.proteins);
+				if (pos==-1)
+					self.proteins.push(protein);
+				else
+					self.proteins[pos]=protein;
 			}
 
 			if (self.previousRequest!=null && self.previousRequest=="*:*")
@@ -65,7 +53,8 @@
 		},
 		processJson: function(json){
 			var self=this;
-			var recursive= (self.manager.store.get('q').val()!="*:*" && self.requestedProteins[json.responseHeader.params.q.substr(5)].type=="recursive");
+			var recursive= (json.responseHeader.params.q!="*:*" && self.requestedProteins[json.responseHeader.params.q.substr(5)].type=="recursive");
+			var protein =json.responseHeader.params.q.substr(5);
 			for (var i = 0, l = json.response.docs.length; i < l; i++) {
 				var doc = json.response.docs[i];
 				if (self.ids.indexOf(doc[self.fields["p1"]])==-1)
@@ -73,90 +62,26 @@
 				if (self.ids.indexOf(doc[self.fields["p2"]])==-1)
 					self.ids.push(doc[self.fields["p2"]]);
 				
-					
-			}			
-			if (recursive){
-				if (typeof something != "undefined")  
-					clearInterval(something);
-				self.iteration=0;
-				
-				something=setInterval(function (){self.getNextInternalInteractions(self,json.response.docs);},500);
+				if (recursive)
+					self.getNextInternalInteractions(self,doc);
 			}
+			if(self.manager.store.get('q').val()!="*:*" && json.response.numFound*1 > (json.response.start+json.response.docs.length)){
+				var fq=(typeof json.responseHeader.params.fq=="undefined")?"":json.responseHeader.params.fq;
+				var prevF=self.currentFilter;
+				self.setFilter(fq);
+				self.requestPaging(self.manager.store.get('q').val(),1+ json.response.start+json.response.docs.length);
+				self.setFilter(prevF);
+			}
+			if(json.responseHeader.params.q!="*:*")
+				self.requestedProteins[protein].numOfInteracts=json.response.start+json.response.docs.length;
+
 		}, 
-		iteration:0,
-		getNextInternalInteractions: function(self,docs){
-			if(self.iteration>=docs.length)
-				clearInterval(something);
-			else{
-				var doc = docs[self.iteration++];
+		getNextInternalInteractions: function(self,doc,i){
+//				var doc = docs[i];
 				self.requestExplicit(doc[self.fields["p1"]]);
 				self.requestExplicit(doc[self.fields["p2"]]);
-			}
 		},
-//		afterRemove: function (facet) {
-//			var self=this; 
-//			if (facet!="*:*" && facet in self.requestedProteins)
-//				self.requestedProteins[facet].type="removed";
-//		},
-		
-		requestInteractionsByProtein: function(protein){
-			var self =this;
-			if (jQuery.inArray(protein,self.proteins)!=-1) return false;
-			var pos=jQuery.inArray("*"+protein,self.proteins);
-			if (pos!=-1)
-				self.proteins[pos]=protein;
-			else
-				self.proteins.push(protein);
-			var q=self.manager.store.get('q').val();
-			q = 'text:'+protein;
-			if (self.manager.store.addByValue('q', q)) {
-				self.manager.doRequest(0);
-			}
-			return true;
-		},
-		requestSingleProtein: function(protein){
-			var self =this;
-			if (jQuery.inArray(protein,self.proteins)!=-1) return false;
-			self.proteins.push("*"+protein);
-			var q=self.manager.store.get('q').val();
-			q = 'text:'+protein;
-			self.manager.store.addByValue('rows', 1);
-			if (self.manager.store.addByValue('q', q)) {
-				self.manager.doRequest(0);
-				var rows =(typeof params != "undefined" && typeof params.rows != "undefined")?params.rows:300;
-				self.manager.store.addByValue('rows', rows);
-			}
-			return true;
-		},
-		requestInteractionsBetweenProteins: function(protein,interactors){
-			var self =this;
-			if (jQuery.inArray(protein,self.proteins)!=-1) return false;
-			var q=self.manager.store.get('q').val();
-			var sep="";
-			var interStr="";
-			for (var i=0; i< interactors.length; i++){
-				if (interactors[i]!=protein){
-					interStr += sep+"text:"+interactors[i];
-					sep=" OR ";
-				}
-			}
-			q = 'text:'+protein;
-			if (self.previousRequest!="*:*"){
-				for (var i=0; i< self.ids.length; i++){
-					if (self.ids[i]!=protein){
-						interStr += sep+"text:"+self.ids[i];
-						sep=" OR ";
-					}
-				}
-			}
-			if (interStr!="") q+=' AND ('+interStr+')';
-			else return false;
-			if (self.manager.store.addByValue('q', q)) {
-				self.manager.doRequest(0);
-			}
-			return true;
-		},
-		
+
 		/**
 		 * Needs to be implemented
 		 * 
@@ -173,7 +98,7 @@
 				case "explicit":
 					self.requestExplicit(parameters[0]);
 					break;
-				case "extended":
+				case "recursive":
 					self.requestRecursive(parameters[0]);
 					break;
 			}
@@ -183,41 +108,59 @@
 			var self =this;
 			
 			if (protein in self.requestedProteins) {
-				if (self.requestedProteins[protein].type=="normal" || self.requestedProteins[protein].type=="recursive")
-					return false;
-				else if (self.requestedProteins[protein].type=="explicit" || self.requestedProteins[protein].type=="removed"){
-					self.requestedProteins[protein].type ="normal";
-					self.manager.store.add("q",AjaxSolr.Parameter({"name":"q","value":protein}));
-					self.manager.handleResponse(self.requestedProteins[protein].doc);
-					return false;
-					//TODO: execute the widgets to process the preloaded document in the normal way
+				var fq=(self.requestedProteins[protein].doc==null ||typeof self.requestedProteins[protein].doc.responseHeader.params.fq=="undefined")?"":self.requestedProteins[protein].doc.responseHeader.params.fq;
+				if (fq==self.currentFilter){
+					if (self.requestedProteins[protein].type=="normal" || self.requestedProteins[protein].type=="recursive")
+						return false;
+					else if (self.requestedProteins[protein].type=="explicit" || self.requestedProteins[protein].type=="removed"){
+						self.requestedProteins[protein].type ="normal";
+						self.manager.store.add("q",AjaxSolr.Parameter({"name":"q","value":protein}));
+						self.manager.handleResponse(self.requestedProteins[protein].doc);
+						return false;
+					}
 				}
 			}
 			var q = 'text:'+protein;
 			if (self.manager.store.addByValue('q', q)) {
+		        self.manager.store.remove('fq');
+				if(self.currentFilter!="") self.manager.store.addByValue('fq', self.currentFilter);
 				self.requestedProteins[protein] ={ "type":"normal", "doc":null};
 				self.manager.doRequest(0);
+			}
+			return true;
+		},
+		requestPaging: function(query,start){
+			var self =this;
+			
+			if (self.manager.store.addByValue('q', query)) {
+		        self.manager.store.remove('fq');
+				if(self.currentFilter!="") self.manager.store.addByValue('fq', self.currentFilter);
+				self.manager.doRequest(start);
 			}
 			return true;
 		},
 		requestRecursive: function(protein){
 			var self =this;
 			if (protein in self.requestedProteins) {
-				if (self.requestedProteins[protein].type=="normal" || self.requestedProteins[protein].type=="explicit"){
-					self.requestedProteins[protein].type ="recursive";
-					self.processJson(self.requestedProteins[protein].doc);
-					return false;
-					//TODO: execute the widgets to process the preloaded document in the normal way and start the recursion
-				}else if (self.requestedProteins[protein].type=="recursive"){
-					return false;
-				}else if (self.requestedProteins[protein].type=="removed"){
-					self.requestedProteins[protein].type ="recursive";
-					self.manager.handleResponse(self.requestedProteins[protein].doc);
-					return false;
+				var fq=(self.requestedProteins[protein].doc==null ||typeof self.requestedProteins[protein].doc.responseHeader.params.fq=="undefined")?"":self.requestedProteins[protein].doc.responseHeader.params.fq;
+				if (fq==self.currentFilter){
+					if (self.requestedProteins[protein].type=="normal" || self.requestedProteins[protein].type=="explicit"){
+						self.requestedProteins[protein].type ="recursive";
+						self.processJson(self.requestedProteins[protein].doc);
+						return false;
+					}else if (self.requestedProteins[protein].type=="recursive"){
+						return false;
+					}else if (self.requestedProteins[protein].type=="removed"){
+						self.requestedProteins[protein].type ="recursive";
+						self.manager.handleResponse(self.requestedProteins[protein].doc);
+						return false;
+					}
 				}
 			}
 			var q = 'text:'+protein;
 			if (self.manager.store.addByValue('q', q)) {
+		        self.manager.store.remove('fq');
+				if(self.currentFilter!="") self.manager.store.addByValue('fq', self.currentFilter);
 				self.requestedProteins[protein] ={ "type":"recursive", "doc":null};
 				self.manager.doRequest(0);
 			}
@@ -226,15 +169,20 @@
 		requestExplicit: function(protein){
 			var self =this;
 			if (protein in self.requestedProteins){ 
-				if (self.requestedProteins[protein].type=="removed"){
-					self.requestedProteins[protein].type ="explicit";
-					self.manager.handleResponse(self.requestedProteins[protein].doc);
+				var fq=(self.requestedProteins[protein].doc==null ||typeof self.requestedProteins[protein].doc.responseHeader.params.fq=="undefined")?"":self.requestedProteins[protein].doc.responseHeader.params.fq;
+				if (fq==self.currentFilter){
+					if (self.requestedProteins[protein].type=="removed"){
+						self.requestedProteins[protein].type ="explicit";
+						self.manager.handleResponse(self.requestedProteins[protein].doc);
+					}
+					return false;
 				}
-				return false;
 			}
 			
 			var q = 'text:'+protein;
 			if (self.manager.store.addByValue('q', q)) {
+		        self.manager.store.remove('fq');
+				if(self.currentFilter!="") self.manager.store.addByValue('fq', self.currentFilter);
 				self.requestedProteins[protein] ={ "type":"explicit", "doc":null};
 				self.manager.doRequest(0);
 			}
@@ -250,6 +198,7 @@
 				self.proteins= Array();
 				if (self.manager.store.addByValue('q', "*:*")) {
 			        self.manager.store.remove('fq');
+					if(self.currentFilter!="") self.manager.store.addByValue('fq', self.currentFilter);
 					self.manager.doRequest(0);
 					for (prot in self.requestedProteins)
 						self.requestedProteins[prot].type="removed";
@@ -260,30 +209,41 @@
 		},
 		getNumberOfResponsesPerQuery: function(query){
 			var self =this; 
-			if (typeof self.numOfInteracts[query] != 'undefined')
-				return self.numOfInteracts[query];
+			
+			if (typeof self.requestedProteins[query] != "undefined" && typeof self.requestedProteins[query].numOfInteracts != 'undefined')
+				return self.requestedProteins[query].numOfInteracts;
 			if (typeof this.manager.response.responseHeader.params.q != 'undefined' && this.manager.response.responseHeader.params.q.substr(5)==query){
-				self.numOfInteracts[this.manager.response.responseHeader.params.q.substr(5)]=this.manager.response.response.docs.length;
-				return self.numOfInteracts[query];
+				return this.manager.response.response.docs.length;
 			}
 			return 0;
 		},
-		removeQuery: function (facet) {
+		removeQuery: function (facet,executeRandom) {
 			var self = this; 
+			executeRandom= (typeof executeRandom == "undefined")?true:executeRandom;
+			
 			return function () {
 				var index = jQuery.inArray(facet,self.proteins);
 				if (index==-1) return;
 				self.proteins.splice(index, 1);
-				var protein = (facet[0]=="*")?facet.substring(1):facet;
+				var protein = facet;
+//				var protein = (facet[0]=="*")?facet.substring(1):facet;
 				self.requestedProteins[protein].type="removed";
 
 				
 				// if is the last protein then call the random query
-				if (self.proteins.length==0 && self.manager.store.addByValue('q', "*:*")) 
+				if (executeRandom && self.proteins.length==0 && self.manager.store.addByValue('q', "*:*")) {
+			        self.manager.store.remove('fq');
+					if(self.currentFilter!="") self.manager.store.addByValue('fq', self.currentFilter);
 					self.manager.doRequest(0);
+				}
 				self.manager.facetRemoved(protein);
 				return false;
 			};
+		},
+		currentFilter:"",
+		setFilter:function(filter){
+			var self = this;
+			self.currentFilter=filter;
 		},
 		initTest:function() {
 			var self = this;
@@ -294,7 +254,7 @@
 			var protein= Manager.widgets["qunit"].test.value;
 			ok( protein in self.requestedProteins, "Widget("+self.id+"-ProteinAjaxRequesterWidget): The requested protein is now in the requester cache" );
 			ok(self.requestedProteins[protein].type==Manager.widgets["qunit"].test.type,"Widget("+self.id+"-ProteinAjaxRequesterWidget): The type of the document on the cache is as requested");
-			var onlist=(Manager.widgets["qunit"].test.type=="explicit")?"*"+protein:protein;
+			var onlist=protein;
 			ok(self.proteins.indexOf(onlist)!=-1, "Widget("+self.id+"-ProteinAjaxRequesterWidget): The requested protein is now in the array of ids ");
 			ok(self.requestedProteins[protein].numOfInteracts==Manager.response.response.docs.length,"Widget("+self.id+"-ProteinAjaxRequesterWidget): The number of interactions in the requester cache is the same as in the reponse");
 			
@@ -322,17 +282,22 @@
 		},
 		status2JSON:function(){
 			var self = this;
-			var nor=[],exp=[],ext=[];
+			var nor=[],exp=[],ext=[],
+				norF=[],expF=[],extF=[];
 			for (var protein in self.requestedProteins){
+				var fq=(self.requestedProteins[protein].doc==null ||typeof self.requestedProteins[protein].doc.responseHeader.params.fq=="undefined")?"":self.requestedProteins[protein].doc.responseHeader.params.fq;
 				switch (self.requestedProteins[protein].type){
 					case "normal":
 						nor.push(protein);
+						norF.push(fq);
 						break;
 					case "explicit":
 						exp.push(protein);
+						expF.push(fq);
 						break;
 					case "recursive":
 						ext.push(protein);
+						extF.push(fq);
 						break;
 				}
 			}
@@ -341,14 +306,38 @@
 					"normal":nor,
 					"explicit":exp,
 					"recursive":ext
-				}
+				},
+				"filters":{
+					"normal":norF,
+					"explicit":expF,
+					"recursive":extF
+				},
 			};
 		},
 		uploadStatus:function(json){
 			var self = this;
+			var globalFilter=null,globalType=null;
 			for (var type in json.queried)
-				for (var i=0;i<json.queried[type].length;i++)
+				for (var i=0;i<json.queried[type].length;i++){
+					if(json.queried[type][i]=="*"){
+						globalFilter=json.filters[type][i];
+						globalType=type;
+						continue;
+					}
+					var prevFilter=self.currentFilter;
+					self.setFilter("");
+					if (typeof json.filters != "undefined") 
+						self.setFilter(json.filters[type][i]);
 					self.request([json.queried[type][i]],type);
+					self.setFilter(prevFilter);
+				}
+			
+			var prevFilter=self.currentFilter;
+			self.setFilter("");
+			if (typeof json.filters != "undefined") 
+				self.setFilter(globalFilter);
+			self.request(["*"],globalType);
+			self.setFilter(prevFilter);
 		},
 		resetStatus:function(){
 			var self = this;

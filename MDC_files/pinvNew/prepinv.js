@@ -11,14 +11,14 @@ var URLrequests=[];
 includeProteinsFromURLParameter(URLrequests,"proteins","normal");
 includeProteinsFromURLParameter(URLrequests,"prtNor","normal");
 includeProteinsFromURLParameter(URLrequests,"prtExp","explicit");
-includeProteinsFromURLParameter(URLrequests,"prtExt","extended");
+includeProteinsFromURLParameter(URLrequests,"prtExt","recursive");
 
 var coreURL=getURLParameter("core");
 if (coreURL==null || coreURL=="null" || jQuery.trim(coreURL)=="")
 	coreURL="";
 
 var model=[],
-	mainfields=["p1","p1_organism","p2","p1_organism","score"],
+	mainfields=["p1","p1_organism","p2","p2_organism","score"],
 	prefix=["p1_",false,"p2_",false,"score_"];
 
 var callback = function (response) {

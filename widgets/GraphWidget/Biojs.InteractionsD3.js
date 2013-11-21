@@ -5,8 +5,8 @@
  * @class
  * @extends Biojs
  * 
- * @author <a href="gustavoadolfo.salazar@gmail.com">Gustavo A. Salazar</a>
- * @version 0.9.0_alpha
+ * @author <a href="mailto:gustavoadolfo.salazar@gmail.com">Gustavo A. Salazar</a>
+ * @version 0.9.1_beta
  * @category 1
  * 
  * @requires <a href='http://code.jquery.com/query-1.7.2.min.js'>jQuery Core 1.7.2</a>
@@ -22,16 +22,24 @@
  * 
  * @option {string} target
  *    Identifier of the DIV tag where the component should be displayed.
+ * @option {string} width
+ *    Width of the SVG element, if given in percentage it will use it on proportion of the container 
+ * @option {string} height
+ *    Height of the SVG element, if given in percentage it will use it on proportion of the container 
+ * @option {string} radius
+ *    Radius of the nodes representing the proteins
+ * @option {string} enableEdges
+ * 	  Force the proteins to stay in the defined area of the SVG
  * 
  * @example
  * 			var instance = new Biojs.InteractionsD3({
  * 				target: "YourOwnDivId",
  * 			});	
- * 			var pid=1;
- *			instance.addProtein({id:'p'+pid++,group:1});
- *			instance.addProtein({id:'p'+pid++,group:1});
- *			instance.addProtein({id:'p'+pid++,group:1});
- * 			instance.addInteraction("p"+(pid-1),"p"+(pid-2),{id:"p"+(pid-1)+"_p"+(pid-2),feature1:"value"});
+ * 			for (var pid=1;pid<=15;pid++)
+ *				instance.addProtein({ "id":pid,"name":pid,"showLegend":false,"typeLegend":"id","organism":"human"+pid%3,"features":{"f1":"val1","f2":"val2","f3":"val3"}});
+ *			
+ * 			for (var pid=1;pid<=30;pid++)
+ *				instance.addInteraction(Math.floor((Math.random()*15)+1),Math.floor((Math.random()*15)+1) ,{score:Math.random()});
  * 			instance.restart();
  */
 Biojs.InteractionsD3 = Biojs.extend (
@@ -70,8 +78,7 @@ Biojs.InteractionsD3 = Biojs.extend (
 			$(this._container).addClass("graphNetwork");
 			
 			var	width = $(this._container).width(),
-				height = $(this._container).height(),
-				r=self.opt.radius;
+				height = $(this._container).height();
 
 			if (self.opt.width.indexOf("%")!=-1)
 				width = width*(self.opt.width.substring(0, self.opt.width.length-1)*1)/100.0;
@@ -91,9 +98,6 @@ Biojs.InteractionsD3 = Biojs.extend (
 			self.color = function() {
 			    return d3.scale.ordinal().range(self.colors);
 			}();
-//			self.color2 = function() {
-//			    return d3.scale.ordinal().range(self.colors);
-//			}();
 
 			self.zoom=d3.behavior.zoom().
     		scaleExtent([(self.opt.enableEdges)?1:0.1, 10])
@@ -124,21 +128,6 @@ Biojs.InteractionsD3 = Biojs.extend (
 
 			self.perspective=d3.select("#"+self.opt.target + " svg").append('svg:g');
 			
-//			self.plines= self.perspective.selectAll("line")
-//				.data([0,1,2,3]);
-			
-//			self.plines.enter().append("line")
-//			 	.attr("x1", function(d) { 
-//			 		return (d%2==0)?0:width;
-//			 	})
-//			 	.attr("y1", function(d) {return (d<2)?0:height;})
-//			 	.attr("x2", function(d) { 
-//			 		return (d%2==0)?0:width;
-//			 	})
-//			 	.attr("y2", function(d) {return (d<2)?0:height;})
-//			 	.style("stroke", "#DDD")
-//				.style("stroke-dasharray","5,5");
-
 			 
 			
 			function redraw(x,y,scaleP) {
@@ -166,23 +155,6 @@ Biojs.InteractionsD3 = Biojs.extend (
 				  self.vis.attr("transform",
 				      "translate(" + trans + ")"
 				      + " scale(" + scale + ")");
-//				  self.plines
-//				 	.attr("x2", function(d) { 
-//				 		switch(d){
-//					 		case 0: case 2:
-//					 			return trans[0];
-//					 		case 1:case 3:
-//					 			return trans[0]+self.rect.attr('width')*scale;
-//				 		}
-//				 	})
-//				 	.attr("y2", function(d) { 
-//				 		switch(d){
-//				 		case 0:case 1:
-//				 			return trans[1];
-//				 		case 2: case 3:
-//				 			return trans[1]+self.rect.attr('height')*scale;
-//			 		}
-//			 	});
 			};
 			self.redraw=redraw;
 			
@@ -278,9 +250,10 @@ Biojs.InteractionsD3 = Biojs.extend (
 			/**
 			 * @name Biojs.InteractionsD3#proteinClick
 			 * @event
-			 * @param {function} actionPerformed A function which receives an {@link Biojs.Event} object as argument.
-			 * @eventData {Object} source The component which did triggered the event.
-			 * @eventData {Object} protein the information of the protein that has been clicked.
+			 * @param {function} actionPerformed It is triggered when the user clicks on a protein
+			 * @eventData {@link Biojs.Event} objEvent Object containing the information of the event
+			 * @eventData {Object} objEvent.source The component which did triggered the event.
+			 * @eventData {Object} objEvent.protein the information of the protein that has been clicked.
 			 * @example 
 			 * instance.proteinClick(
 			 *    function( objEvent ) {
@@ -293,9 +266,10 @@ Biojs.InteractionsD3 = Biojs.extend (
 			/**
 			 * @name Biojs.InteractionsD3#proteinMouseOver
 			 * @event
-			 * @param {function} actionPerformed A function which receives an {@link Biojs.Event} object as argument.
-			 * @eventData {Object} source The component which did triggered the event.
-			 * @eventData {Object} protein the information of the protein that has been mouseover.
+			 * @param {function} actionPerformed It is triggered when the mouse pointer is over a protein
+			 * @eventData {@link Biojs.Event} objEvent Object containing the information of the event
+			 * @eventData {Object} objEvent.source The component which did triggered the event.
+			 * @eventData {Object} objEvent.protein the information of the protein that has been mouseover.
 			 * @example 
 			 * instance.proteinMouseOver(
 			 *    function( objEvent ) {
@@ -306,6 +280,22 @@ Biojs.InteractionsD3 = Biojs.extend (
 			 * */
 			"proteinMouseOver",
 			/**
+			 * @name Biojs.InteractionsD3#proteinMouseOut
+			 * @event
+			 * @param {function} actionPerformed It is triggered when the mouse pointer leave the area of a protein
+			 * @eventData {@link Biojs.Event} objEvent Object containing the information of the event
+			 * @eventData {Object} objEvent.source The component which did triggered the event.
+			 * @eventData {Object} objEvent.protein the information of the protein that has been mouseout.
+			 * @example 
+			 * instance.proteinMouseOut(
+			 *    function( objEvent ) {
+			 *       alert("The mouse is out the protein " + objEvent.protein.id);
+			 *    }
+			 * ); 
+			 * 
+			 * */
+			"proteinMouseOut",
+			/**
 			 * @name Biojs.InteractionsD3#interactionClick
 			 * @event
 			 * @param {function} actionPerformed A function which receives an {@link Biojs.Event} object as argument.
@@ -314,7 +304,7 @@ Biojs.InteractionsD3 = Biojs.extend (
 			 * @example 
 			 * instance.interactionClick(
 			 *    function( objEvent ) {
-			 *       alert("Click on the interaction " + objEvent.interaction.id);
+			 *       alert("Click on the interaction " + objEvent.interaction.source.id +" - "+ objEvent.interaction.target.id);
 			 *    }
 			 * ); 
 			 * 
@@ -329,13 +319,56 @@ Biojs.InteractionsD3 = Biojs.extend (
 			 * @example 
 			 * instance.interactionMouseOver(
 			 *    function( objEvent ) {
-			 *       alert("The mouse is over the interaction " + objEvent.interaction.id);
+			 *       alert("The mouse is over the interaction " + objEvent.interaction.source.id +" - "+ objEvent.interaction.target.id);
 			 *    }
 			 * ); 
 			 * 
 			 * */
-			"interactionMouseOver"
+			"interactionMouseOver",
+			/**
+			 * @name Biojs.InteractionsD3#interactionMouseOut
+			 * @event
+			 * @param {function} actionPerformed It is triggered when the mouse pointer leave an interaction
+			 * @eventData {@link Biojs.Event} objEvent Object containing the information of the event
+			 * @eventData {Object} source The component which did triggered the event.
+			 * @eventData {Object} interaction the information of the interaction that has been mouseout.
+			 * @example 
+			 * instance.interactionMouseOut(
+			 *    function( objEvent ) {
+			 *      alert("The mouse is out of the interaction " + objEvent.interaction.source.id +" - "+ objEvent.interaction.target.id);
+			 *    }
+			 * ); 
+			 * 
+			 * */
+			"interactionMouseOut",
+			/**
+			 * @name Biojs.InteractionsD3#sizeChanged
+			 * @event
+			 * @param {function} actionPerformed It is triggered when the size of the SVG element has been changed. 
+			 * @eventData {@link Biojs.Event} objEvent Object containing the information of the event
+			 * @eventData {Object} source The component which did triggered the event.
+			 * @eventData {Object} width The width of the new size
+			 * @eventData {Object} height The height of the new size
+			 * @example 
+			 * instance.sizeChanged(
+			 *    function( objEvent ) {
+			 *      alert("The size has changed: ("+objEvent.width+","+objEvent.height+")" );
+			 *    }
+			 * ); 
+			 * 
+			 * */
+			"sizeChanged"
 		], 
+		/**
+		 * 
+		 * allows to resize the SVG element updating the gravity points
+		 * @param {string} width value of width to be assign to the SVG
+		 * @param {string} height value of height to be assign to the SVG
+		 *
+		 * @example 
+		 * instance.setSize(400,400);
+		 * instance.restart();
+		 */
 		setSize:function(width,height){
 			var self =this;
 			self.opt.width=width;
@@ -354,19 +387,6 @@ Biojs.InteractionsD3 = Biojs.extend (
 			for (var i=0; i<numberOfOrganism; i++){
 				self.foci.push({x: (self.opt.width/(numberOfOrganism+1))*(i+1), y:self.opt.height/2});
 			}
-//			self.plines
-//				.attr("x1", function(d) { 
-//					switch(d){
-//						case 0: case 2: return 0;
-//						case 1:case 3: return width;
-//					}
-//				})
-//				.attr("y1", function(d) { 
-//					switch(d){
-//						case 0:case 1: return 0;
-//					case 2: case 3:	return height;
-//					}
-//				});
 			if (self.tTranslate!=null) self.redraw(self.tTranslate[0], self.tTranslate[1], self.tScale);
 			self.restart();
 			self.raiseEvent('sizeChanged', {
@@ -383,7 +403,7 @@ Biojs.InteractionsD3 = Biojs.extend (
 		 * 					to be stored in the interaction itself. useful for triggered events
 		 *
 		 * @example 
-		 * instance.addInteraction("p"+(pid-1),"p"+(pid-2),{id:"p"+(pid-1)+"_p"+(pid-2),feature1:"new"});
+		 * instance.addInteraction(Math.floor((Math.random()*15)+1),Math.floor((Math.random()*15)+1) ,{score:Math.random()});
 		 * instance.restart();
 		 */
 		addInteraction: function(proteinId1,proteinId2,extraAtributes) {
@@ -428,7 +448,7 @@ Biojs.InteractionsD3 = Biojs.extend (
 		 * @param {Object} protein An object containing information of the protein 
 		 *
 		 * @example 
-		 * instance.addProtein({id:'p'+pid++,group:2});
+		 *  instance.addProtein({ "id":"new","name":"new","showLegend":true,"typeLegend":"id","organism":"human"+pid%3,"features":{"f1":"val1","f2":"val2","f3":"val3"}});
 		 * instance.restart();
 		 */
 		addProtein: function(protein) {
@@ -444,6 +464,7 @@ Biojs.InteractionsD3 = Biojs.extend (
 				protein.y=self.fixedProteins[protein.id][1];
 				protein.fixed=true;
 			}
+			if(typeof protein.size == "undefined") protein.size=1;
 			n= self.proteins.push(protein);
 			self.proteinsA[protein.id]=protein;
 			if (typeof self.interactionsA[protein.id] == "undefined")
@@ -459,19 +480,30 @@ Biojs.InteractionsD3 = Biojs.extend (
 			return n;
 		},
 		/**
-		 * gets the protein object by its id
+		 * Gets the protein object by its id
 		 * 
 		 * @param {string} proteinId The id of the protein
 		 *  
 		 * @return {Object} protein An object containing information of the protein 
 		 *
 		 * @example 
-		 * instance.getProtein('p3');
+		 * alert(instance.getProtein('3'));
 		 */
 		getProtein: function(proteinId) {
 			var self=this;
 			return self.proteinsA[proteinId];
 		},
+		/**
+		 * Gets the array index of the interaction object by the ids of the interactors
+		 * 
+		 * @param {string} proteinId1 The id of the first protein interacting
+		 * @param {string} proteinId2 The id of the second protein interacting
+		 *  
+		 * @return {Integer} An int value indicating the index of the interaction in the array this.interactions 
+		 *
+		 * @example 
+		 * alert(instance.getInteractionIndex('3','5'));
+		 */
 		getInteractionIndex: function(proteinId1,proteinId2){
 			var self =this;
 			for (var i=0; i<self.interactions.length; i++){
@@ -491,20 +523,20 @@ Biojs.InteractionsD3 = Biojs.extend (
 		 * @return {Object} An object containing information of the interaction 
 		 *
 		 * @example 
-		 * instance.getInteraction('p1','p3');
+		 * alert(instance.getInteraction('1','3'));
 		 */
 		getInteraction: function(proteinId1,proteinId2){
 			var self =this;
 			return self.getInteractionIndex(proteinId1,proteinId2);
 		},
 		/**
-		 * removes from the graphic the interaction by the id of its proteins
+		 * Removes from the graphic the interaction by the id of its proteins
 		 * 
 		 * @param {string} proteinId1 The id of the first protein
 		 * @param {string} proteinId2 The id of the second protein
 		 *  
 		 * @example 
-		 * instance.removeInteraction('p2','p3');
+		 * instance.removeInteraction('2','3');
 		 */
 		removeInteraction: function(proteinId1,proteinId2){
 			var self = this;
@@ -527,7 +559,7 @@ Biojs.InteractionsD3 = Biojs.extend (
 		 * @param {string} proteinId The id of the protein to delete
 		 *  
 		 * @example 
-		 * instance.removeProtein('p2');
+		 * instance.removeProtein('2');
 		 */
 		removeProtein: function(proteinId, excludelist){
 			var self=this;
@@ -558,38 +590,9 @@ Biojs.InteractionsD3 = Biojs.extend (
 			}
 		},
 		/**
-		 * removes a protein from the graphic with all the interactions unless the interactor 
-		 * is also interacting with another protein that is visible. 
 		 * 
-		 * @param {string} proteinId The id of the protein to delete
-		 *  
-		 * @example 
-		 * instance.removeProtein('p2');
-		 */
-		removeProteinForce: function(proteinId){
-			var self=this;
-
-			if (typeof self.interactionsA[proteinId] != "undefined"){
-				for (var i=0;i<self.interactionsA[proteinId].length;i++){
-					var targetid=self.interactionsA[proteinId][i].id;
-					self.removeInteraction(proteinId,targetid);
-					i--;
-				}
-				delete self.interactionsA[proteinId];
-			}
-			for(var i=0; i<self.proteins.length; i++) {
-				if(self.proteins[i].id == proteinId) {
-					self.proteins.splice(i, 1);
-					break;
-				}
-			}
-			delete self.proteinsA[proteinId];
-		},
-		/**
+		 * Resets the graphic to zero proteins - zero interactions
 		 * 
-		 * Resets the graphic to zero proteins zero interactions
-		 * 
-		 *  
 		 * @example 
 		 * instance.resetGraphic();
 		 */
@@ -602,11 +605,11 @@ Biojs.InteractionsD3 = Biojs.extend (
 		},
 		_figuresOrder:[0,3,2,5,4,1],
 		/**
-		 * Restart the graphic to materialize the changes don on it(e.g. add/remove proteins)
+		 * Restart the graphic to materialize the changes done on it(e.g. add/remove proteins)
+		 * It is here where the SVG elemnts are created.
 		 * 
 		 * @example 
 		 * instance.restart();
-		 * 
 		 */
 		restart: function(){
 			var self = this;
@@ -625,6 +628,11 @@ Biojs.InteractionsD3 = Biojs.extend (
 				.attr("id", function(d) { return "link_"+d.source.id+"_"+d.target.id; })
 				.on("mouseover", function(d){ 
 					self.raiseEvent('interactionMouseOver', {
+						interaction: d
+					});
+				})
+				.on("mouseout",  function(d){ 
+					self.raiseEvent('interactionMouseOut', {
 						interaction: d
 					});
 				})
@@ -668,6 +676,11 @@ Biojs.InteractionsD3 = Biojs.extend (
 				})
 				.on("mouseover", function(d){ 
 					self.raiseEvent('proteinMouseOver', {
+						protein: d
+					});
+				})
+				.on("mouseout",  function(d){ 
+					self.raiseEvent('proteinMouseOut', {
 						protein: d
 					});
 				})
@@ -785,6 +798,13 @@ Biojs.InteractionsD3 = Biojs.extend (
 		},
 		longestLegend:4,
 		legendTypes:[],
+		/**
+		 * Adds a legend to the graphic
+		 * 
+		 * @example 						
+		 * instance.addLegends(["Legend red"],"Color","#FF0000");
+		 * instance.restart();
+		 */
 		addLegends:function(legends,type,color){
 			var self = this;
 			if (self.legends==null) self.legends=[],self.legendTypes=[];
@@ -824,7 +844,7 @@ Biojs.InteractionsD3 = Biojs.extend (
 		 * @param {string} selector a string to represent a set of elements. Check the <a href="http://www.w3.org/TR/css3-selectors/">CSS3 selectors documentation</a> to build a selector string
 		 *  
 		 * @example 
-		 * instance.hide("[id = node_p"+(pid-1)+"]");
+		 * instance.hide("[id = node_10]");
 		 */
 		hide: function(selector){
 			var self=this;
@@ -838,7 +858,7 @@ Biojs.InteractionsD3 = Biojs.extend (
 		 * @param {string} selector a string to represent a set of elements. Check the <a href="http://www.w3.org/TR/css3-selectors/">CSS3 selectors documentation</a> to build a selector string
 		 *  
 		 * @example 
-		 * instance.show("[id = node_p"+(pid-1)+"]");
+		 * instance.show("[id = node_10]");
 		 */
 		show: function(selector){
 			var self=this;
@@ -852,7 +872,7 @@ Biojs.InteractionsD3 = Biojs.extend (
 		 * @param {string} selector a string to represent a set of elements. Check the <a href="http://www.w3.org/TR/css3-selectors/">CSS3 selectors documentation</a> to build a selector string
 		 *  
 		 * @example 
-		 * instance.highlight("[id = node_p"+(pid-1)+"]");
+		 * instance.highlight("[id *= node_1]");
 		 */
 		highlight: function(selector){
 			var self=this;
@@ -866,7 +886,7 @@ Biojs.InteractionsD3 = Biojs.extend (
 		 * @param {string} color a color in web format eg. #FF0000
 		 *  
 		 * @example 
-		 * instance.setFillColor("[id = node_p"+(pid-1)+"]","#FF0000");
+		 * instance.setFillColor(".figure","#FF0000");
 		 */
 		setFillColor: function(selector,color){
 			var self=this;
@@ -880,7 +900,7 @@ Biojs.InteractionsD3 = Biojs.extend (
 		 * @param {string} color a color in web format eg. #FF0000
 		 *  
 		 * @example 
-		 * instance.setColor("[id = node_p"+(pid-1)+"]","#FF0000");
+		 * instance.setColor("[id *= node_2]","#FF0000");
 		 */
 		setColor: function(selector,color){
 			var self=this;
@@ -892,7 +912,7 @@ Biojs.InteractionsD3 = Biojs.extend (
 		 * @param {string} protein the id of the protein to swap is position on the graphic
 		 *  
 		 * @example 
-		 * instance.swapFixed("p"+(pid-1));
+		 * instance.swapFixed("3");
 		 */
 		swapFixed: function(protein){
 			var self=this;
@@ -903,12 +923,12 @@ Biojs.InteractionsD3 = Biojs.extend (
 			});
 		},
 		/**
-		 * Shows/Hide the legend(id) of the protein
+		 * Shows the legend(id) of the protein
 		 * 
 		 * @param {string} protein the id of the protein to swap the visibility of the legend
 		 *  
 		 * @example 
-		 * instance.swapShowLegend("#node_p"+(pid-1)+" .legend");
+		 * instance.swapShowLegend("#node_5 .legend");
 		 */
 		showLegend: function(selector,typeLegend){
 			var self=this;
@@ -924,12 +944,13 @@ Biojs.InteractionsD3 = Biojs.extend (
 //			self.restart();
 		}, 
 		/**
-		 * Shows/Hide the legend(id) of the protein
+		 * Scales the area of a protein
 		 * 
-		 * @param {string} protein the id of the protein to swap the visibility of the legend
+		 * @param {string} protein the id of the protein to scale
+		 * @param {integer} scale value to scale a node
 		 *  
 		 * @example 
-		 * instance.swapShowLegend("#node_p"+(pid-1)+" .legend");
+		 * instance.setSizeScale("#figure_1",4);
 		 */
 		setSizeScale: function(selector,scale){
 			var self=this;
@@ -942,8 +963,17 @@ Biojs.InteractionsD3 = Biojs.extend (
 						return d3.svg.symbolTypes[self._figuresOrder[self.organisms[d.organism]]];
 					})
 				);
-//			self.restart();
 		}, 
+		/**
+		 * Scales the size of the proteins which value has been modify by other means
+		 * 
+		 * @param {string} selector a CSS3 selector to choose the nodes to resize
+		 *  
+		 * @example 
+		 * for (var i=0;i<instance.proteins.length;i++)
+		 * 	instance.proteins[i].size=1+i%4;
+		 * instance.refreshSizeScale(".figure");
+		 */
 		refreshSizeScale: function(selector){
 			var self=this;
 			self.vis.selectAll(selector).attr("d", d3.svg.symbol()
@@ -956,12 +986,12 @@ Biojs.InteractionsD3 = Biojs.extend (
 				);
 		}, 
 		/**
-		 * Shows/Hide the legend(id) of the protein
+		 * Hide the legend(id) of the protein
 		 * 
-		 * @param {string} protein the id of the protein to swap the visibility of the legend
+		 * @param {string} selector a CSS3 selector to choose the nodes to hide its legend
 		 *  
 		 * @example 
-		 * instance.swapShowLegend("#node_p"+(pid-1)+" .legend");
+		 * instance.hideLegend("#node_5 .legend");
 		 */
 		hideLegend: function(selector){
 			var self=this;
@@ -973,7 +1003,7 @@ Biojs.InteractionsD3 = Biojs.extend (
 		 * @param {string} protein the id of the protein to swap the visibility of the legend
 		 *  
 		 * @example 
-		 * instance.swapShowLegend("#node_p"+(pid-1)+" .legend");
+		 * instance.swapShowLegend("#node_5 .legend");
 		 */
 		swapShowLegend: function(selector){
 			var self=this;
@@ -982,6 +1012,12 @@ Biojs.InteractionsD3 = Biojs.extend (
 				return (d.showLegend)?"visible":"hidden";
 			});
 		},
+		/**
+		 * gets an array of objects with the list of proteins which poition has been fixed into the graphic
+		 * 
+		 * @example 
+		 * alert(instance.getFixedProteins());
+		 */
 		getFixedProteins:function(){
 			var self = this;
 			var prots=[];
@@ -996,6 +1032,13 @@ Biojs.InteractionsD3 = Biojs.extend (
 			return prots;
 		},
 		fixedProteins:{},
+		/**
+		 * fix into the graphic a protein in a determined position
+		 * 
+		 * @example 
+		 * instance.fixProteinAt("7",10,10);
+		 * instance.restart();
+		 */
 		fixProteinAt:function(protein,x,y){
 			var self = this;
 			if (typeof self.proteinsA[protein] == "undefined") {
@@ -1009,17 +1052,7 @@ Biojs.InteractionsD3 = Biojs.extend (
 			self.proteinsA[protein].fixed=true;
 		//	self.tick();
 		},
-//		/**
-//		 * 
-//		 * Resizing the graph depending on the size of the window.
-//		 * 
-//		 * @param self
-//		 */
-//		_resize:  function (self) {
-//			var width = window.innerWidth, height = window.innerHeight;
-//			self.vis.attr("width", width).attr("height", height);
-//			self.force.size([width, height]).resume();
-//		},
+
 		colors: [ "#1f77b4", "#aec7e8", "#ff7f0e", "#ffbb78", "#2ca02c", "#98df8a", "#d62728", "#ff9896", "#9467bd", "#c5b0d5", 
 		          "#8c564b", "#c49c94", "#e377c2", "#f7b6d2", "#7f7f7f", "#c7c7c7", "#bcbd22", "#dbdb8d", "#17becf", "#9edae5",
 		          '#3399FF', '#99FF66', '#66FF99', '#CCFF00', '#6699CC', '#99CC00', '#99FFCC', '#993399', '#33FFFF', '#33CC33', 

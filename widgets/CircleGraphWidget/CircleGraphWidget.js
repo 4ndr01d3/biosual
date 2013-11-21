@@ -73,6 +73,9 @@
 							doc.id=doc[self.fields["p1"]] +" - "+ doc[self.fields["p2"]];
 							self.graph.addInteraction(doc[self.fields["p1"]] ,doc[self.fields["p2"]] ,{score:doc[self.fields["score"]],doc:self._getInteractionFeaturesFromDoc(doc)});
 						}
+					} else if ((typeof self.graph.proteins[doc[self.fields["p1"]]] != "undefined") && (typeof self.graph.proteins[doc[self.fields["p2"]]] != "undefined")){
+						doc.id=doc[self.fields["p1"]] +" - "+ doc[self.fields["p2"]];
+						self.graph.addInteraction(doc[self.fields["p1"]] ,doc[self.fields["p2"]] ,{score:doc[self.fields["score"]],doc:self._getInteractionFeaturesFromDoc(doc)});
 					}
 				}
 			}
@@ -275,10 +278,10 @@
 			var classes =[];
 			for (var i in self.graph.proteins){
 				var c=(feature!="organism")?self.graph.proteins[i].features[feature]:self.graph.proteins[i].organism;
-				var g = classes.indexOf(c);
+				var g = classes.indexOf(c.toLowerCase());
 				if (g==-1){
 					g = classes.length;
-					classes.push(c);
+					classes.push(c.toLowerCase());
 				}
 				self.graph.proteins[i].group=g;
 			}

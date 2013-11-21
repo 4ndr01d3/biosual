@@ -3,9 +3,9 @@
 	text-align: left;
 }
 #search textarea{
-	width: 95%;
-	min-width: 200px;
-}	
+	min-width: 210px;
+ 	resize: none;
+ }	
 #search input[type="text"] {
   width: 350px;
 }
@@ -29,7 +29,9 @@
 	font-size: 14px;
 }
 
-
+#search #modes{
+	float: right;
+}
 
 .drop_menu_container {
 	list-style:none;

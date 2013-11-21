@@ -77,11 +77,19 @@
 							doc.id=doc[self.fields["p1"]] +" - "+ doc[self.fields["p2"]];
 							self.graph.addInteraction(doc[self.fields["p1"]] ,doc[self.fields["p2"]] ,{score:doc[self.fields["score"]],doc:self._getInteractionFeaturesFromDoc(doc)});
 						}
+					} else if ((typeof self.graph.proteinsA[doc[self.fields["p1"]]] != "undefined") && (typeof self.graph.proteinsA[doc[self.fields["p2"]]] != "undefined")){
+						doc.id=doc[self.fields["p1"]] +" - "+ doc[self.fields["p2"]];
+						self.graph.addInteraction(doc[self.fields["p1"]] ,doc[self.fields["p2"]] ,{score:doc[self.fields["score"]],doc:self._getInteractionFeaturesFromDoc(doc)});
 					}
 				}
 			}
-
 			self.graph.restart();
+			//used to get into an stable state of the graphic.
+			var k = 0;
+			while ((self.graph.force.alpha() > 1e-2) && (k < 50)) {
+				self.graph.force.tick();
+			    k = k + 1;
+			}
 			self.previousRequest=currentQ;
 			self.visibleProteins = Object.keys(self.graph.proteinsA);
 			self.executeStylers();
@@ -230,10 +238,10 @@
 			var classes =[];
 			for (var i=0;i<self.graph.proteins.length;i++){
 				var c=(feature!="organism")?self.graph.proteins[i].features[feature]:self.graph.proteins[i].organism;
-				var g = classes.indexOf(c);
+				var g = classes.indexOf(c.toLowerCase());
 				if (g==-1){
 					g = classes.length;
-					classes.push(c);
+					classes.push(c.toLowerCase());
 				}
 				self.graph.proteins[i].group=g;
 			}
@@ -363,7 +371,8 @@
 					"translateY":translate[1],
 					"scale":scale,
 					"fixed":fixed,
-					"selected":self.selected};
+					"selected":self.selected,
+					"organisms":self.graph.organisms};
 		},
 		onceOffStatus:null,
 		uploadStatus:function(json){
@@ -371,6 +380,9 @@
 			if (self.previousRequest=="*:*"){
 				self.onceOffStatus=json;
 				return;
+			}
+			if (typeof json.organisms != "undefined" && json.organisms != null){
+				self.graph.organisms=json.organisms;
 			}
 			self.graph.redraw(json.translateX,json.translateY,json.scale);
 			self.graph.zoom.translate([json.translateX,json.translateY]).scale(json.scale);

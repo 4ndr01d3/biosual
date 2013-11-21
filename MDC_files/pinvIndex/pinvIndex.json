@@ -39,7 +39,11 @@
 		},
 		{	"widget": "IFrameWidget",
 			"templateTarget":"center",
-			"tags":{"id":"documentation","url":"docs.html" }
+			"tags":{"id":"documentation","url":"https://docs.google.com/document/d/1K-C_l_kMd11rB0BZ5WHJaxgEix6N0UIyYwO3DrffE0Y/pub" }
+		},
+		{	"widget": "IFrameWidget",
+			"templateTarget":"center",
+			"tags":{"id":"about","url":"biosual/about.html" }
 		},
 		{	"widget": "InvertedTabsWidget",
 			"parameters": {
@@ -56,6 +60,10 @@
 				     },
 				     { "title": "Documentation",
 				       "target":"documentation",
+				       "selected":false
+				     },
+				     { "title": "About",
+				       "target":"about",
 				       "selected":false
 				     }
 				],

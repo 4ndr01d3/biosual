@@ -329,7 +329,7 @@ Biojs.ExpressionLoader = Biojs.extend (
 			$("#"+self.opt.target+" .fake-file").html("Change File...");
 			$("#"+self.opt.target+" .exp-edit").remove();
 			$("#"+self.opt.target+" .exp-remove").remove();
-			$("#"+self.opt.target+" .fake-file").after("<div class='exp-remove'></div>");
+			$("#"+self.opt.target+" .fake-file").after("<div class='exp-remove'><span class='tooltip'>Remove expression file</span></div>");
 			$("#"+self.opt.target+" .exp-remove").click(function() {
 				self.expressions =null;
 				self.min =99999;
@@ -343,7 +343,7 @@ Biojs.ExpressionLoader = Biojs.extend (
 				$("#"+self.opt.target+" .button-link").val('');
 				self.raiseEvent('onFileRemoved', {});
 			});
-			$("#"+self.opt.target+" .fake-file").after("<div class='exp-edit'></div>");
+			$("#"+self.opt.target+" .fake-file").after("<div class='exp-edit'><span class='tooltip'>Edit Parameters</span></div>");
 			$("#"+self.opt.target+" .exp-edit").click(function() {
 				self.startWizzard();
 			});

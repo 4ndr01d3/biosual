@@ -6,7 +6,7 @@
  * @extends Biojs
  * 
  * @author <a href="gustavoadolfo.salazar@gmail.com">Gustavo A. Salazar</a>
- * @version 0.9.0_alpha
+ * @version 0.9.1_beta
  * @category 1
  * 
  * @requires <a href='http://code.jquery.com/query-1.7.2.min.js'>jQuery Core 1.7.2</a>
@@ -22,6 +22,14 @@
  * 
  * @option {string} target
  *    Identifier of the DIV tag where the component should be displayed.
+ * @option {string} width
+ *    Width of the SVG element, if given in percentage, it will use it on proportion of the container 
+ * @option {string} height
+ *    Height of the SVG element, if given in percentage, it will use it on proportion of the container 
+ * @option {string} radius
+ *    Radius of the nodes representing the proteins
+ * @option {string} textLength
+ *    Space in pixels to be reserved for the labels around the circle 
  * 
  * @example
  * 			var instance = new Biojs.InteractionsBundleD3({
@@ -55,12 +63,6 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 		//Transformation values
 		tTranslate:null,
 		tScale:null,
-
-//		proteinsA:[],
-//		node_drag:null,
-//		color: null,
-//		foci: [],
-//		organisms: {},
 		
 		constructor: function (options) {
 			var self 	= this;
@@ -75,14 +77,20 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 			self.svg=null;
 			self.interactionsA={};
 			
-			var w = 1280,
-			    h = 800;
-			
-			if (typeof self.opt.width != "undefined")
-				w=self.opt.width*1;
-			if (typeof self.opt.height != "undefined")
-				h=self.opt.height*1;
-		    var rx = w / 2,
+			this._container = $("#"+self.opt.target);
+			this._container.empty();
+			$(this._container).addClass("graphCircle");
+
+			var	w = $(this._container).width(),
+			h = $(this._container).height();
+
+			w = (self.opt.width.indexOf("%")!=-1)?w*(self.opt.width.substring(0, self.opt.width.length-1)*1)/100.0:self.opt.width*1;
+			self.opt.width=w;
+		
+			h = (self.opt.height.indexOf("%")!=-1)?h*(self.opt.height.substring(0, self.opt.height.length-1)*1)/100.0:self.opt.height*1;
+			self.opt.height=h;
+
+			var rx = w / 2,
 		    	ry = h / 2;
 		    
 		    var tmpR=(rx<ry)?rx:ry;
@@ -97,9 +105,6 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 			    .radius(function(d) { return d.y; })
 			    .angle(function(d) { return d.x / 180 * Math.PI; });
 
-			this._container = $("#"+self.opt.target);
-			this._container.empty();
-			$(this._container).addClass("graphCircle");
 			this._container.width(w);
 			this._container.height(h);
 
@@ -182,9 +187,10 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 			/**
 			 * @name Biojs.InteractionsBundleD3#proteinClick
 			 * @event
-			 * @param {function} actionPerformed A function which receives an {@link Biojs.Event} object as argument.
-			 * @eventData {Object} source The component which did triggered the event.
-			 * @eventData {Object} protein the information of the protein that has been clicked.
+			 * @param {function} actionPerformed It is triggered when the user clicks on a protein
+			 * @eventData {@link Biojs.Event} objEvent Object containing the information of the event
+			 * @eventData {Object} objEvent.source The component which did triggered the event.
+			 * @eventData {Object} objEvent.protein the information of the protein that has been clicked.
 			 * @example 
 			 * instance.proteinClick(
 			 *    function( objEvent ) {
@@ -198,45 +204,48 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 			/**
 			 * @name Biojs.InteractionsBundleD3#proteinMouseOver
 			 * @event
-			 * @param {function} actionPerformed A function which receives an {@link Biojs.Event} object as argument.
-			 * @eventData {Object} source The component which did triggered the event.
-			 * @eventData {Object} protein the information of the protein that has been mouseover.
-			 * @example 
-			 * instance.proteinMouseOut(
-			 *    function( objEvent ) {
-			 *      instance.setColor("#node-" + objEvent.protein.key,'');
-			 *      instance.setColor("path.link.target-" + objEvent.protein.key,"");
-			 *      instance.setColor("path.link.target-" + objEvent.protein.key,"");
-			 *      alert("The mouse is over the protein " + objEvent.protein.id);
-			 *    }
-			 * ); 
-			 * 
-			 * */
-			"proteinMouseOut",
-			/**
-			 * @name Biojs.InteractionsBundleD3#proteinMouseOut
-			 * @event
-			 * @param {function} actionPerformed A function which receives an {@link Biojs.Event} object as argument.
-			 * @eventData {Object} source The component which did triggered the event.
-			 * @eventData {Object} protein the information of the protein that has been mouseout.
+			 * @param {function} actionPerformed It is triggered when the mouse pointer is over a protein
+			 * @eventData {@link Biojs.Event} objEvent Object containing the information of the event
+			 * @eventData {Object} objEvent.source The component which did triggered the event.
+			 * @eventData {Object} objEvent.protein the information of the protein that has been mouseover.
 			 * @example 
 			 * instance.proteinMouseOver(
 			 *    function( objEvent ) {
 			 *      instance.highlight("path.link.target-" + objEvent.protein.key);
 			 *      instance.highlight("path.link.target-" + objEvent.protein.key);
 			 *      instance.setColor("#node-" + objEvent.protein.key,'#0f0');
-			 *      alert("The mouse is out of the protein " + objEvent.protein.id);
+			 *      alert("The mouse is over of the protein " + objEvent.protein.id);
 			 *    }
 			 * ); 
 			 * 
 			 * */
 			"proteinMouseOver",
 			/**
+			 * @name Biojs.InteractionsBundleD3#proteinMouseOut
+			 * @event
+			 * @param {function} actionPerformed It is triggered when the mouse pointer leave the area of a protein
+			 * @eventData {@link Biojs.Event} objEvent Object containing the information of the event
+			 * @eventData {Object} objEvent.source The component which did triggered the event.
+			 * @eventData {Object} objEvent.protein the information of the protein that has been mouseout.
+			 * @example 
+			 * instance.proteinMouseOut(
+			 *    function( objEvent ) {
+			 *      instance.setColor("#node-" + objEvent.protein.key,'');
+			 *      instance.setColor("path.link.target-" + objEvent.protein.key,"");
+			 *      instance.setColor("path.link.target-" + objEvent.protein.key,"");
+			 *      alert("The mouse is out the protein " + objEvent.protein.id);
+			 *    }
+			 * ); 
+			 * 
+			 * */
+			"proteinMouseOut",
+			/**
 			 * @name Biojs.InteractionsBundleD3#interactionClick
 			 * @event
-			 * @param {function} actionPerformed A function which receives an {@link Biojs.Event} object as argument.
-			 * @eventData {Object} source The component which did triggered the event.
-			 * @eventData {Object} interaction the information of the interaction that has been clicked.
+			 * @param {function} actionPerformed It is triggered when the user clicks over an interaction path
+			 * @eventData {@link Biojs.Event} objEvent Object containing the information of the event
+			 * @eventData {Object} objEvent.source The component which did triggered the event.
+			 * @eventData {Object} objEvent.interaction the information of the interaction that has been clicked.
 			 * @example 
 			 * instance.interactionClick(
 			 *    function( objEvent ) {
@@ -251,7 +260,8 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 			/**
 			 * @name Biojs.InteractionsBundleD3#interactionMouseOver
 			 * @event
-			 * @param {function} actionPerformed A function which receives an {@link Biojs.Event} object as argument.
+			 * @param {function} actionPerformed It is triggered when the mouse pointer is over an interaction
+			 * @eventData {@link Biojs.Event} objEvent Object containing the information of the event
 			 * @eventData {Object} source The component which did triggered the event.
 			 * @eventData {Object} interaction the information of the interaction that has been mouseover.
 			 * @example 
@@ -270,7 +280,8 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 			/**
 			 * @name Biojs.InteractionsBundleD3#interactionMouseOut
 			 * @event
-			 * @param {function} actionPerformed A function which receives an {@link Biojs.Event} object as argument.
+			 * @param {function} actionPerformed It is triggered when the mouse pointer leave an interaction
+			 * @eventData {@link Biojs.Event} objEvent Object containing the information of the event
 			 * @eventData {Object} source The component which did triggered the event.
 			 * @eventData {Object} interaction the information of the interaction that has been mouseout.
 			 * @example 
@@ -289,14 +300,15 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 			/**
 			 * @name Biojs.InteractionsBundleD3#sizeChanged
 			 * @event
-			 * @param {function} actionPerformed A function which receives an {@link Biojs.Event} object as argument.
+			 * @param {function} actionPerformed It is triggered when the size of the SVG element has been changed. 
+			 * @eventData {@link Biojs.Event} objEvent Object containing the information of the event
 			 * @eventData {Object} source The component which did triggered the event.
 			 * @eventData {Object} width The width of the new size
-			 * @eventData {Object} heigth The heigth of the new size
+			 * @eventData {Object} height The height of the new size
 			 * @example 
 			 * instance.sizeChanged(
 			 *    function( objEvent ) {
-			 *      alert("The size has changed: ("+objEvent.width+","+objEvent.heigth+")" );
+			 *      alert("The size has changed: ("+objEvent.width+","+objEvent.height+")" );
 			 *    }
 			 * ); 
 			 * 
@@ -304,6 +316,15 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 			"sizeChanged"
 			
 		], 
+		/**
+		 * allows to resize the SVG element updating the gravity points
+		 * @param {string} width value of width to be assign to the SVG
+		 * @param {string} height value of height to be assign to the SVG
+		 *
+		 * @example 
+		 * instance.setSize(400,400);
+		 * instance.restart();
+		 */
 		setSize:function(width,height){
 			var self =this;
 			self.opt.width=width;
@@ -408,6 +429,7 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 		 */
 		addProtein: function(protein) {
 			var self=this;
+			if(typeof protein.size == "undefined") protein.size=1;
 			self.addOrganism(protein.organism);
 			if (!self.proteins.hasOwnProperty(protein.id)){
 				self.proteins[protein.id] = protein;
@@ -445,12 +467,23 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 		 * @return {Object} protein An object containing information of the protein 
 		 *
 		 * @example 
-		 * instance.getProtein('p3');
+		 * alert(instance.getProtein('p3'));
 		 */
 		getProtein: function(proteinId) {
 			var self=this;
 			return self.proteins[proteinId];
 		},
+		/**
+		 * Gets the array index of the interaction object by the ids of the interactors
+		 * 
+		 * @param {string} proteinId1 The id of the first protein interacting
+		 * @param {string} proteinId2 The id of the second protein interacting
+		 *  
+		 * @return {Integer} An int value indicating the index of the interaction in the array this.interactions 
+		 *
+		 * @example 
+		 * alert(instance.getInteractionIndex('3','5'));
+		 */
 		getInteractionIndex: function(proteinId1,proteinId2){
 			var self =this;
 			for (var i=0; i<self.interactions.length; i++){
@@ -470,7 +503,7 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 		 * @return {Object} An object containing information of the interaction 
 		 *
 		 * @example 
-		 * instance.getInteraction('p1','p3');
+		 *alert( instance.getInteraction('p1','p3'));
 		 */
 		getInteraction: function(proteinId1,proteinId2){
 			var self =this;
@@ -486,6 +519,7 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 		 * @example 
 		 * for (var i=1;i<100;i+=1)
 		 *   instance.removeInteraction('p'+i,'p'+(100+i));
+		 * instance.restart();
 		 */
 		removeInteraction: function(proteinId1,proteinId2){
 			var self = this;
@@ -516,6 +550,7 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 		 *  
 		 * @example 
 		 * instance.removeProtein('p2');
+		 * instance.restart();
 		 */
 		removeProtein: function(proteinId, excludelist){
 			var self=this;
@@ -563,6 +598,7 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 			var self=this;
 			self.proteins=[];
 			self.interactions=[];
+			self.interactionsA={};
 			self.restart();
 		},
 		clearAndRestartGraphic:function(){
@@ -584,7 +620,7 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 	        // For each import, construct a link from the source to target node.
 	        nodes.forEach(function(d) {
 	          if (d.imports) d.imports.forEach(function(i) {
-	        	var int =self.getInteraction(map[d.name].id,map[i].id)
+	        	var int =self.getInteraction(map[d.name].id,map[i].id);
 	            if (int!=null && imports.indexOf(int)==-1)
 	            	imports.push(int);
 	          });
@@ -606,6 +642,7 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 			var nodes = self.cluster.nodes(self.model),
 				links = self.imports(nodes);
 			
+			if (typeof self.model.children == "undefined") self.model.children=[];
 			self.splines = self.bundle(links);
 
 			var path = self.svg.selectAll("path.link")
@@ -649,7 +686,14 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 						.attr("text-anchor", function(d) { return d.x < 180 ? "start" : "end"; })
 						.attr("transform", function(d) { return d.x < 180 ? null : "rotate(180)"; })
 						.attr("visibility",function(d) { return (d.showLegend)?"visible":"hidden";})
-						.text(function(d) { return d.key; });
+						.text(function(d) { 
+							if (d.typeLegend=="id") 
+								return d.id;
+							else if (d.typeLegend.indexOf("features.")==0)
+								return d.features[d.typeLegend.substr(9)];
+							else
+								return d[d.typeLegend];
+							});
 
 			svgNode.append("circle")
 				.attr("class", "figure")
@@ -768,6 +812,13 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 		},
 		longestLegend:4,
 		legendTypes:[],
+		/**
+		 * Adds a legend to the graphic
+		 * 
+		 * @example 						
+		 * instance.addLegends(["Legend red"],"Color","#FF0000");
+		 * instance.restart();
+		 */
 		addLegends:function(legends,type,color){
 			var self = this;
 			if (self.legends==null) self.legends=[],self.legendTypes=[];
@@ -808,7 +859,7 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 		 * @param {string} selector a string to represent a set of elements. Check the <a href="http://www.w3.org/TR/css3-selectors/">CSS3 selectors documentation</a> to build a selector string
 		 *  
 		 * @example 
-		 * instance.hide("[id = node_p"+(pid-1)+"]");
+		 * instance.hide('[id *="node-p1"]');
 		 */
 		hide: function(selector){
 			var self=this;
@@ -822,7 +873,7 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 		 * @param {string} selector a string to represent a set of elements. Check the <a href="http://www.w3.org/TR/css3-selectors/">CSS3 selectors documentation</a> to build a selector string
 		 *  
 		 * @example 
-		 * instance.show("[id = node_p"+(pid-1)+"]");
+		 * instance.show('[id *="node-p1"]');
 		 */
 		show: function(selector){
 			var self=this;
@@ -836,7 +887,7 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 		 * @param {string} selector a string to represent a set of elements. Check the <a href="http://www.w3.org/TR/css3-selectors/">CSS3 selectors documentation</a> to build a selector string
 		 *  
 		 * @example 
-		 * instance.highlight("[id = node_p"+(pid-1)+"]");
+		 * instance.highlight(".figure");
 		 */
 		highlight: function(selector){
 			var self=this;
@@ -850,7 +901,7 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 		 * @param {string} color a color in web format eg. #FF0000
 		 *  
 		 * @example 
-		 * instance.setFillColor("[id = node_p"+(pid-1)+"]","#FF0000");
+		 * instance.setFillColor(".figure","#FF0000");
 		 */
 		setFillColor: function(selector,color){
 			var self=this;
@@ -864,7 +915,7 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 		 * @param {string} color a color in web format eg. #FF0000
 		 *  
 		 * @example 
-		 * instance.setColor("[id = node_p"+(pid-1)+"]","#FF0000");
+		 * instance.setColor(".figure","#FF0000");
 		 */
 		setColor: function(selector,color){
 			var self=this;
@@ -876,7 +927,7 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 		 * @param {string} protein the id of the protein to swap the visibility of the legend
 		 *  
 		 * @example 
-		 * instance.swapShowLegend("#node_p"+(pid-1)+" .legend");
+		 * instance.swapShowLegend("#node-p"+(pid-1)+" .legend");
 		 */
 		showLegend: function(selector,typeLegend){
 			var self=this;
@@ -891,6 +942,15 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 				});
 		}, 
 		
+		/**
+		 * Scales the area of a protein
+		 * 
+		 * @param {string} protein the id of the protein to scale
+		 * @param {integer} scale value to scale a node
+		 *  
+		 * @example 
+		 * instance.setSizeScale("#figure_p188",4);
+		 */
 		setSizeScale: function(selector,scale){
 			var self=this;
 			
@@ -900,6 +960,17 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 				return self.opt.radius*Math.sqrt(d.size); 
 			});
 		}, 
+		/**
+		 * Scales the size of the proteins which value has been modify by other means
+		 * 
+		 * @param {string} selector a CSS3 selector to choose the nodes to resize
+		 *  
+		 * @example 
+		 * var j=0;
+		 * for (var i in instance.proteins)
+		 * 	instance.proteins[i].size=1+(j++)%4;
+		 * instance.refreshSizeScale(".figure");
+		 */
 		refreshSizeScale: function(selector){
 			var self=this;
 			self.vis.selectAll(selector).attr("r", function(d) { 
@@ -914,7 +985,7 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 		 * @param {string} protein the id of the protein to swap the visibility of the legend
 		 *  
 		 * @example 
-		 * instance.swapShowLegend("#node_p"+(pid-1)+" .legend");
+		 * instance.swapShowLegend("#node-p"+(pid-1)+" .legend");
 		 */
 		hideLegend: function(selector){
 			var self=this;
@@ -926,7 +997,7 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 		 * @param {string} protein the id of the protein to swap the visibility of the legend
 		 *  
 		 * @example 
-		 * instance.swapShowLegend("#node_p"+(pid-1)+" .legend");
+		 * instance.swapShowLegend("#node-p"+(pid-1)+" .legend");
 		 */
 		swapShowLegend: function(selector){
 			var self=this;

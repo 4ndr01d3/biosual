@@ -1,0 +1,36 @@
+<img alt="filter" src="biosual/widgets/QueryFilterWidget/filter1.png" class="filter_img" />
+<div id="{id}">
+  <div id="filter_mask" class="filter_mask"></div>
+  <div id="filter_container" class="filter_container">
+  	<header><a id="filter_close">X</a></header>
+  	<div class="filter_div" >
+		<header>Filters</header> 
+		<div id="filter_ruler"></div>
+  		<div class="filter_stats">
+			<div class="filter_stats_chart" ></div>
+			<div class="filter_stats_text">
+				<table>
+					<tr><th>Total Interactions: </th><td class="filter_total"></td></tr>
+					<tr><th>All filters:</th><td class="filter_filtered"></td></tr>
+					<tr><th>Filter Contribution:</th><td>
+						<table style="font-size:0.7em;" class="filter_contributions">
+						</table>
+					</td></tr>
+				</table>
+			</div><br/>
+			<div id="label_svg_filter"></div><br class="clearboth" />
+			<div>
+				<input type="radio" name="filter_action" id="future" value="future" checked="checked">
+				<label for="future">Apply on future queries</label><br>
+				<input type="radio" name="filter_action" id="past" value="past">
+				<label for="past">Re-execute previous queries and apply on future queries</label><br>
+				<input type="radio" name="filter_action" id="explicit" value="explicit">
+				<label for="explicit">Execute filters over the current graphic(Explicit mode)</label><br>
+				<input type="radio" name="filter_action" id="full" value="full">
+				<label for="full">Execute filters over the full network</label><br>
+			</div>
+		</div>
+  	</div>
+	<div class="filter_button"><button>Execute</button></div>
+  </div>
+</div>

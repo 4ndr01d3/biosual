@@ -7,12 +7,13 @@
 			self.queries=self.manager.widgets["requester"].queries;
 			$("#"+this.target+ " textarea").remove();
 			$("#"+this.target+ " button").remove();
+			$("#"+this.target+ " br").remove();
 			$("#"+this.target+ " #modes").remove();
-			$("#"+this.target).append('<textarea id="query" name="query" ></textarea><br/>');
+			$("#"+this.target).append('<textarea id="query" name="query" placeholder="Accession numbers separated by comma. e.g. P09239, Q05861"></textarea><br/>');
 			
 			$("#"+this.target).append('<button type="button">Search</button>');
 
-			$("#"+this.target).append('<div id="modes" style="display: inline-block;"/>');
+			$("#"+this.target).append('<div id="modes" />');
 			if (typeof self.modes!="undefined"){
 				var modes=$("#"+this.target).find("#modes");
 				modes.html("<ul class='drop_menu_container'><li>" +

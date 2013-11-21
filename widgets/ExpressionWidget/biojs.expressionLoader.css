@@ -45,3 +45,16 @@
 	padding-top: 10px;
 	
 }
+
+.expressionloader  span.tooltip {
+    z-index:10;
+    display:none; 
+    width:140px; 
+    line-height:16px;
+    text-align:center;
+}
+.expressionloader  .exp-edit:hover span.tooltip,.expressionloader  .exp-remove:hover span.tooltip{
+    display:inline; position:absolute; color:#111;
+    border:1px solid #DCA; background:#fffAF0;
+    margin-left:30px;}
+

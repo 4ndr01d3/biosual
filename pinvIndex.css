@@ -5,6 +5,7 @@ body {
 }
 .invertedshiftdown {
 	border-top:0px;
+	text-align: center;
 }
 .invertedshiftdown a{
 	-moz-border-radius-topleft: 5px;
@@ -15,7 +16,9 @@ body {
 }
 
 .invertedshiftdown ul {
-	margin-left: 340px;
+	display: inline-block;
+	margin: 0;
+	padding: 0;
 }
 body>footer {
 	text-align: center;

@@ -1,0 +1,10 @@
+{
+    "name": "Query Filter",
+    "description": "Interface to graphically build filters",
+    "dependencies":["jquery.miniColors.min.js","Biojs.Ruler.js"],
+    "dependenciesCSS":["jquery.miniColors.css","biojs.ruler.css"],
+    "js": "QueryFilterWidget.js",
+    "html": "QueryFilterWidget.html",
+    "css": "queryfilter.css"
+    
+}

@@ -29,4 +29,5 @@
 
 .graphNetwork .mainLegend{
 	font-size: 70%;
+	text-transform: capitalize;
 }
