@@ -10,7 +10,8 @@
 		
 		init: function(){
 			var self = this;
-
+			self.queries={};
+			self.queried={};
 
 			$(".filter_img").click(function(){
 				$('#filter_mask').show(); 
@@ -27,6 +28,7 @@
 			});	
 			$(".filter_div .ruler .add_rule a").html("Add Filter");
 
+			$(".filter_stats_chart").empty();
 			self.color = d3.scale.category20();
 			self.svg = d3.select(".filter_stats_chart").append("svg")
 				.attr("width", self.width)
@@ -59,7 +61,7 @@
 			$(".filter_button button").click(function(){
 				self.executeClick(self);
 			});
-			
+			self.refreshGraphicFromCurrentFilters(self);
 
 		},
 		restart: function(){
@@ -267,6 +269,10 @@
 		afterRequest: function () {
 			var self = this;
 			self._fillDynamicFields();
+			if (self.onceOffStatus!=null){
+				self.uploadStatus(self.onceOffStatus);
+				self.onceOffStatus=null;
+			}
 		},
 		_fillDynamicFields: function(){
 			var self = this;
@@ -324,8 +330,13 @@
 				"option":$("input[name='filter_action']:checked").val()
 			};
 		},
+		onceOffStatus:null,
 		uploadStatus:function(json){
 			var self = this;
+			if (self.previousRequest=="*:*"){
+				self.onceOffStatus=json;
+				return;
+			}
 			for (var i=0;i<json.rules.length;i++){
 				self.ruler.addActiveRule(json.rules[i]);
 			}

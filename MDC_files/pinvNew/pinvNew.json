@@ -481,7 +481,7 @@
 				"id": "status",
 				"server_URL":"http://localhost/~4ndr01d3/biosual/saves/",
 				"uploader_URL":"http://biosual.cbio.uct.ac.za/uploader/",
-				"reinit":["requester","table","text"]
+				"reinit":["requester","table","text","queryfilter"]
 			}
 		},
 

@@ -656,7 +656,7 @@ Biojs.Ruler = Biojs.extend (
 	},
 	_addColorSelector: function(n,parameter,color){
 		color  = (typeof color!="undefined")?color:'#56992F';
-		$("#action_parameters_"+n).append('<input type="hidden" id="action_parameters_'+parameter+'_'+n+'" name="color4" class="color-picker" size="6" />')
+		$("#action_parameters_"+n).append('<input id="action_parameters_'+parameter+'_'+n+'" name="color4" class="color-picker" size="6" />')
 		$("#action_parameters_"+parameter+"_"+n).miniColors({
 			letterCase: 'uppercase'
 		}).miniColors('value',color);

@@ -155,3 +155,9 @@
     -webkit-box-shadow: 5px 5px 8px #CCC;
     box-shadow: 5px 5px 8px #CCC;
 }
+
+
+input.color-picker{
+	width: 60px;
+	
+}

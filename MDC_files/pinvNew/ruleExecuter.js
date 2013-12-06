@@ -12,8 +12,8 @@
 				selector ="";
 				var rule=rules[i];
 				if (rule.target==model.target[0].name){ //Proteins
-					var prefix =(rule.action.name=="Resize" || rule.action.name=="Resize By" || rule.action.name=="Color" || rule.action.name=="Color By" || rule.action.name=="Border" || rule.action.name=="Border By")?"figure_":"node_";
-					var prefix2=(rule.action.name=="Resize" || rule.action.name=="Resize By" || rule.action.name=="Color" || rule.action.name=="Color By" || rule.action.name=="Border" || rule.action.name=="Border By")?".figure":".node";
+					var prefix =(rule.action.name=="Resize" || rule.action.name=="Resize By" || rule.action.name=="Color" || rule.action.name=="Color By" || rule.action.name=="Border" || rule.action.name=="Border By" || rule.action.name=="Highlight")?"figure_":"node_";
+					var prefix2=(rule.action.name=="Resize" || rule.action.name=="Resize By" || rule.action.name=="Color" || rule.action.name=="Color By" || rule.action.name=="Border" || rule.action.name=="Border By" || rule.action.name=="Highlight")?".figure":".node";
 					switch (rule.condition){
 						case model.target[0].conditions[1].name: // interactions with
 							if (typeof self.graph.interactionsA[rule.parameters[0]] == "undefined") 
@@ -217,8 +217,8 @@
 				selector ="";
 				var rule=rules[i];
 				if (rule.target==model.target[0].name){ //Proteins
-					var prefix=(rule.action.name=="Resize" || rule.action.name=="Resize By" || rule.action.name=="Color" || rule.action.name=="Color By")?"figure_":"node-";
-					var prefix2=(rule.action.name=="Resize" || rule.action.name=="Resize By" || rule.action.name=="Color" || rule.action.name=="Color By")?".figure":".node";
+					var prefix=(rule.action.name=="Resize" || rule.action.name=="Resize By" || rule.action.name=="Color" || rule.action.name=="Color By" || rule.action.name=="Highlight")?"figure_":"node-";
+					var prefix2=(rule.action.name=="Resize" || rule.action.name=="Resize By" || rule.action.name=="Color" || rule.action.name=="Color By" || rule.action.name=="Highlight")?".figure":".node";
 					switch (rule.condition){
 						case model.target[0].conditions[1].name: // interactions with
 							if (typeof self.graph.interactionsA[rule.parameters[0]] == "undefined") 
