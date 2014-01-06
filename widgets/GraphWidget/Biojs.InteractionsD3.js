@@ -100,8 +100,9 @@ Biojs.InteractionsD3 = Biojs.extend (
 			}();
 
 			self.zoom=d3.behavior.zoom().
-    		scaleExtent([(self.opt.enableEdges)?1:0.1, 10])
-    		.on("zoom", redraw);
+    					scaleExtent([(self.opt.enableEdges)?1:0.05, 10])
+    					.on("zoom", redraw);
+			
 			self.vis = d3.select("#"+self.opt.target).append("svg")
 			    .attr("width", width)
 			    .attr("height", height)
@@ -155,6 +156,9 @@ Biojs.InteractionsD3 = Biojs.extend (
 				  self.vis.attr("transform",
 				      "translate(" + trans + ")"
 				      + " scale(" + scale + ")");
+				  
+				  self._refreshZoomLegend();
+
 			};
 			self.redraw=redraw;
 			
@@ -706,9 +710,11 @@ Biojs.InteractionsD3 = Biojs.extend (
 
 			nodes.exit().remove();
 			
-			self.perspective.selectAll(".legendBlock").remove();
+			self.perspective.selectAll(".legendBlock, .legendZoomBlock").remove();
 			if (typeof self.legends!="undefined" && self.legends!=null)
 				self._paintLegends();
+			
+			self._paintZoomLegend();
 		},
 		_sortLegends:function(){
 			var self = this;
@@ -837,6 +843,41 @@ Biojs.InteractionsD3 = Biojs.extend (
 						self.longestLegend=legends[i].length;
 				}
 		},
+		_paintZoomLegend: function(){
+			var self = this;
+			var w=70;
+			var legendBlock = self.perspective.insert("g",".link")
+				.attr("class", "legendZoomBlock");
+			legendBlock.append("rect")
+				.attr("x", 0)
+				.attr("height", 22)
+				.attr("width", w)
+				.style("fill", "#fff")
+				.style("fill-opacity","0.0");
+
+			
+
+			self.zoomLegend = legendBlock.selectAll(".mainLegend") 
+				.data(["1.00 :",self.tScale])
+				.enter().insert("g")
+				.attr("class", "mainLegend")
+				.attr("transform", function(d,i){
+					return "translate("+i*30+",15)";
+				}) 
+				.append("text");
+			self._refreshZoomLegend();
+					
+//			for (var i=0; i< self.legendTypes.length; i++)
+//				self._paintLegend(legend,self.legendTypes[i]);
+
+		},
+		_refreshZoomLegend: function(){
+			var self = this;
+			self.zoomLegend.text(function(d,i) { 
+				return (i==0)?d:(self.tScale*1.0).toFixed(2); 
+			}).attr("font-size", function(d,i){
+				return (i==0)?"1em":((self.tScale*1<1)?"0.8em":"1.5em");
+			});		},
 		/**
 		 * Hides the elements on the graphic that match the selector. 
 		 * Check the <a href="http://www.w3.org/TR/css3-selectors/">CSS3 selectors documentation</a> to build a selector string 
