@@ -192,6 +192,8 @@ Biojs.InteractionsD3 = Biojs.extend (
 			}
 			self.force.on("tick", tick);
 			function tick(e) {
+				if (!self._isAnimationEnabled) return;
+
 				if (e.type=="tick"){
 					var k = .1 * e.alpha;
 					self.proteins.forEach(function(o, i) {
@@ -363,6 +365,15 @@ Biojs.InteractionsD3 = Biojs.extend (
 			 * */
 			"sizeChanged"
 		], 
+		jumpToStable:function(){
+			var self = this;
+			var k = 0;
+			while ((self.force.alpha() > 1e-2) && (k < 50)) {
+				self.force.tick();
+			    k = k + 1;
+			}
+
+		},
 		/**
 		 * 
 		 * allows to resize the SVG element updating the gravity points
@@ -608,6 +619,17 @@ Biojs.InteractionsD3 = Biojs.extend (
 			self.restart();
 		},
 		_figuresOrder:[0,3,2,5,4,1],
+		_isAnimationEnabled: true,
+		enableAnimation:function(){
+			var self = this;
+			self._isAnimationEnabled=true;
+			self.restart();
+			self.jumpToStable();
+		},
+		disableAnimation:function(){
+			var self = this;
+			self._isAnimationEnabled=false;			
+		},
 		/**
 		 * Restart the graphic to materialize the changes done on it(e.g. add/remove proteins)
 		 * It is here where the SVG elemnts are created.

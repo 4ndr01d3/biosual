@@ -27,7 +27,15 @@
 		    			$.fn[styler.id][styler.method](self);
 		    		};
 		    	}(styler));
-		    }			
+		    }		
+		    $("#"+self.target).before("<label for=\""+self.target+"_switch\">Stop Animation</label><input type='checkbox' id='"+self.target+"_switch' checked='checked'/>");
+		    $("#"+self.target+"_switch").change(function(e){
+		    	if ($(this).is(':checked')){
+		    		self.graph.enableAnimation();
+		    		self.executeStylers();
+		    	}else
+		    		self.graph.disableAnimation();
+		    });
 		},
 
 		afterRequest: function () {
@@ -83,15 +91,15 @@
 					}
 				}
 			}
-			self.graph.restart();
-			//used to get into an stable state of the graphic.
-			var k = 0;
-			while ((self.graph.force.alpha() > 1e-2) && (k < 50)) {
-				self.graph.force.tick();
-			    k = k + 1;
-			}
 			self.previousRequest=currentQ;
 			self.visibleProteins = Object.keys(self.graph.proteinsA);
+			
+			if (!$("#"+self.target+"_switch").is(':checked'))
+				return;
+			
+			self.graph.restart();
+			self.graph.jumpToStable();
+			//used to get into an stable state of the graphic.
 			self.executeStylers();
 			if (self.onceOffStatus!=null){
 				self.uploadStatus(self.onceOffStatus);
@@ -399,6 +407,18 @@
 					self.selected=json.selected;
 				}
 			}
+		},
+		isAnimationRunning:function(){
+			var self = this;
+			return $("#"+self.target+"_switch").is(':checked');
+		},
+		stopAnimation:function(){
+			var self = this;
+			return $("#"+self.target+"_switch").attr('checked', false);
+		},
+		startAnimation:function(){
+			var self = this;
+			return $("#"+self.target+"_switch").attr('checked', true);
 		}
 	});
 })(jQuery);

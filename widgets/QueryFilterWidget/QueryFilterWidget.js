@@ -75,7 +75,7 @@
 				})
 				.startAngle(0)
 				.endAngle(function(d){
-					return Math.PI*(d.value/self.total);
+					return (self.total==0)?0:Math.PI*(d.value/self.total);
 				});
 			
 			var testData=d3.entries(self.queries);

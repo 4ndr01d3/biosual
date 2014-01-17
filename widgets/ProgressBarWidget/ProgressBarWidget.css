@@ -1,0 +1,123 @@
+.progress_mask{
+	-webkit-transform: translate3d(0px, 0px, 0px); 
+	background-color: rgb(0, 0, 0); 
+	margin: 0px; 
+	padding: 0px; 
+	height: 5248px; 
+	left: 0px; 
+	position: fixed; 
+	width: 2500px; 
+	top: 0px; 
+	z-index: 2147483645; 
+	opacity: 0.8;
+	display:none;
+}
+.pgb_container{
+	display:none;
+	background-color:white;
+	-webkit-transform: translate3d(0px, 0px, 0px); 
+	height: 150px;
+	left: 50%;
+	margin-left: -200px;
+	position: fixed;
+	top: 50px;
+	width: 400px;
+	z-index: 2147483646; 
+	opacity: 1;
+	text-align: center;
+	padding-top: 20px;
+	border-style: solid;
+	border-width: 5px;
+	border-color: #D10000;
+	-moz-border-radius: 10px;
+	-webkit-border-radius: 10px;
+	border-radius: 10px; /* future proofing */
+	-khtml-border-radius: 10px; /* for old Konqueror browsers */
+}
+.pgb_container header{
+	margin-bottom: -15px
+	font-size: 1.4em;
+}
+progress.pgb[value] {
+  /* Reset the default appearance */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+   appearance: none;
+   border: none;
+
+  width: 250px;
+  height: 20px;
+  z-index: 2147483646; 
+	
+  /* For IE10 */
+  color: blue; 
+}
+progress.pgb[value]::-webkit-progress-bar {
+  background-color: #eee;
+  border-radius: 2px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25) inset;
+}
+progress.pgb[value]::-moz-progress-bar { 
+  background-image:
+    -moz-linear-gradient(
+      135deg, 
+      transparent 33%, 
+      rgba(0, 0, 0, 0.1) 33%, 
+      rgba(0, 0, 0, 0.1) 66%, 
+      transparent 66% 
+    ),
+    -moz-linear-gradient(
+      top, 
+      rgba(255, 255, 255, 0.25), 
+      rgba(0, 0, 0, 0.25)
+    ),
+    -moz-linear-gradient(
+      left, 
+      #09c, 
+      #f44
+    );
+
+  border-radius: 2px; 
+  background-size: 35px 20px, 100% 100%, 100% 100%; 
+}
+progress.pgb[value]::-webkit-progress-value {
+  background-image:
+	   -webkit-linear-gradient(-45deg, 
+	                           transparent 33%, rgba(0, 0, 0, .1) 33%, 
+	                           rgba(0,0, 0, .1) 66%, transparent 66%),
+	   -webkit-linear-gradient(top, 
+	                           rgba(255, 255, 255, .25), 
+	                           rgba(0, 0, 0, .25)),
+	   -webkit-linear-gradient(left, #09c, #f44);
+
+    border-radius: 2px; 
+    background-size: 35px 20px, 100% 100%, 100% 100%;
+    -webkit-animation: animate-stripes 5s linear infinite;
+        animation: animate-stripes 5s linear infinite;
+}
+@-webkit-keyframes animate-stripes {
+   100% { background-position: -100px 0px; }
+}
+
+@keyframes animate-stripes {
+   100% { background-position: -100px 0px; }
+}
+.progress-bar {
+  background-color: whiteSmoke;
+  border-radius: 2px;
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.25) inset;
+
+  width: 250px;
+  height: 20px;
+  
+  position: relative;
+  display: block;
+}
+  
+.progress-bar > span {
+  background-color: blue;
+  border-radius: 2px;
+
+  display: block;
+  text-indent: -9999px;
+}

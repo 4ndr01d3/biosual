@@ -1,0 +1,10 @@
+{
+    "name": "Progress Bar Widget",
+    "description": "utility widget to display a progress bar",
+    "dependencies":[],
+    "dependenciesCSS":[],
+    "js": "ProgressBarWidget.js",
+    "html": "ProgressBarWidget.html",
+    "css": "ProgressBarWidget.css"
+    
+}

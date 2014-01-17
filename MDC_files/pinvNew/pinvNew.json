@@ -259,6 +259,15 @@
 			"templateTarget":"left",
 			"tags":{"id":"queryfilter"}
 		},
+
+		{	"widget": "ProgressBarWidget",
+			"parameters": {
+				"id": "progressbar",
+				"target":"progressbarDiv"
+			},
+			"templateTarget":"left",
+			"tags":{"id":"progressbarDiv"}
+		},
 		
 		{	"widget": "CurrentSearchWidget",
 			"parameters": {

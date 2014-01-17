@@ -51,10 +51,28 @@
 			self.previousRequest=self.manager.store.get('q').val();
 			
 		},
+		jointQueries:{},
+		previousAnimationState:false,
 		processJson: function(json){
 			var self=this;
 			var recursive= (json.responseHeader.params.q!="*:*" && self.requestedProteins[json.responseHeader.params.q.substr(5)].type=="recursive");
 			var protein =json.responseHeader.params.q.substr(5);
+
+			if (recursive){
+				if (typeof self.jointQueries[protein]=="undefined")
+					self.jointQueries[protein] = {
+						"len":0,
+						"parents":[],
+						"children":{},
+						"responded":0
+					};
+				self.previousAnimationState=self.manager.widgets["graph"].isAnimationRunning();
+				self.manager.widgets["graph"].stopAnimation();
+				self.manager.widgets["progressbar"].addProgressBar(protein,"Recursive calls from protein: "+protein);
+			}else
+				self._tagIfInJointQuery(protein);
+			
+			
 			for (var i = 0, l = json.response.docs.length; i < l; i++) {
 				var doc = json.response.docs[i];
 				if (self.ids.indexOf(doc[self.fields["p1"]])==-1)
@@ -62,9 +80,14 @@
 				if (self.ids.indexOf(doc[self.fields["p2"]])==-1)
 					self.ids.push(doc[self.fields["p2"]]);
 				
-				if (recursive)
+				if (recursive){
+					self._addToJointQuery(protein,doc[self.fields["p1"]]);
+					self._addToJointQuery(protein,doc[self.fields["p2"]]);
 					self.getNextInternalInteractions(self,doc);
+				}
 			}
+			
+			//PAGING
 			if(self.manager.store.get('q').val()!="*:*" && json.response.numFound*1 > (json.response.start+json.response.docs.length)){
 				var fq=(typeof json.responseHeader.params.fq=="undefined")?"":json.responseHeader.params.fq;
 				var prevF=self.currentFilter;
@@ -76,6 +99,44 @@
 				self.requestedProteins[protein].numOfInteracts=json.response.start+json.response.docs.length;
 
 		}, 
+		_addToJointQuery: function(parent,protein){
+			var self=this;
+			if (protein!=parent){
+				if (typeof self.jointQueries[protein] == "undefined"){
+					self.jointQueries[protein] = {
+						"len":0,
+						"parents":[parent],
+						"children":{},
+						"responded":0
+					};
+				}
+				//add the child to its parent
+				self.jointQueries[parent]["children"][protein]=self.jointQueries[protein];
+				// making sure the length of the parent gets updated
+				self.jointQueries[parent]["len"]=Object.keys(self.jointQueries[parent]["children"]).length;
+				
+				if (self.jointQueries[protein]["parents"].indexOf(parent)==-1)
+					self.jointQueries[protein]["parents"].push(parent);
+			}
+		},
+		
+		_tagIfInJointQuery:function(protein){
+			var self = this;
+			
+			if (typeof self.jointQueries[protein] != "undefined"){
+				for (var i=0;i<self.jointQueries[protein]["parents"].length;i++){
+					var parent=self.jointQueries[protein]["parents"][i];
+					self.jointQueries[parent]["responded"] +=1;
+					self.manager.widgets["progressbar"].updateProgressBarValue(parent,self.jointQueries[parent]["responded"],self.jointQueries[parent]["len"]);
+				}
+				self.manager.widgets["progressbar"].updateProgressBarValue(protein,self.jointQueries[protein]["responded"],self.jointQueries[protein]["len"]);
+				if ($(".pgb_container").size()==0)
+					self.manager.widgets["graph"].startAnimation();
+
+//					console.debug("PROGRESS:"+self.jointQueries[parent]["responded"]+"/"+self.jointQueries[parent]["len"]);
+				
+			}
+		},
 		getNextInternalInteractions: function(self,doc,i){
 //				var doc = docs[i];
 				self.requestExplicit(doc[self.fields["p1"]]);
@@ -141,6 +202,7 @@
 		},
 		requestRecursive: function(protein){
 			var self =this;
+//			self.jointQueries[protein]={};
 			if (protein in self.requestedProteins) {
 				var fq=(self.requestedProteins[protein].doc==null ||typeof self.requestedProteins[protein].doc.responseHeader.params.fq=="undefined")?"":self.requestedProteins[protein].doc.responseHeader.params.fq;
 				if (fq==self.currentFilter){
@@ -149,6 +211,7 @@
 						self.processJson(self.requestedProteins[protein].doc);
 						return false;
 					}else if (self.requestedProteins[protein].type=="recursive"){
+//						delete self.jointQueries[protein];
 						return false;
 					}else if (self.requestedProteins[protein].type=="removed"){
 						self.requestedProteins[protein].type ="recursive";
@@ -169,8 +232,11 @@
 		requestExplicit: function(protein){
 			var self =this;
 			if (protein in self.requestedProteins){ 
+				//Checking for differences in the filters
 				var fq=(self.requestedProteins[protein].doc==null ||typeof self.requestedProteins[protein].doc.responseHeader.params.fq=="undefined")?"":self.requestedProteins[protein].doc.responseHeader.params.fq;
 				if (fq==self.currentFilter){
+					if (self.requestedProteins[protein].doc!=null)
+						self._tagIfInJointQuery(protein);
 					if (self.requestedProteins[protein].type=="removed"){
 						self.requestedProteins[protein].type ="explicit";
 						self.manager.handleResponse(self.requestedProteins[protein].doc);
