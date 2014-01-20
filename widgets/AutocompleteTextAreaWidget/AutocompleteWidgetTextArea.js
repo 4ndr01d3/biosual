@@ -79,10 +79,8 @@
 					if (value!="")
 						valuesClean.push(value);
 				}
-				for (var i=0; i<valuesClean.length; i++){
 					self.requestSent = true;
-					self.manager.widgets["requester"].request([ valuesClean[i] ],self.mode);
-				}
+					self.manager.widgets["requester"].request(valuesClean ,self.mode);
 				$("#"+self.target).find('textarea').val('');
 			});
 

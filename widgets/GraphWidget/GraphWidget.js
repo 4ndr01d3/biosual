@@ -30,14 +30,17 @@
 		    }		
 		    $("#"+self.target).before("<label for=\""+self.target+"_switch\">Stop Animation</label><input type='checkbox' id='"+self.target+"_switch' checked='checked'/>");
 		    $("#"+self.target+"_switch").change(function(e){
-		    	if ($(this).is(':checked')){
-		    		self.graph.enableAnimation();
-		    		self.executeStylers();
-		    	}else
-		    		self.graph.disableAnimation();
+		    	self.animateOnSwitch();
 		    });
 		},
-
+		animateOnSwitch:function(){
+			var self = this;
+	    	if ($("#"+self.target+"_switch").is(':checked')){
+	    		self.graph.enableAnimation();
+	    		self.executeStylers();
+	    	}else
+	    		self.graph.disableAnimation();
+		},
 		afterRequest: function () {
 			var self =this;
 			var currentQ=this.manager.response.responseHeader.params.q;
@@ -414,11 +417,13 @@
 		},
 		stopAnimation:function(){
 			var self = this;
-			return $("#"+self.target+"_switch").attr('checked', false);
+			$("#"+self.target+"_switch").attr('checked', false);
+			self.animateOnSwitch();
 		},
 		startAnimation:function(){
 			var self = this;
-			return $("#"+self.target+"_switch").attr('checked', true);
+			$("#"+self.target+"_switch").attr('checked', true);
+			self.animateOnSwitch();
 		}
 	});
 })(jQuery);

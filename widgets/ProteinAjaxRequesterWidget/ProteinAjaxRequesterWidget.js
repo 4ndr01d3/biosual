@@ -59,16 +59,12 @@
 			var protein =json.responseHeader.params.q.substr(5);
 
 			if (recursive){
-				if (typeof self.jointQueries[protein]=="undefined")
-					self.jointQueries[protein] = {
-						"len":0,
-						"parents":[],
-						"children":{},
-						"responded":0
-					};
-				self.previousAnimationState=self.manager.widgets["graph"].isAnimationRunning();
-				self.manager.widgets["graph"].stopAnimation();
-				self.manager.widgets["progressbar"].addProgressBar(protein,"Recursive calls from protein: "+protein);
+				self._createJointQuery(protein);
+				for (var i = 0, l = json.response.docs.length; i < l; i++) {
+					var doc = json.response.docs[i];
+					self._addToJointQuery(protein,doc[self.fields["p1"]]);
+					self._addToJointQuery(protein,doc[self.fields["p2"]]);
+				}
 			}else
 				self._tagIfInJointQuery(protein);
 			
@@ -80,11 +76,8 @@
 				if (self.ids.indexOf(doc[self.fields["p2"]])==-1)
 					self.ids.push(doc[self.fields["p2"]]);
 				
-				if (recursive){
-					self._addToJointQuery(protein,doc[self.fields["p1"]]);
-					self._addToJointQuery(protein,doc[self.fields["p2"]]);
+				if (recursive)
 					self.getNextInternalInteractions(self,doc);
-				}
 			}
 			
 			//PAGING
@@ -92,16 +85,43 @@
 				var fq=(typeof json.responseHeader.params.fq=="undefined")?"":json.responseHeader.params.fq;
 				var prevF=self.currentFilter;
 				self.setFilter(fq);
-				self.requestPaging(self.manager.store.get('q').val(),1+ json.response.start+json.response.docs.length);
+				self.requestPaging(self.manager.store.get('q').val(),1+ json.response.start+json.response.docs.length,json.response.numFound*1);
 				self.setFilter(prevF);
+			} else{
+				if (typeof self._mapPagingIds[self.manager.store.get('q').val()] !="undefined" ){
+					self.manager.widgets["progressbar"].updateProgressBarValue(self._mapPagingIds[self.manager.store.get('q').val()],100,100);
+					delete self._mapPagingIds[self.manager.store.get('q').val()];
+					if ($(".pgb_container").size()==0){
+						self.manager.widgets["graph"].startAnimation();
+					}
+				}
 			}
 			if(json.responseHeader.params.q!="*:*")
 				self.requestedProteins[protein].numOfInteracts=json.response.start+json.response.docs.length;
 
 		}, 
+		_createJointQuery:function(protein){
+			var self = this;
+			if (typeof self.jointQueries[protein]=="undefined")
+				self.jointQueries[protein] = {
+						"len":0,
+						"parents":[],
+						"children":{},
+						"responded":0
+					};
+			else{
+				self.jointQueries[protein].len=0;
+				self.jointQueries[protein].responded=0;
+				self.jointQueries[protein].children={};
+			}
+			self.previousAnimationState=self.manager.widgets["graph"].isAnimationRunning();
+			self.manager.widgets["graph"].stopAnimation();
+			self.manager.widgets["progressbar"].addProgressBar(protein,"Recursive calls from protein: "+protein);
+			
+		},
 		_addToJointQuery: function(parent,protein){
 			var self=this;
-			if (protein!=parent){
+			if (protein!=parent && typeof self.jointQueries[parent] != "undefined"){
 				if (typeof self.jointQueries[protein] == "undefined"){
 					self.jointQueries[protein] = {
 						"len":0,
@@ -129,11 +149,12 @@
 					self.jointQueries[parent]["responded"] +=1;
 					self.manager.widgets["progressbar"].updateProgressBarValue(parent,self.jointQueries[parent]["responded"],self.jointQueries[parent]["len"]);
 				}
+				self.jointQueries[protein]["parents"] = [];
 				self.manager.widgets["progressbar"].updateProgressBarValue(protein,self.jointQueries[protein]["responded"],self.jointQueries[protein]["len"]);
-				if ($(".pgb_container").size()==0)
+				if ($(".pgb_container").size()==0){
 					self.manager.widgets["graph"].startAnimation();
-
-//					console.debug("PROGRESS:"+self.jointQueries[parent]["responded"]+"/"+self.jointQueries[parent]["len"]);
+					
+				}
 				
 			}
 		},
@@ -151,19 +172,28 @@
 		 */
 		request: function(parameters,type){
 			var self=this;
+			if (!$.isArray(parameters))
+				parameters=[parameters];
+			else
+				self._createJointQuery("mult_query_"+self.multipleQueries);
 			type= (typeof type=="undefined")?"normal":type;
-			switch (type){
-				case "normal":
-					self.requestNormal(parameters[0]);
-					break;
-				case "explicit":
-					self.requestExplicit(parameters[0]);
-					break;
-				case "recursive":
-					self.requestRecursive(parameters[0]);
-					break;
+			for(var i=0;i<parameters.length;i++){
+				self._addToJointQuery("mult_query_"+self.multipleQueries, parameters[i]);
+				switch (type){
+					case "normal":
+						self.requestNormal(parameters[i]);
+						break;
+					case "explicit":
+						self.requestExplicit(parameters[i]);
+						break;
+					case "recursive":
+						self.requestRecursive(parameters[i]);
+						break;
+				}
 			}
+			self.multipleQueries++;
 		},
+		multipleQueries:0,
 		requestedProteins:{},
 		requestNormal: function(protein){
 			var self =this;
@@ -171,6 +201,7 @@
 			if (protein in self.requestedProteins) {
 				var fq=(self.requestedProteins[protein].doc==null ||typeof self.requestedProteins[protein].doc.responseHeader.params.fq=="undefined")?"":self.requestedProteins[protein].doc.responseHeader.params.fq;
 				if (fq==self.currentFilter){
+					self._tagIfInJointQuery(protein);
 					if (self.requestedProteins[protein].type=="normal" || self.requestedProteins[protein].type=="recursive")
 						return false;
 					else if (self.requestedProteins[protein].type=="explicit" || self.requestedProteins[protein].type=="removed"){
@@ -190,8 +221,16 @@
 			}
 			return true;
 		},
-		requestPaging: function(query,start){
+		_mapPagingIds:{},
+		requestPaging: function(query,start,total){
 			var self =this;
+			if (typeof self._mapPagingIds[query] =="undefined" ){
+				self._mapPagingIds[query]="paging_"+Object.keys(self._mapPagingIds).length;
+				self.previousAnimationState=self.manager.widgets["graph"].isAnimationRunning();
+				self.manager.widgets["graph"].stopAnimation();
+				self.manager.widgets["progressbar"].addProgressBar(self._mapPagingIds[query],"Paging query:"+query);
+			} else
+				self.manager.widgets["progressbar"].updateProgressBarValue(self._mapPagingIds[query],start,total);
 			
 			if (self.manager.store.addByValue('q', query)) {
 		        self.manager.store.remove('fq');
@@ -202,16 +241,15 @@
 		},
 		requestRecursive: function(protein){
 			var self =this;
-//			self.jointQueries[protein]={};
 			if (protein in self.requestedProteins) {
 				var fq=(self.requestedProteins[protein].doc==null ||typeof self.requestedProteins[protein].doc.responseHeader.params.fq=="undefined")?"":self.requestedProteins[protein].doc.responseHeader.params.fq;
 				if (fq==self.currentFilter){
+					self._tagIfInJointQuery(protein);
 					if (self.requestedProteins[protein].type=="normal" || self.requestedProteins[protein].type=="explicit"){
 						self.requestedProteins[protein].type ="recursive";
 						self.processJson(self.requestedProteins[protein].doc);
 						return false;
 					}else if (self.requestedProteins[protein].type=="recursive"){
-//						delete self.jointQueries[protein];
 						return false;
 					}else if (self.requestedProteins[protein].type=="removed"){
 						self.requestedProteins[protein].type ="recursive";
@@ -394,16 +432,18 @@
 					self.setFilter("");
 					if (typeof json.filters != "undefined") 
 						self.setFilter(json.filters[type][i]);
-					self.request([json.queried[type][i]],type);
+					self.request(json.queried[type][i],type);
 					self.setFilter(prevFilter);
 				}
 			
-			var prevFilter=self.currentFilter;
-			self.setFilter("");
-			if (typeof json.filters != "undefined") 
-				self.setFilter(globalFilter);
-			self.request(["*"],globalType);
-			self.setFilter(prevFilter);
+			if(globalType != null){
+				var prevFilter=self.currentFilter;
+				self.setFilter("");
+				if (typeof json.filters != "undefined") 
+					self.setFilter(globalFilter);
+				self.request(["*"],globalType);
+				self.setFilter(prevFilter);
+			}
 		},
 		resetStatus:function(){
 			var self = this;

@@ -1,6 +1,7 @@
 (function ($) {
 	AjaxSolr.ProgressBarWidget = AjaxSolr.AbstractWidget.extend({
 		bars:{},
+		pgbNum:0,
 		addProgressBar: function(id,subtitle){
 			subtitle = subtitle || "";
 			var self = this;
@@ -14,11 +15,14 @@
 					"	</progress>" +
 					"	<p class=\"pgb_progress_label\"></p>" +
 					"</div>";
-			var top=50+$(".pgb_container").size()*152;
+			var top=50+(self.pgbNum%4)*160;
+			var left=-620+parseInt(self.pgbNum/4)*420;
 			$("#"+self.target).append(html);
 			$("#"+self.target+" .progress_mask").show();
 			$("#pgb_"+id).show();
 			$("#pgb_"+id).css("top",top+"px");
+			$("#pgb_"+id).css("margin-left",left+"px");
+			self.pgbNum=(self.pgbNum>12)?0:self.pgbNum+1;
 		},
 		updateProgressBarValue: function(id,progress,total){
 			var per =100.0*progress/total;
@@ -26,11 +30,15 @@
 			$("#pgb_"+id+" progress .progress-bar span").css("width",per+"%");
 			$("#pgb_"+id+" progress .progress-bar span").html("Progress: "+per+"%");
 			$("#pgb_"+id+" p.pgb_progress_label").html("Progress: "+progress+"/"+total+"");
-			if (total==progress){
+			if (total<=progress){
 				$("#pgb_"+id).remove();
 				if ($(".pgb_container").size()==0)
 					$("#"+self.target+" .progress_mask").hide();
 			}
+		},
+		isProgressBarSet:function(id){
+			var self = this;
+			return (typeof self.bars[id]!="undefined");
 		}
 	});
 })(jQuery);

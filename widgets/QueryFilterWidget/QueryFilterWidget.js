@@ -309,16 +309,16 @@
 					for (var i=0;i<qs.length;i++){
 						var q=qs[i],m=requestedProteins[qs[i]].type;
 						self.manager.widgets["requester"].removeQuery(q,false)();
-						self.manager.widgets["requester"].request([q],m);
+						self.manager.widgets["requester"].request(q,m);
 					}
 					break;
 				case "explicit":
 					self.manager.widgets["requester"].setFilter(self.currentFilter);
-					self.manager.widgets["requester"].request(["*"],"explicit");
+					self.manager.widgets["requester"].request("*","explicit");
 					break;
 				case "full":
 					self.manager.widgets["requester"].setFilter(self.currentFilter);
-					self.manager.widgets["requester"].request(["*"]);
+					self.manager.widgets["requester"].request("*");
 					break;
 			}
 			$("#filter_close").click();

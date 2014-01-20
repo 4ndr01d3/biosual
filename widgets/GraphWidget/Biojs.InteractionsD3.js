@@ -203,12 +203,23 @@ Biojs.InteractionsD3 = Biojs.extend (
 				}
 				self.vis.selectAll("path.figure")
 						.attr("transform", function(d) { 
+							if (self._onceOffFixedRefresh && typeof self.fixedProteins[d.id]!="undefined"){
+								d.px= self.fixedProteins[d.id][0];
+								d.py= self.fixedProteins[d.id][1];
+								d.x= self.fixedProteins[d.id][0];
+								d.y= self.fixedProteins[d.id][1];
+								d.fixed=true;
+							}
+								
 							if (self.opt.enableEdges)
 								return "translate(" + Math.max(r, Math.min(self.opt.width , d.x+r)) + "," + Math.max(r, Math.min(self.opt.height, d.y+r)) + ")";
 							else
 								return "translate(" + d.x + "," +  d.y + ")"; 
 						});
-
+				if(self._onceOffFixedRefresh){
+					self._onceOffFixedRefresh=false;
+					self.fixedProteins={};
+				}
 				if (self.opt.enableEdges) 
 					self.vis.selectAll(".legend")
 						.attr("x", function(d) { return d.x = Math.max(r, Math.min(self.opt.width - r, d.x)); })
@@ -236,6 +247,7 @@ Biojs.InteractionsD3 = Biojs.extend (
 			
 			self.restart();
 		},
+		_onceOffFixedRefresh:false,
 		/**
 		 *  Default values for the options
 		 *  @name Biojs.InteractionsD3-opt
@@ -494,6 +506,14 @@ Biojs.InteractionsD3 = Biojs.extend (
 			}
 			return n;
 		},
+		refreshFixedproteins: function(){
+			var self = this;
+			if (typeof self.fixedProteins!="undefined")
+				for (var i in self.fixedProteins){
+					self.proteins[i].x = self.fixedProteins[i][0];
+					self.proteins[i].y = self.fixedProteins[i][1];
+				}
+		},
 		/**
 		 * Gets the protein object by its id
 		 * 
@@ -624,6 +644,7 @@ Biojs.InteractionsD3 = Biojs.extend (
 			var self = this;
 			self._isAnimationEnabled=true;
 			self.restart();
+			self._onceOffFixedRefresh=true;
 			self.jumpToStable();
 		},
 		disableAnimation:function(){
