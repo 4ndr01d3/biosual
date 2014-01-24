@@ -29,10 +29,11 @@
 				response=this.manager.response;
 			
 
-			if(response.responseHeader.params.q=="*:*"){
-				self.ids=[];
-			}else if (response !=null && typeof response.responseHeader.params.q != 'undefined'){
-				if (self.previousRequest!=null && self.previousRequest=="*:*")
+//			if(response.responseHeader.params.q=="*:*"){
+//				self.ids=[];
+//			}else 
+			if (response !=null && typeof response.responseHeader.params.q != 'undefined'){
+				if (self.previousRequest!=null)// && self.previousRequest=="*:*")
 					self.ids=[];
 				var protein =response.responseHeader.params.q.substr(5);
 				self.requestedProteins[protein].doc=response;
@@ -43,8 +44,8 @@
 					self.proteins[pos]=protein;
 			}
 
-			if (self.previousRequest!=null && self.previousRequest=="*:*")
-				self.afterRemove("*:*");
+//			if (self.previousRequest!=null && self.previousRequest=="*:*")
+//				self.afterRemove("*:*");
 			
 			self.processJson(response);
 
@@ -55,7 +56,8 @@
 		previousAnimationState:false,
 		processJson: function(json){
 			var self=this;
-			var recursive= (json.responseHeader.params.q!="*:*" && self.requestedProteins[json.responseHeader.params.q.substr(5)].type=="recursive");
+//			var recursive= (json.responseHeader.params.q!="*:*" && self.requestedProteins[json.responseHeader.params.q.substr(5)].type=="recursive");
+			var recursive= self.requestedProteins[json.responseHeader.params.q.substr(5)].type=="recursive";
 			var protein =json.responseHeader.params.q.substr(5);
 
 			if (recursive){
@@ -81,7 +83,9 @@
 			}
 			
 			//PAGING
-			if(self.manager.store.get('q').val()!="*:*" && json.response.numFound*1 > (json.response.start+json.response.docs.length)){
+			//if(self.manager.store.get('q').val()!="*:*" && json.response.numFound*1 > (json.response.start+json.response.docs.length)){
+	
+			if(json.response.numFound*1 > (json.response.start+json.response.docs.length)){
 				var fq=(typeof json.responseHeader.params.fq=="undefined")?"":json.responseHeader.params.fq;
 				var prevF=self.currentFilter;
 				self.setFilter(fq);
@@ -96,8 +100,8 @@
 					}
 				}
 			}
-			if(json.responseHeader.params.q!="*:*")
-				self.requestedProteins[protein].numOfInteracts=json.response.start+json.response.docs.length;
+//			if(json.responseHeader.params.q!="*:*")
+			self.requestedProteins[protein].numOfInteracts=json.response.start+json.response.docs.length;
 
 		}, 
 		_createJointQuery:function(protein){
@@ -299,14 +303,20 @@
 		removeAll: function() {
 			var self =this;
 			return function () {
+				var clone = self.proteins.slice(0);
+				for (var i=0;i<self.proteins.length;i++)
+					self.requestedProteins[self.proteins[i]].type="removed";
 				self.proteins= Array();
-				if (self.manager.store.addByValue('q', "*:*")) {
-			        self.manager.store.remove('fq');
-					if(self.currentFilter!="") self.manager.store.addByValue('fq', self.currentFilter);
-					self.manager.doRequest(0);
-					for (prot in self.requestedProteins)
-						self.requestedProteins[prot].type="removed";
-				}
+				for (var i=0;i<clone.length;i++)
+					self.manager.facetRemoved(clone[i]);
+//				self.proteins= Array();
+//				if (self.manager.store.addByValue('q', "*:*")) {
+//			        self.manager.store.remove('fq');
+//					if(self.currentFilter!="") self.manager.store.addByValue('fq', self.currentFilter);
+//					self.manager.doRequest(0);
+//					for (prot in self.requestedProteins)
+//						self.requestedProteins[prot].type="removed";
+//				}
 				return false;
 			};
 
@@ -321,9 +331,8 @@
 			}
 			return 0;
 		},
-		removeQuery: function (facet,executeRandom) {
+		removeQuery: function (facet) {
 			var self = this; 
-			executeRandom= (typeof executeRandom == "undefined")?true:executeRandom;
 			
 			return function () {
 				var index = jQuery.inArray(facet,self.proteins);
@@ -335,11 +344,11 @@
 
 				
 				// if is the last protein then call the random query
-				if (executeRandom && self.proteins.length==0 && self.manager.store.addByValue('q', "*:*")) {
-			        self.manager.store.remove('fq');
-					if(self.currentFilter!="") self.manager.store.addByValue('fq', self.currentFilter);
-					self.manager.doRequest(0);
-				}
+//				if (executeRandom && self.proteins.length==0 && self.manager.store.addByValue('q', "*:*")) {
+//			        self.manager.store.remove('fq');
+//					if(self.currentFilter!="") self.manager.store.addByValue('fq', self.currentFilter);
+//					self.manager.doRequest(0);
+//				}
 				self.manager.facetRemoved(protein);
 				return false;
 			};

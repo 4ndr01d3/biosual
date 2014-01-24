@@ -2,7 +2,9 @@
   $(function () {
 	  	$.fn.ruler={};
 		$.fn.ruler.applyRules = function(self){
-
+			//not apply rules on a non visible target
+			if (!$("#"+self.target).is(':visible')) return;
+			
 			var rules = Manager.widgets["ruler"].ruler.getActiveRules();
 			var model = Manager.widgets["ruler"].rules;
 
@@ -208,6 +210,9 @@
 			}
 		};	  	
 		$.fn.ruler.applyRules2 = function(self){
+			//not apply rules on a non visible target
+			if (!$("#"+self.target).is(':visible')) return;
+
 			var rules = Manager.widgets["ruler"].ruler.getActiveRules();
 			var model = Manager.widgets["ruler"].rules;
 
@@ -404,6 +409,9 @@
 			}
 		};
 		$.fn.ruler.applyRules3 = function(self){
+			//not apply rules on a non visible target
+			if (!$("#"+self.target).is(':visible')) return;
+
 			var rules = Manager.widgets["ruler"].ruler.getActiveRules();
 			var model = Manager.widgets["ruler"].rules;
 			var selectorTR ="",selectorTD ="";

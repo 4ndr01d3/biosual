@@ -673,6 +673,12 @@ Biojs.Ruler = Biojs.extend (
 		    	}
 		    }
 		}
+	},
+	triggerOrderChange: function(){
+		var self = this;
+		self.raiseEvent('onOrderChanged', {
+			rules : self.getActiveRules()
+		});
 	}
 
 });

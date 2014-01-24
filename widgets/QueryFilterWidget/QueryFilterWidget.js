@@ -13,6 +13,9 @@
 			self.queries={};
 			self.queried={};
 
+			$('#filter_mask').show(); 
+			$('#filter_container').show();
+
 			$(".filter_img").click(function(){
 				$('#filter_mask').show(); 
 				$('#filter_container').show();
@@ -43,7 +46,7 @@
 				self.restart();
 				self.refreshTextFromCurrentFilters(self);
 			};
-			var q="*:*";
+			var q="*";
 			self.prequery(q,gotTotal);
 
 
@@ -62,6 +65,9 @@
 				self.executeClick(self);
 			});
 			self.refreshGraphicFromCurrentFilters(self);
+			if (modelrequester!=null) modelrequester.done(function(p){
+				self._fillDynamicFields();
+			});
 
 		},
 		restart: function(){
@@ -268,11 +274,13 @@
 		},
 		afterRequest: function () {
 			var self = this;
+			$('#filter_mask').hide(); 
+			$('#filter_container').hide();
 			self._fillDynamicFields();
-			if (self.onceOffStatus!=null){
-				self.uploadStatus(self.onceOffStatus);
-				self.onceOffStatus=null;
-			}
+//			if (self.onceOffStatus!=null){
+//				self.uploadStatus(self.onceOffStatus);
+//				self.onceOffStatus=null;
+//			}
 		},
 		_fillDynamicFields: function(){
 			var self = this;
@@ -333,10 +341,10 @@
 		onceOffStatus:null,
 		uploadStatus:function(json){
 			var self = this;
-			if (self.previousRequest=="*:*"){
-				self.onceOffStatus=json;
-				return;
-			}
+//			if (self.previousRequest=="*:*"){
+//				self.onceOffStatus=json;
+//				return;
+//			}
 			for (var i=0;i<json.rules.length;i++){
 				self.ruler.addActiveRule(json.rules[i]);
 			}

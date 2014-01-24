@@ -68,6 +68,7 @@
 				       "on_show":{"widget":"table","method":"refreshButtons"}
 				     }
 				],
+				"on_show":{"widget":"ruler","method":"triggerExecuters"},
 				"sideEffects":[
 				     { "target":"size",
 				       "visibleWith":["Network","Circle"] 
@@ -418,8 +419,9 @@
 				"itemHoverStyle" : 	{"font-size":	"0.8em"},
 				"menu": {
 					"interactions" :	{ "label":	"Get Interactions"},
-					"hideProtein" :		{ "label":	"Hide"},
+					"hideProtein" :		{ "label":	"Hide Protein"},
 					"hideInteractions":	{ "label":	"Hide Interactions"},
+					"hideBoth" :		{ "label":	"Hide Protein+Interactions"},
 					"label" :			{ "label":	"Show/Hide Label"},
 					"lock" :			{ "label":"Release"},
 					"highlight" :		{ "label":"Highlight"},
@@ -438,8 +440,9 @@
 				"itemHoverStyle":	{"font-size": "0.8em"},
 				"menu": {
 					"interactions":		{"label":	"Get Interactions"},
-					"hideProtein":		{"label":	"Hide"},
+					"hideProtein" :		{ "label":	"Hide Protein"},
 					"hideInteractions":	{ "label":	"Hide Interactions"},
+					"hideBoth" :		{ "label":	"Hide Protein+Interactions"},
 					"label":			{"label":	"Show/Hide Label"},
 					"highlight":		{"label":	"Highlight"},
 					"highlight_p":		{"label":	"Highlight Interactors"},

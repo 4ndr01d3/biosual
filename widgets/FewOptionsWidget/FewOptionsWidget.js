@@ -24,17 +24,17 @@
 				});
 			}
 		},
-		afterRequest:function(){
-			var self =this;
-			if (self.previousRequest!=null && self.previousRequest=="*:*"){
-				$("#"+self.target+ " ul li").removeClass("current");
-				for (var i=0;i<self.options.length;i++){
-					if  (self.options[i].selected)
-						$("#"+self.target+ " ul a[title="+self.options[i].title+"]").parent().addClass("current");
-				}
-			}
-			self.previousRequest=self.manager.store.get('q').val();
-		},
+//		afterRequest:function(){
+//			var self =this;
+//			if (self.previousRequest!=null && self.previousRequest=="*:*"){
+//				$("#"+self.target+ " ul li").removeClass("current");
+//				for (var i=0;i<self.options.length;i++){
+//					if  (self.options[i].selected)
+//						$("#"+self.target+ " ul a[title="+self.options[i].title+"]").parent().addClass("current");
+//				}
+//			}
+//			self.previousRequest=self.manager.store.get('q').val();
+//		},
 		initTest: function(){
 			var self = this;
 			ok($("#"+self.target+" ul").length>0,"Widget("+self.id+"-FewOptionsWidget): The target contains at least a UL element");

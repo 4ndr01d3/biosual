@@ -32,6 +32,8 @@
 							$(this).parent().addClass("current");
 						}
 					}
+					if (typeof self.on_show != "undefined")
+						self.manager.widgets[self.on_show.widget][self.on_show.method]();
 				
 					if (typeof self.sideEffects !="undefined") 
 						for (var i=0;i<self.sideEffects.length;i++){

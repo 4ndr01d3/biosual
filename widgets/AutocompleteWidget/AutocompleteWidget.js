@@ -77,7 +77,7 @@
 			});
 
 
-			var paramsL = [ 'q=*:*&rows=0&facet=true&facet.limit=-1&facet.mincount=1&json.nl=map' ];
+			var paramsL = [ 'q=*&rows=0&facet=true&facet.limit=-1&facet.mincount=1&json.nl=map' ];
 			if (typeof self.fields == "undefined")
 				self.fields = params['facet.field'];
 			for (var i = 0; i < self.fields.length; i++) 

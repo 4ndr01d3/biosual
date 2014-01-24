@@ -114,22 +114,22 @@
 		},
 		afterRequest: function () {
 			var self=this;
-			if(self.manager.store.get('q').val()=="*:*"){
-				self.ids=[];
-				self.trIds=[];
-				self.responses=[];
-				self.restartTable();
-			}
-			if (self.previousRequest!=null && self.previousRequest=="*:*")
-				self.afterRemove("*:*");
+//			if(self.manager.store.get('q').val()=="*:*"){
+//				self.ids=[];
+//				self.trIds=[];
+//				self.responses=[];
+//				self.restartTable();
+//			}
+//			if (self.previousRequest!=null && self.previousRequest=="*:*")
+//				self.afterRemove("*:*");
 			var currentQ=self.manager.response.responseHeader.params.q;
 			var type = "";
-			if(currentQ=="*:*")
-				type = "normal";
-			else{
+//			if(currentQ=="*:*")
+//				type = "normal";
+//			else{
 				currentQ=currentQ.substr(5);
 				type =self.manager.widgets["requester"].requestedProteins[currentQ].type;
-			}
+//			}
 			this.manager.response.type=type;
 			this.manager.response.currentQ=currentQ;
 			if (typeof self.columns =="undefined"){

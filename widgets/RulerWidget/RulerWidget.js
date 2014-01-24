@@ -49,6 +49,10 @@
 			for (var i=0;i<json.rules.length;i++){
 				self.ruler.addActiveRule(json.rules[i]);
 			}
+		}, 
+		triggerExecuters:function(){
+			var self = this;
+			self.ruler.triggerOrderChange();
 		}
 	});
 })(jQuery);

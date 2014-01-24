@@ -30,24 +30,25 @@
 		afterRequest: function () {
 			var self =this;
 			var currentQ=this.manager.response.responseHeader.params.q;
-			if(currentQ=="*:*")
-				self.resetGraphic();
-			else
+//			if(currentQ=="*:*")
+//				self.resetGraphic();
+//			else
 				currentQ=currentQ.substr(5);
 			
-			if (self.previousRequest!=null && self.previousRequest=="*:*"){
-				$("#"+this.target).empty();
-				self.graph.resetGraphic();
-				self.graph = new Biojs.InteractionsBundleD3({
-				    target: self.target,
-					width: (typeof self.width == "undefined")?"800":self.width,
-					height: (typeof self.height == "undefined")?"800":self.height 
-				});			
-			}
+//			if (self.previousRequest!=null ){//}&& self.previousRequest=="*:*"){
+//				$("#"+this.target).empty();
+//				self.graph.resetGraphic();
+//				self.graph = new Biojs.InteractionsBundleD3({
+//				    target: self.target,
+//					width: (typeof self.width == "undefined")?"800":self.width,
+//					height: (typeof self.height == "undefined")?"800":self.height 
+//				});			
+//			}
 				
 			self.interactions = Array(); 
 			
-			var type = (currentQ=="*:*")?"normal":self.manager.widgets["requester"].requestedProteins[currentQ].type;
+//			var type = (currentQ=="*:*")?"normal":self.manager.widgets["requester"].requestedProteins[currentQ].type;
+			var type = self.manager.widgets["requester"].requestedProteins[currentQ].type;
 			
 			for (var i = 0, l = this.manager.response.response.docs.length; i < l; i++) {
 				var doc = this.manager.response.response.docs[i];
@@ -84,42 +85,7 @@
 			self.visibleProteins = Object.keys(self.graph.proteins);
 			self.executeStylers();
 		},	
-		afterRequestOld: function () {
-			var self =this;
-			if(self.manager.store.get('q').val()=="*:*")
-				self.resetGraphic();
-			if (self.previousRequest!=null && self.previousRequest=="*:*"){
-				$("#"+this.target).empty();
-				self.graph.resetGraphic();
-				self.graph = new Biojs.InteractionsBundleD3({
-				    target: self.target,
-					width: (typeof self.width == "undefined")?"800":self.width,
-					height: (typeof self.height == "undefined")?"800":self.height 
-				});			
-			}
-				
-			self.interactions = Array(); 
-			
-			var singleProt = (this.manager.response.responseHeader.params.rows=="1");
-			
-			for (var i = 0, l = this.manager.response.response.docs.length; i < l; i++) {
-				var doc = this.manager.response.response.docs[i];
-				doc.organism1 = (typeof doc.organism1 == 'undefined')?'undefined':doc.organism1;
-				doc.organism2 = (typeof doc.organism2 == 'undefined')?'undefined':doc.organism2;
-				
-				self.addProtein(doc,self.fields["p1"], self.prefixes["p1"],self.fields["organism1"],singleProt);
-				self.addProtein(doc,self.fields["p2"], self.prefixes["p2"],self.fields["organism2"],singleProt);
 
-				if (!singleProt){
-					doc.id=doc[self.fields["p1"]] +" - "+ doc[self.fields["p2"]];
-					self.graph.addInteraction(doc[self.fields["p1"]] ,doc[self.fields["p2"]] ,{score:doc[self.fields["score"]],doc:self._getInteractionFeaturesFromDoc(doc)});
-				}
-			}
-			self.graph.clearAndRestartGraphic();
-			self.previousRequest=self.manager.store.get('q').val();
-			self.visibleProteins = Object.keys(self.graph.proteins);
-			self.executeStylers();
-		},	
 		
 		addProtein:function(doc,id,prefix,orgfield){
 			var self = this;

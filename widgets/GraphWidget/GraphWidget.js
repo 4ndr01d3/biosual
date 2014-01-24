@@ -44,24 +44,25 @@
 		afterRequest: function () {
 			var self =this;
 			var currentQ=this.manager.response.responseHeader.params.q;
-			if(currentQ=="*:*")
-				self.resetGraphic();
-			else
+//			if(currentQ=="*:*")
+//				self.resetGraphic();
+//			else
 				currentQ=currentQ.substr(5);
 			
-			if (self.previousRequest!=null && self.previousRequest=="*:*"){
-				$("#"+this.target).empty();
-				self.graph.resetGraphic();
-				self.graph = new Biojs.InteractionsD3({
-					target: self.target,
-					radius: 10,
-					enableEdges:self.enableEdges,
-					width: (typeof self.width == "undefined")?"800":self.width,
-					height: (typeof self.height == "undefined")?"800":self.height 
-				});			
-			}
+//			if (self.previousRequest!=null && self.previousRequest=="*:*"){
+//				$("#"+this.target).empty();
+//				self.graph.resetGraphic();
+//				self.graph = new Biojs.InteractionsD3({
+//					target: self.target,
+//					radius: 10,
+//					enableEdges:self.enableEdges,
+//					width: (typeof self.width == "undefined")?"800":self.width,
+//					height: (typeof self.height == "undefined")?"800":self.height 
+//				});			
+//			}
 				
-			var type = (currentQ=="*:*")?"normal":self.manager.widgets["requester"].requestedProteins[currentQ].type;
+//			var type = (currentQ=="*:*")?"normal":self.manager.widgets["requester"].requestedProteins[currentQ].type;
+			var type = self.manager.widgets["requester"].requestedProteins[currentQ].type;
 
 			for (var i = 0, l = this.manager.response.response.docs.length; i < l; i++) {
 				var doc = this.manager.response.response.docs[i];
@@ -388,10 +389,10 @@
 		onceOffStatus:null,
 		uploadStatus:function(json){
 			var self = this;
-			if (self.previousRequest=="*:*"){
-				self.onceOffStatus=json;
-				return;
-			}
+//			if (self.previousRequest=="*:*"){
+//				self.onceOffStatus=json;
+//				return;
+//			}
 			if (typeof json.organisms != "undefined" && json.organisms != null){
 				self.graph.organisms=json.organisms;
 			}

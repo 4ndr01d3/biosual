@@ -15,12 +15,13 @@ var Manager;
 		}
 		for (var name in params)
 			Manager.store.addByValue(name, params[name]);
-		if ( typeof URLrequests == "undefined" || !Array.isArray(URLrequests) || URLrequests.length<1) {
-			if (getURLParameter("status")==null || getURLParameter("status")=="null"){
-				Manager.store.addByValue('q', '*:*');
-				Manager.doRequest();
-			}
-		}else
+//		if ( typeof URLrequests == "undefined" || !Array.isArray(URLrequests) || URLrequests.length<1) {
+//			if (getURLParameter("status")==null || getURLParameter("status")=="null"){
+//				Manager.store.addByValue('q', '*:*');
+//				Manager.doRequest();
+//			}
+//		}else
+		if ( typeof URLrequests != "undefined" || Array.isArray(URLrequests))
 			for (var i=0;i<URLrequests.length;i++)
 				Manager.widgets["requester"].request([URLrequests[i].id],URLrequests[i].type);
 	});
