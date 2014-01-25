@@ -52,7 +52,6 @@ Biojs.InteractionsD3 = Biojs.extend (
 		proteins:[],
 		proteinsA:{},
 		node_drag:null,
-		color: null,
 		foci: [],
 		organisms: {},
 		

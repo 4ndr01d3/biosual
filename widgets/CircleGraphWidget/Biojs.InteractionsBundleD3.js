@@ -108,10 +108,6 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 			this._container.width(w);
 			this._container.height(h);
 
-			self.color = function() {
-			    return d3.scale.ordinal().range(self.colors);
-			  }();
-			
 			self.vis = d3.select("#"+self.opt.target).insert("div", "h2")
 			    .style("width", w + "px")
 			    .style("height", h + "px");
@@ -733,7 +729,7 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 					return -1;
 				}else
 					return 1;
-				return 0;
+				return a[0]-b[0];
 			});
 		},
 		_paintLegend:function(legend,type){
@@ -776,7 +772,7 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 					.attr("height", 13)
 					.style("fill", function(d,i) {
 						if (typeof d[2]== "undefined")
-							return self.color(i);
+							return self.colors[i];
 						return d[2];
 					});
 				legend.filter(function(d) { return d[0]!="label" && d[1]== type; }).append("text")
@@ -842,9 +838,12 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 				self.legends.push([legends,type]);
 			} else //is a color label
 				for (var i=0;i<legends.length;i++){
-					if (typeof color=="undefined")
-						self.legends.push([legends[i],type]);
-					else
+					if (typeof color=="undefined"){
+						if (typeof getDistinctColors != "undefined")
+							self.legends.push([legends[i],type,getDistinctColors(legends.length)[i]]);
+						else
+							self.legends.push([legends[i],type]);
+					}else
 						self.legends.push([legends[i],type,color]);
 					
 					if (legends[i].length>self.longestLegend)
