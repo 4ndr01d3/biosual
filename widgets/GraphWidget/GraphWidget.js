@@ -201,9 +201,10 @@
 			var self=this;
 			return self.manager.widgets["requester"].getQueries();
 		},
-		getColor: function(group){
-			var self=this;
-			return self.graph.color(group);
+		getColor: function(group,numberOfClasses){
+//			var self=this;
+			return getDistinctColors(numberOfClasses)[group];
+//			return self.graph.color(group);
 		},
 		removeProtein: function(protein,excludelist){
 			var self =this;
@@ -257,12 +258,20 @@
 				}
 				self.graph.proteins[i].group=g;
 			}
+			var classesS=classes.slice(0);
+			if (isNumberArray(classesS))
+				classesS.sort(function(a,b){return a-b;});
+			else
+				classesS.sort();
+			for (var i=0;i<self.graph.proteins.length;i++)
+				self.graph.proteins[i].group=classesS.indexOf(classes[self.graph.proteins[i].group]);
+			
 			if (typeof type != "undefined" && type=="color"){
-				self.colorBy(self,selector);
-				self.graph.addLegends(classes,"Color By");
+				self.colorBy(self,selector,classes.length);
+				self.graph.addLegends(classesS,"Color By ("+feature+")");
 			}else{
-				self.borderBy(self,selector);
-				self.graph.addLegends(classes,"Border By");
+				self.borderBy(self,selector,classes.length);
+				self.graph.addLegends(classesS,"Border By ("+feature+")");
 			}
 		},
 		colorBySeed: function(self,selector,type){
@@ -281,21 +290,21 @@
 				}
 			}
 			if (typeof type != "undefined" && type=="color"){
-				self.colorBy(self,selector);
-				self.graph.addLegends(proteins,"Color By");
+				self.colorBy(self,selector,proteins.length);
+				self.graph.addLegends(proteins,"Color By (Protein)");
 			}else{
-				self.borderBy(self,selector);
-				self.graph.addLegends(proteins,"Border By");
+				self.borderBy(self,selector,proteins.length);
+				self.graph.addLegends(proteins,"Border By (Protein)");
 			}
 		},
-		colorBy:function(self,selector){
+		colorBy:function(self,selector,numberOfClasses){
 			self.graph.vis.selectAll(selector).style("fill", function(d) {       	
-				return self.getColor(d.group);   
+				return self.getColor(d.group,numberOfClasses);   
 			});
 		},
-		borderBy:function(self,selector){
+		borderBy:function(self,selector,numberOfClasses){
 			self.graph.vis.selectAll(selector).style("stroke", function(d) {       	
-				return self.getColor(d.group);   
+				return self.getColor(d.group,numberOfClasses);   
 			});
 		},
 		registerStyler:function(name,styler){

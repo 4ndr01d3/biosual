@@ -27,13 +27,3 @@ var Manager;
 	});
 
 })(jQuery);
-var STATUS={};
-STATUS.NO_APPLICABLE=979223;
-function getURLParameter(name) {
-    return decodeURIComponent(
-        (location.search.match(RegExp("[?|&]"+name+'=(.+?)(&|$)'))||[,null])[1]
-    );  
-}
-function isNumber(n) {
-  return !isNaN(parseFloat(n)) && isFinite(n);
-}

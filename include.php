@@ -70,6 +70,11 @@ switch ($_GET['type']){
 						
 			echo "\n//".$path."\n".getFile($path);
 		}
+		
+		//Adding utility functions 
+		echo "//Utility functions\n".getFile("core/util.js");
+		
+		
 		//Adding the template
 		$path="templates/".$json->template->name."/markup.html";
 		if (file_exists($path) ){
