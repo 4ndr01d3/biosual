@@ -579,7 +579,7 @@ Biojs.Ruler = Biojs.extend (
 				code_rule+=self._getSelect('condition_params_'+n+'_'+target_id+'_'+condition_id+'_0',condition.values,"",
 						gotRule?rule.parameters[0]:rule
 				);
-				code_rule+=self._getSelect('condition_params_'+n+'_'+target_id+'_'+condition_id+'_1',["equals","contains","different","not contains",">","<"],"",
+				code_rule+=self._getSelect('condition_params_'+n+'_'+target_id+'_'+condition_id+'_1',["equals","contains","different","not contains"],"",//,">","<"],"",
 						gotRule?rule.parameters[1]:rule
 				);
 				var value = gotRule?rule.parameters[2]:"";

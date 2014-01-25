@@ -63,7 +63,7 @@
 									selector =prefix2+"[id *=\""+rule.parameters[1]+"\"]";
 									break;
 								case "different":
-									selector =prefix2+':not([id="node_'+rule.parameters[1]+'"])';
+									selector =prefix2+':not([id="'+prefix+rule.parameters[1]+'"])';
 									break;
 								case "not contains":
 									selector =prefix2+":not([id *="+rule.parameters[1]+"])";

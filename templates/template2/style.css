@@ -28,7 +28,7 @@ header.main h2{
 }
 .right {
 	min-width: 50%;
-	float: left;
+/*	float: left;*/
 	padding: 10px 20px 10px 40px;
 	border-left: 1px solid #aaa;
 	text-align: justify;

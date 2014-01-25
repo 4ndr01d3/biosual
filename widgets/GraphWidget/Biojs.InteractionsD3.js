@@ -957,7 +957,7 @@ Biojs.InteractionsD3 = Biojs.extend (
 		 */
 		highlight: function(selector){
 			var self=this;
-			self.vis.selectAll(selector).style("stroke", '#3d6');
+			self.vis.selectAll(selector).style("stroke", '#0f0');
 		},
 		/**
 		 * Set the fill's color of the elements on the graphic that match the selector. 

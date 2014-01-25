@@ -159,6 +159,9 @@
 			}else
 				self.prequery(query, callback);
 		},
+		_solrScape:function(text){
+			return text.replace(/[-[\]{}\[\]()*:\/~!+\"?\\^&|#\s]/g, "\\$&");
+		},
 		refreshGraphicFromCurrentFilters:function(self){
 			var rules = self.ruler.getActiveRules();
 			var model = self.rules;
@@ -209,7 +212,8 @@
 										break;
 								}
 								
-							}else
+							}else{
+								rule.parameters[0]=self._solrScape(rule.parameters[0]);
 								switch (rule.parameters[1]){
 									case "equals":
 										query ='(p1_'+rule.parameters[0]+':'+rule.parameters[2]+' OR p2_'+rule.parameters[0]+':'+rule.parameters[2]+')';
@@ -230,7 +234,7 @@
 										query ='(p1_'+rule.parameters[0]+':[* TO '+rule.parameters[2]+'] OR p2_'+rule.parameters[0]+':[* TO '+rule.parameters[2]+'])';
 										break;
 								}
-							break;
+							}
 						case model.target[0].conditions[1].name: // number of interactions
 							break;
 					}
