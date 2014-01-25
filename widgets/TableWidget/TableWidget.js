@@ -288,6 +288,7 @@
 			var from = 0.3, to =5.0;
 			//get max and min
 			var max=-99999999,min=999999999;
+//			console.debug((new Date()).getTime());
 			for (var i=0;i<self.ids.length;i++){
 				//ignoring the scores that have id and have a '.'
 				var trs=[];
@@ -299,6 +300,8 @@
 						c=(feature=="organism")?doc["organism1"]:doc["p1_"+feature];
 					else
 						c=(feature=="organism")?doc["organism2"]:doc["p2_"+feature];
+
+					doc.c=c;
 					if (c=="Unknown") break;
 
 					if (typeof c=="undefined" || !isNumber(c))
@@ -309,17 +312,18 @@
 			}
 			var m=(from-to)/(min-max);
 			var b=to-m*max;
+//			console.debug((new Date()).getTime());
 			for (var i=0;i<self.ids.length;i++){
 				//ignoring the scores that have id and have a '.'
 				var trs=[];
 				if (self.ids[i].indexOf(".")==-1) trs= self.oTable.$('tr', {"filter": "applied"}).filter("[id*='"+self.ids[i]+"']");
 				if (trs.length>0){
-					var doc = $(trs[0]).data("doc");
-					var c=""; 
-					if (doc.protein1==self.ids[i])
-						c=(feature=="organism")?doc["organism1"]:doc["p1_"+feature];
-					else
-						c=(feature=="organism")?doc["organism2"]:doc["p2_"+feature];
+//					var doc = $(trs[0]).data("doc");
+					var c=$(trs[0]).data("doc").c; //""
+//					if (doc.protein1==self.ids[i])
+//						c=(feature=="organism")?doc["organism1"]:doc["p1_"+feature];
+//					else
+//						c=(feature=="organism")?doc["organism2"]:doc["p2_"+feature];
 
 					if (c=="Unknown") 
 						trs.children().filter("[content="+self.ids[i]+"]").data("size",1);
@@ -327,7 +331,9 @@
 						trs.children().filter("[content="+self.ids[i]+"]").data("size",Math.sqrt(m*c+b));
 				}
 			}
+//			console.debug((new Date()).getTime());
 			self.resizeBy(selectorTR,selectorTD);
+//			console.debug((new Date()).getTime());
 		},
 		paintCell:function(selectorTR,selectorTD,color){ //paint protein
 			var self = this;
@@ -404,9 +410,9 @@
 				}
 			}
 			if (typeof type != "undefined" && type=="color")
-				self.colorBy(selectorTR,selectorTD);
+				self.colorBy(selectorTR,selectorTD,proteins.length);
 			else
-				self.borderBy(selectorTR,selectorTD);
+				self.borderBy(selectorTR,selectorTD,proteins.length);
 		},
 		colorByFeature: function(selectorTR,selectorTD,feature,type){
 			var self = this;
@@ -431,43 +437,58 @@
 					trs.children().filter("[content="+self.ids[i]+"]").data("group",g);
 				}
 			}
-			if (typeof type != "undefined" && type=="color")
-				self.colorBy(selectorTR,selectorTD);
+			
+			var classesS=classes.slice(0);
+			if (isNumberArray(classesS))
+				classesS.sort(function(a,b){return a-b;});
 			else
-				self.borderBy(selectorTR,selectorTD);
+				classesS.sort();
+			for (var i=0;i<self.ids.length;i++){
+				var trs=[];
+				if (self.ids[i].indexOf(".")==-1) trs= self.oTable.$('tr', {"filter": "applied"}).filter("[id*='"+self.ids[i]+"']");
+				if (trs.length>0){
+					var g =trs.children().filter("[content="+self.ids[i]+"]").data("group");
+					trs.children().filter("[content="+self.ids[i]+"]").data("group",classesS.indexOf(classes[g]));
+				}
+			}
+			
+			if (typeof type != "undefined" && type=="color")
+				self.colorBy(selectorTR,selectorTD,classes.length);
+			else
+				self.borderBy(selectorTR,selectorTD,classes.length);
 		},
-		borderBy:function(selectorTR,selectorTD){
+		borderBy:function(selectorTR,selectorTD,numberOfClasses){
 			var self = this;
 			self.oTable.fnFilter("");
 			if (selectorTR==null ||selectorTR=="") {
 				self.oTable.$('td', {"filter": "applied"}).filter(selectorTD).each(function(i,td){
 					var group=$(td).data("group");
 					if(typeof group!="undefined" && group*1>-1) 
-						$(td).css('border', "1px solid "+self.colors[group]);
+						$(td).css('border', "1px solid "+getDistinctColors(numberOfClasses)[group]);
 				});
 			}else{
 				self.oTable.$('tr', {"filter": "applied"}).filter(selectorTR).children().filter(selectorTD).each(function(i,td){
 					var group=$(td).data("group");
 					if(typeof group!="undefined" && group*1>-1) 
-						$(td).css('border', "1px solid "+self.colors[group]);
+						$(td).css('border', "1px solid "+getDistinctColors(numberOfClasses)[group]);
 				});
 			}
 			self.oTable.fnFilter('');		
 		},
-		colorBy:function(selectorTR,selectorTD){
+		colorBy:function(selectorTR,selectorTD,numberOfClasses){
 			var self = this;
 			self.oTable.fnFilter("");
 			if (selectorTR==null ||selectorTR=="") {
 				self.oTable.$('td', {"filter": "applied"}).filter(selectorTD).each(function(i,td){
 					var group=$(td).data("group");
 					if(typeof group!="undefined" && group*1>-1) 
-						$(td).css('color', self.colors[group]);
+						$(td).css('color', getDistinctColors(numberOfClasses)[group]);
 				});
 			}else{
 				self.oTable.$('tr', {"filter": "applied"}).filter(selectorTR).children().filter(selectorTD).each(function(i,td){
 						var group=$(td).data("group");
 						if(typeof group!="undefined" && group*1>-1) 
-							$(td).css('color', self.colors[group]);
+							$(td).css('color', getDistinctColors(numberOfClasses)[group]);
 				});
 			}
 			self.oTable.fnFilter('');		
@@ -553,31 +574,7 @@
 			    }
 			});
 			self.oTable.fnPageChange( json.startsAt/json.numberOfRows );
-		},
-		colors: [ "#1f77b4", "#aec7e8", "#ff7f0e", "#ffbb78", "#2ca02c", "#98df8a", "#d62728", "#ff9896", "#9467bd", "#c5b0d5", 
-		          "#8c564b", "#c49c94", "#e377c2", "#f7b6d2", "#7f7f7f", "#c7c7c7", "#bcbd22", "#dbdb8d", "#17becf", "#9edae5",
-		          '#3399FF', '#99FF66', '#66FF99', '#CCFF00', '#6699CC', '#99CC00', '#99FFCC', '#993399', '#33FFFF', '#33CC33', 
-		         '#66CCFF', '#009999', '#00FFFF', '#CC66CC', '#FF9966', '#CC3300', '#009966', '#660000', '#99FF33', '#330066', 
-		         '#FFFF00', '#0099FF', '#FF6699', '#33FF00', '#FFFFCC', '#990000', '#99CC33', '#0033CC', '#006699', '#6699FF', 
-		         '#FFCC00', '#330099', '#999999', '#666633', '#FFCC99', '#00CCCC', '#006633', '#CCCC99', '#3300FF', '#33CC66', 
-		         '#339999', '#6666FF', '#33FF66', '#990033', '#33CC99', '#993300', '#00FF00', '#666699', '#00CC00', '#FF66CC', 
-		         '#00FFCC', '#FF9999', '#66FF00', '#003366', '#CCFF33', '#660066', '#6633CC', '#FF3366', '#99FF00', '#FF33CC', 
-		         '#CCFFCC', '#99CCCC', '#3300CC', '#0066FF', '#66CC33', '#3366CC', '#CCCCCC', '#FF0000', '#6666CC', '#336699', 
-		         '#999966', '#FFFF99', '#66CC99', '#FF0033', '#999933', '#CC99FF', '#FF0099', '#6600CC', '#CC9966', '#00CC66', 
-		         '#33CC00', '#666666', '#33CCCC', '#FF0066', '#00CC33', '#FFCC66', '#FF6600', '#9999FF', '#CC66FF', '#9933FF', 
-		         '#FF00CC', '#CC3399', '#CC6633', '#33FFCC', '#FF33FF', '#009900', '#660099', '#669999', '#CC3366', '#0099CC', 
-		         '#9900FF', '#669933', '#FFFFFF', '#CCCCFF', '#66CCCC', '#669966', '#0066CC', '#CC9900', '#663300', '#33FF99', 
-		         '#996666', '#3399CC', '#99FF99', '#66CC66', '#CC0066', '#CCFF66', '#663366', '#99CC66', '#000033', '#003333', 
-		         '#FF6666', '#009933', '#FFFF66', '#996699', '#FFCCCC', '#00CCFF', '#339966', '#3366FF', '#00CC99', '#336633', 
-		         '#FF99FF', '#663333', '#CCFF99', '#CC99CC', '#339933', '#33CCFF', '#333366', '#006666', '#CC6600', '#333300', 
-		         '#FFCC33', '#9966CC', '#003300', '#9966FF', '#996600', '#CC9933', '#9999CC', '#FF9933', '#006600', '#6633FF', 
-		         '#CC6699', '#FF3399', '#993333', '#CCFFFF', '#330033', '#FFCCFF', '#FFFF33', '#990066', '#CCCC66', '#CC0099', 
-		         '#CCCC00', '#339900', '#660033', '#FF00FF', '#333333', '#99CC99', '#66FFCC', '#003399', '#999900', '#99FFFF', 
-		         '#990099', '#3333FF', '#CC33CC', '#CC6666', '#3333CC', '#9900CC', '#9933CC', '#CC0033', '#CC00FF', '#FF99CC', 
-		         '#FF66FF', '#66FFFF', '#6600FF', '#66FF66', '#996633', '#669900', '#00FF99', '#CC9999', '#993366', '#CC33FF', 
-		         '#336666', '#0033FF', '#336600', '#CC0000', '#FF9900', '#33FF33', '#000000', '#99CCFF', '#000066', '#0000CC', 
-		         '#000099', '#00FF33', '#666600', '#66FF33', '#CCCC33', '#66CC00', '#FF3333', '#CC3333', '#663399', '#333399', 
-		         '#FF3300', '#0000FF', '#CC00CC', '#00FF66', '#330000', '#FF6633']
+		}
 
 
 	});
