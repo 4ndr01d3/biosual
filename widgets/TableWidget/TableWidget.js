@@ -302,7 +302,7 @@
 						c=(feature=="organism")?doc["organism2"]:doc["p2_"+feature];
 
 					doc.c=c;
-					if (c=="Unknown") break;
+					if (c=="Unknown" || c=="") break;
 
 					if (typeof c=="undefined" || !isNumber(c))
 						throw "not a number"; 
@@ -325,8 +325,8 @@
 //					else
 //						c=(feature=="organism")?doc["organism2"]:doc["p2_"+feature];
 
-					if (c=="Unknown") 
-						trs.children().filter("[content="+self.ids[i]+"]").data("size",1);
+					if (c=="Unknown" || c=="")
+						trs.children().filter("[content="+self.ids[i]+"]").data("size",Math.sqrt(m*(min-5)+b));
 					else
 						trs.children().filter("[content="+self.ids[i]+"]").data("size",Math.sqrt(m*c+b));
 				}

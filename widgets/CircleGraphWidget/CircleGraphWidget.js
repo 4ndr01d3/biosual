@@ -216,7 +216,7 @@
 			var max=-99999999,min=999999999;
 			for (var i in self.graph.proteins){
 				var c=(feature!="organism")?self.graph.proteins[i].features[feature]:self.graph.proteins[i].organism;
-				if (c=="Unknown") break;
+				if (c=="Unknown" || c=="") break;
 				
 				if (typeof c=="undefined" || !isNumber(c))
 					throw "not a number"; 
@@ -228,8 +228,8 @@
 			
 			for (var i in self.graph.proteins){
 				var c=(feature!="organism")?self.graph.proteins[i].features[feature]:self.graph.proteins[i].organism;
-				if (c=="Unknown") 
-					self.graph.proteins[i].size= 1;
+				if (c=="Unknown" || c=="") 
+					self.graph.proteins[i].size= m*(min-5)+b;
 				else
 					self.graph.proteins[i].size= m*c+b;
 			}
