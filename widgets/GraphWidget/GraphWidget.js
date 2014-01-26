@@ -175,6 +175,20 @@
 				self.selected=d.protein.name;
 			}
 		},
+		proteinLabelVisibility:{},
+		proteinMouseOver: function(d){
+			var self = this;
+			self.proteinLabelVisibility[d.protein.id]=self.graph.isLegendVisible("#node_"+d.protein.id);
+			if (!self.proteinLabelVisibility[d.protein.id])
+				self.graph.swapShowLegend("#node_"+d.protein.id);
+		},
+		proteinMouseOut: function(d){
+			var self = this;
+			if (typeof self.proteinLabelVisibility[d.protein.id] != "undefined" && !self.proteinLabelVisibility[d.protein.id]){
+				self.graph.swapShowLegend("#node_"+d.protein.id);
+				self.proteinLabelVisibility[d.protein.id]=false;
+			}
+		},
 		_getInteractionFeaturesFromDoc: function(doc){
 			var self=this;
 			var features = {};

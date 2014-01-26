@@ -155,11 +155,15 @@
 				self.selected=d.interaction.source.id+"-"+d.interaction.target.id;
 			}
 		},
+		proteinLabelVisibility:{},
 		overProtein: function( objEvent ) {
 			var self=this;
 			self.graph.highlight("path.link.target-" + objEvent.protein.key);
 			self.graph.highlight("path.link.source-" + objEvent.protein.key);
 			self.graph.setColor("#node-" + objEvent.protein.key,'#0f0');
+			self.proteinLabelVisibility[objEvent.protein.key]=self.graph.isLegendVisible("#node-"+objEvent.protein.key);
+			if (!self.proteinLabelVisibility[objEvent.protein.key])
+				self.graph.swapShowLegend("#node-"+objEvent.protein.key);
 		},
 		outOfProtein: function( objEvent ) {
 			var self=this;
@@ -167,6 +171,10 @@
 			self.graph.setColor("path.link.target-" + objEvent.protein.key,"");
 			self.graph.setColor("path.link.source-" + objEvent.protein.key,"");
 			self.executeStylers();
+			if (typeof self.proteinLabelVisibility[objEvent.protein.key] != "undefined" && !self.proteinLabelVisibility[objEvent.protein.key]){
+				self.graph.swapShowLegend("#node-"+objEvent.protein.key);
+				self.proteinLabelVisibility[objEvent.protein.key]=false;
+			}
 		},
 		_getInteractionFeaturesFromDoc: function(doc){
 			var self=this;

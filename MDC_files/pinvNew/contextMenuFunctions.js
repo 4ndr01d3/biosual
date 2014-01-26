@@ -26,7 +26,7 @@
 			Manager.widgets["ruler"].ruler.addActiveRule(rule);
 		};
 		$.fn.context.label = function(t){
-			Manager.widgets["graph"].graph.swapShowLegend("#"+t.id+" .legend");
+			Manager.widgets["graph"].graph.swapShowLegend("#"+t.id);
 		};
 		$.fn.context.lock = function(t){
 			var protein= t.id.substr(5);
@@ -73,7 +73,7 @@
 			Manager.widgets["ruler"].ruler.addActiveRule(rule);
 		};
 		$.fn.context2.label = function(t){
-			Manager.widgets["graph2"].graph.swapShowLegend("#"+t.id+" .legend");
+			Manager.widgets["graph2"].graph.swapShowLegend("#"+t.id);
 		};
 		$.fn.context2.lock = function(t){
 			var protein= t.id.substr(5);

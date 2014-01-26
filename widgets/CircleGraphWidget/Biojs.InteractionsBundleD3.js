@@ -977,6 +977,18 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 			});
 		}, 
 
+		/**
+		 * Is the legend of the protein visible
+		 * 
+		 * @param {string} selector a CSS3 selector to choose the  legend
+		 *  
+		 * @example 
+		 * alert(instance.isLegendVisible("#node_5 .legend"));
+		 */
+		isLegendVisible: function(selector){
+			var self=this;
+			return (self.vis.selectAll(selector).selectAll(".legend").attr("visibility")=="visible");
+		},
 		
 		/**
 		 * Shows/Hide the legend(id) of the protein
@@ -1000,7 +1012,7 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 		 */
 		swapShowLegend: function(selector){
 			var self=this;
-			self.vis.selectAll(selector).attr("visibility", function(d) {
+			self.vis.selectAll(selector).selectAll(".legend").attr("visibility", function(d) {
 				d.showLegend = !d.showLegend;
 				return (d.showLegend)?"visible":"hidden";
 			});
