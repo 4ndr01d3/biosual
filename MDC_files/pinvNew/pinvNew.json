@@ -465,7 +465,7 @@
 				"id": "info",
 				"target": "info",
 				"locations":["protein.features","interaction.doc"],
-				"defeultText": "Selection Empty",
+				"defaultText": "Selection Empty",
 				"positionTarget": "ruler",
 				"myPosition":"right bottom",
 				"atPosition":"right bottom"

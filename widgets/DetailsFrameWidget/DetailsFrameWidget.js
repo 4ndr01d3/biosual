@@ -8,7 +8,7 @@
 			var self = this;
 			self.info = new Biojs.DetailsFrame({
 				target: self.target,
-				features: {id:self.defeultText}
+				features: {id:self.defaultText}
 			});
 			if (typeof self.positionTarget != "undefined") {
 				$("#"+self.target).position({
@@ -34,7 +34,7 @@
 				}
 			
 			if (obj==false || obj.id==self.selected){
-				self.info.updateFeatures({id:self.defeultText});
+				self.info.updateFeatures({id:self.defaultText});
 				self.selected=null;
 			}else{
 				self.info.updateFeatures(obj);//,self.orderProteinFeatures);

@@ -91,6 +91,9 @@ Biojs.DetailsFrame = Biojs.extend (
 		html += 	'		<ul />';
 		$("#"+target).addClass("floater");
 		$("#"+target).append(html);
+		$("#"+target).resizable({
+			minHeight: 60,
+			minWidth: 200});
 		self.updateFeatures();
 		if (self.opt.minizable)
 			$("#"+target+" .minimize").click(function(){
@@ -98,7 +101,13 @@ Biojs.DetailsFrame = Biojs.extend (
 					$("#"+target+" ul").show();
 					$(this).removeClass("minimized");
 					$(this).addClass("to_minimize");
+					 
+					$("#"+target).width(self.prevS[0]);
+					$("#"+target).height(self.prevS[1]);
 				}else{
+					self.prevS =[$("#"+target).width(),$("#"+target).height()]
+					$("#"+target).width("200px");
+					$("#"+target).height("30px");
 					$("#"+target+" ul").hide();
 					$(this).removeClass("to_minimize");
 					$(this).addClass("minimized");
@@ -167,9 +176,11 @@ Biojs.DetailsFrame = Biojs.extend (
 	  */ 
 	updateFeatures: function(features,order){
 		var self=this;
-		self.order=order;
 		if (typeof features != "undefined")
 			self.opt.features = features;
+		if (typeof order == "undefined")
+			order = Object.keys(self.opt.features).sort();
+		self.order=order;
 		var re = new RegExp("[A-NR-Z][0-9][A-Z][A-Z0-9][A-Z0-9][0-9]|[OPQ][0-9][A-Z0-9][A-Z0-9][A-Z0-9][0-9]");
 		var m = re.exec(self.opt.features.id);
 		if (m == null)
