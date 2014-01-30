@@ -24,7 +24,8 @@
 			$("#pgb_"+id).css("margin-left",left+"px");
 			self.pgbNum=(self.pgbNum>12)?0:self.pgbNum+1;
 		},
-		updateProgressBarValue: function(id,progress,total){
+		updateProgressBarValue: function(idOri,progress,total){
+			var id=idOri.replace(/[!"#$%&'()*+,.\/:;<=>?@\[\\\]^`{|}~]/g, '\\$&');
 			var per =100.0*progress/total;
 			$("#pgb_"+id+" progress").attr("value",per);
 			$("#pgb_"+id+" progress .progress-bar span").css("width",per+"%");

@@ -24,7 +24,7 @@ var Manager;
 //				Manager.doRequest();
 //			}
 //		}else
-		if ( typeof URLrequests != "undefined" || Array.isArray(URLrequests))
+		if ( typeof URLrequests != "undefined" && Array.isArray(URLrequests))
 			for (var i=0;i<URLrequests.length;i++)
 				Manager.widgets["requester"].request([URLrequests[i].id],URLrequests[i].type);
 	});

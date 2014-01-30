@@ -207,6 +207,7 @@ Biojs.InteractionsD3 = Biojs.extend (
 								d.x= self.fixedProteins[d.id][0];
 								d.y= self.fixedProteins[d.id][1];
 								d.fixed=true;
+								delete self.fixedProteins[d.id];
 							}
 								
 							if (self.opt.enableEdges)
@@ -216,7 +217,6 @@ Biojs.InteractionsD3 = Biojs.extend (
 						});
 				if(self._onceOffFixedRefresh){
 					self._onceOffFixedRefresh=false;
-					self.fixedProteins={};
 				}
 				if (self.opt.enableEdges) 
 					self.vis.selectAll(".legend")
@@ -505,6 +505,7 @@ Biojs.InteractionsD3 = Biojs.extend (
 				protein.x=self.fixedProteins[protein.id][0];
 				protein.y=self.fixedProteins[protein.id][1];
 				protein.fixed=true;
+				delete self.fixedProteins[protein.id];
 			}
 			if(typeof protein.size == "undefined") protein.size=1;
 			n= self.proteins.push(protein);
@@ -658,6 +659,7 @@ Biojs.InteractionsD3 = Biojs.extend (
 		enableAnimation:function(){
 			var self = this;
 			self._isAnimationEnabled=true;
+		//	self.fixedProteins =self.getFixedProteins();
 			self.restart();
 			self._onceOffFixedRefresh=true;
 			self.jumpToStable();

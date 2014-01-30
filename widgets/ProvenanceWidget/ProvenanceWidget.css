@@ -1,3 +1,6 @@
+.provenance{
+	display:none;
+}
 .provenance header{
 	text-decoration: underline;
 	margin-top: 15px;
@@ -23,4 +26,12 @@ provenance section ol{
 	font-family:Georgia, Times, serif; 
 	font-size:13px; color:#222; 
 	display:block; 
+}
+.provenance_button{
+	font-size:0.8em;
+	cursor: pointer;
+	color: #fff;
+	background-color: #1F77B4;
+	padding: 3px;
+	border: 1px solid #5FB7F4;
 }

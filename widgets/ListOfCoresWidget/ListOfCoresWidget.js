@@ -15,6 +15,10 @@
 		        }, 100);
 			};
 			$('#'+self.target+ " input").keydown(filter);
+			Manager.servlet=servlet;
+			Manager.store.servlet=servlet;
+			Manager.store.addByValue('q', '*');
+			Manager.doRequest();
 		},
 		afterRequest: function(){
 			var self =this;
