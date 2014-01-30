@@ -11,6 +11,21 @@
 				allowOrdering:true,
 				rules: self.rules
 			});	
+			if ( typeof Manager.widgets["provenance"] != "undefined") {
+				self.ruler.onRuleCreated(function(obj){
+					Manager.widgets["provenance"].addAction("Rule Created",self.id,obj);
+				});
+				self.ruler.onRuleRemoved(function(obj){
+					Manager.widgets["provenance"].addAction("Rule Removed",self.id,obj);
+				});
+				self.ruler.onRuleEditing(function(obj){
+					Manager.widgets["provenance"].addAction("Rule Edited",self.id,obj);
+				});
+				self.ruler.onOrderChanged(function(obj){
+					Manager.widgets["provenance"].addAction("Rule's order changed",self.id,obj);
+				});
+			}
+			
 		},
 		afterRequest: function () {
 			var self = this;

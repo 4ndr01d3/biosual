@@ -26,9 +26,17 @@
 			});
 			if (qs.length>0) {
 				for (var i = 0, l = qs.length; i < l; i++) {
-					links.push($('<a href="#"  />').html(' <img src="biosual/images/delete.png" /><span class="tooltip">Remove the protein</span>').click(
-							self.manager.widgets["requester"].removeQuery(qs[i])
-					));
+					links.push($('<a href="#"  />')
+						.html(' <img src="biosual/images/delete.png" /><span class="tooltip">Remove the protein</span>')
+						.click(function(q){
+							return function(){
+								self.manager.widgets["requester"].removeQuery(q);
+								if ( typeof Manager.widgets["provenance"] != "undefined") {
+									Manager.widgets["provenance"].addAction("Removing protein",self.id,q);
+								}
+							};
+						}(qs[i]))
+					);
 				}
 				if (links.length > 1) {
 					links.push($('<a href="#"/>').text('remove all').click(

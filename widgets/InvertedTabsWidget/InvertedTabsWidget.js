@@ -19,6 +19,12 @@
 				
 				
 				$("#"+self.target+ " ul a[title='"+self.tabs[i].title+"']").click(function(d){ 
+					if ( typeof Manager.widgets["provenance"] != "undefined") {
+						Manager.widgets["provenance"].addAction("Changing Tab",self.id,{
+							"from":$("#"+self.target+ " ul li.current a").attr("title"),
+							"to":$(this).attr("title")
+						});
+					}
 					
 					$("#"+self.target+ " ul li").removeClass("current");
 					for (var i=0;i<self.tabs.length;i++){

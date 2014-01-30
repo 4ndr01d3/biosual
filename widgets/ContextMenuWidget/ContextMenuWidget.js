@@ -9,6 +9,9 @@
 				
 				self.bindings[key] = function(k){
 					return function(t){ 
+						if ( typeof Manager.widgets["provenance"] != "undefined") {
+							Manager.widgets["provenance"].addAction("Action from context menu",self.id,self.menu[k].label);
+						}
 						$.fn[self.id][k](t);
 					};
 				}(key);

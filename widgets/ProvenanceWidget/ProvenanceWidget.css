@@ -1,0 +1,26 @@
+.provenance header{
+	text-decoration: underline;
+	margin-top: 15px;
+}
+/* LIST #2 */
+provenance section { 
+	width:320px;
+}
+provenance section ol{ 
+	font-style:italic; 
+	font-family:Georgia, Times, serif; 
+	font-size:20px; 
+	color:#bfb1b1;  
+}
+.provenance section ol li p { 
+	padding:8px; 
+	font-style:normal; 
+	font-family:Courier; 
+	font-size:13px; color:#999; 
+	border-left: 1px solid #999; 
+}
+.provenance section ol li p em { 
+	font-family:Georgia, Times, serif; 
+	font-size:13px; color:#222; 
+	display:block; 
+}

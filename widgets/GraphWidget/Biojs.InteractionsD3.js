@@ -147,11 +147,15 @@ Biojs.InteractionsD3 = Biojs.extend (
 					  if (Ws<W-trans[0]) trans[0]=W-Ws;
 					  if (Hs<H-trans[1]) trans[1]=H-Hs;
 				}
-				  self.vis.attr("transform",
+				self.vis.attr("transform",
 				      "translate(" + trans + ")"
 				      + " scale(" + scale + ")");
-				  
-				  self._refreshZoomLegend();
+			  
+				self._refreshZoomLegend();
+				self.raiseEvent('transformOverSVG', {
+					"translate":trans.slice(0),
+					"scale":scale*1
+				});
 
 			};
 			self.redraw=redraw;
@@ -369,7 +373,24 @@ Biojs.InteractionsD3 = Biojs.extend (
 			 * ); 
 			 * 
 			 * */
-			"sizeChanged"
+			"sizeChanged",
+			/**
+			 * @name Biojs.InteractionsBundleD3#transformOverSVG
+			 * @event
+			 * @param {function} actionPerformed It is triggered when the SVG excutes a transform usually caused by zooming/padding 
+			 * @eventData {@link Biojs.Event} objEvent Object containing the information of the event
+			 * @eventData {Object} translate coordinantes that the SVG has been translated
+			 * @eventData {Object} scale value of the scale that the SVG is applyin
+			 * @example 
+			 * instance.transformOverSVG(
+			 *    function( objEvent ) {
+			 *      alert("The SVG has execute a transform: ("+objEvent.translate+","+objEvent.scale+")" );
+			 *    }
+			 * ); 
+			 * 
+			 * */
+			"transformOverSVG"
+
 		], 
 		jumpToStable:function(){
 			var self = this;

@@ -1,0 +1,7 @@
+{
+    "name": "Provenance Widget",
+    "description": "A widget that allows to record, and visualize actions reported from other widgets",
+    "js": "ProvenanceWidget.js",
+    "html": "ProvenanceWidget.html",
+    "css": "ProvenanceWidget.css"
+}

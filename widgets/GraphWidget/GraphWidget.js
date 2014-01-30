@@ -134,13 +134,15 @@
 			var s=size.split("x");
 			self.graph.setSize(s[0],s[1]);
 			self.executeStylers();
+			if ( typeof Manager.widgets["provenance"] != "undefined") {
+				Manager.widgets["provenance"].addAction("The size of the SVG has been changed",self.id,size);
+			}
 		},
 		interactionClick: function(d){
 			var self = this;
-			var newClick = (new Date()).getTime();
-			if (newClick-self.lastClick<300)
-				return;
-			self.lastClick=newClick;
+			if ( typeof Manager.widgets["provenance"] != "undefined") {
+				Manager.widgets["provenance"].addAction("Click on interaction",self.id,d.interaction.source.id+"_"+d.interaction.target.id);
+			}
 			if (d.interaction.source.id+"_"+d.interaction.target.id==self.selected){
 				self.graph.setColor('[id="link_'+self.selected+'"]',"#999");
 				self.selected=null;
@@ -157,10 +159,9 @@
 		},
 		proteinClick: function(d){
 			var self=this;
-			var newClick = (new Date()).getTime();
-			if (newClick-self.lastClick<300)
-				return;
-			self.lastClick=newClick;
+			if ( typeof Manager.widgets["provenance"] != "undefined") {
+				Manager.widgets["provenance"].addAction("Click on protein",self.id,d.protein.name);
+			}
 			if (d.protein.name==self.selected){
 				$('[id="node_'+self.selected+'"] .figure').css("stroke",'');
 				self.selected=null;
@@ -173,6 +174,12 @@
 				}
 				self.graph.setColor('[id="node_'+d.protein.name+'"] .figure',"#000");
 				self.selected=d.protein.name;
+			}
+		},
+		transformOverSVG:function( objEvent ) {
+			var self = this;
+			if ( typeof Manager.widgets["provenance"] != "undefined") {
+				Manager.widgets["provenance"].addAction("Transform over the SVG",self.id,objEvent);
 			}
 		},
 		proteinLabelVisibility:{},

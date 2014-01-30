@@ -28,10 +28,6 @@
 			if (typeof response == "undefined")
 				response=this.manager.response;
 			
-
-//			if(response.responseHeader.params.q=="*:*"){
-//				self.ids=[];
-//			}else 
 			if (response !=null && typeof response.responseHeader.params.q != 'undefined'){
 				if (self.previousRequest!=null)// && self.previousRequest=="*:*")
 					self.ids=[];
@@ -43,9 +39,6 @@
 				else
 					self.proteins[pos]=protein;
 			}
-
-//			if (self.previousRequest!=null && self.previousRequest=="*:*")
-//				self.afterRemove("*:*");
 			
 			self.processJson(response);
 
@@ -56,12 +49,11 @@
 		previousAnimationState:false,
 		processJson: function(json){
 			var self=this;
-//			var recursive= (json.responseHeader.params.q!="*:*" && self.requestedProteins[json.responseHeader.params.q.substr(5)].type=="recursive");
 			var recursive= self.requestedProteins[json.responseHeader.params.q.substr(5)].type=="recursive";
 			var protein =json.responseHeader.params.q.substr(5);
 
 			if (recursive){
-				self._createJointQuery(protein);
+				self._createJointQuery(protein, "Recursive calls from protein: "+protein);
 				for (var i = 0, l = json.response.docs.length; i < l; i++) {
 					var doc = json.response.docs[i];
 					self._addToJointQuery(protein,doc[self.fields["p1"]]);
@@ -82,8 +74,6 @@
 					self.getNextInternalInteractions(self,doc);
 			}
 			
-			//PAGING
-			//if(self.manager.store.get('q').val()!="*:*" && json.response.numFound*1 > (json.response.start+json.response.docs.length)){
 	
 			if(json.response.numFound*1 > (json.response.start+json.response.docs.length)){
 				var fq=(typeof json.responseHeader.params.fq=="undefined")?"":json.responseHeader.params.fq;
@@ -100,11 +90,10 @@
 					}
 				}
 			}
-//			if(json.responseHeader.params.q!="*:*")
 			self.requestedProteins[protein].numOfInteracts=json.response.start+json.response.docs.length;
 
 		}, 
-		_createJointQuery:function(protein){
+		_createJointQuery:function(protein,label){
 			var self = this;
 			if (typeof self.jointQueries[protein]=="undefined")
 				self.jointQueries[protein] = {
@@ -120,7 +109,7 @@
 			}
 			self.previousAnimationState=self.manager.widgets["graph"].isAnimationRunning();
 			self.manager.widgets["graph"].stopAnimation();
-			self.manager.widgets["progressbar"].addProgressBar(protein,"Recursive calls from protein: "+protein);
+			self.manager.widgets["progressbar"].addProgressBar(protein,label);
 			
 		},
 		_addToJointQuery: function(parent,protein){
@@ -179,7 +168,7 @@
 			if (!$.isArray(parameters))
 				parameters=[parameters];
 			else
-				self._createJointQuery("mult_query_"+self.multipleQueries);
+				self._createJointQuery("mult_query_"+self.multipleQueries, "Executing multiple requested queries");
 			type= (typeof type=="undefined")?"normal":type;
 			for(var i=0;i<parameters.length;i++){
 				self._addToJointQuery("mult_query_"+self.multipleQueries, parameters[i]);
@@ -333,25 +322,22 @@
 		},
 		removeQuery: function (facet) {
 			var self = this; 
-			
-			return function () {
-				var index = jQuery.inArray(facet,self.proteins);
-				if (index==-1) return;
-				self.proteins.splice(index, 1);
-				var protein = facet;
+			var index = jQuery.inArray(facet,self.proteins);
+			if (index==-1) return;
+			self.proteins.splice(index, 1);
+			var protein = facet;
 //				var protein = (facet[0]=="*")?facet.substring(1):facet;
-				self.requestedProteins[protein].type="removed";
+			self.requestedProteins[protein].type="removed";
 
-				
-				// if is the last protein then call the random query
+			
+			// if is the last protein then call the random query
 //				if (executeRandom && self.proteins.length==0 && self.manager.store.addByValue('q', "*:*")) {
 //			        self.manager.store.remove('fq');
 //					if(self.currentFilter!="") self.manager.store.addByValue('fq', self.currentFilter);
 //					self.manager.doRequest(0);
 //				}
-				self.manager.facetRemoved(protein);
-				return false;
-			};
+			self.manager.facetRemoved(protein);
+			return false;
 		},
 		currentFilter:"",
 		setFilter:function(filter){
@@ -429,9 +415,15 @@
 		},
 		uploadStatus:function(json){
 			var self = this;
-			var globalFilter=null,globalType=null;
+			var globalFilter=null,globalType=null, first=true,parent="";
 			for (var type in json.queried)
 				for (var i=0;i<json.queried[type].length;i++){
+					if (first){
+						parent=json.queried[type][i];
+						self._createJointQuery(parent,"Loading Proteins from status.");
+						first=false;
+					}else
+						self._addToJointQuery(parent, json.queried[type][i]);
 					if(json.queried[type][i]=="*"){
 						globalFilter=json.filters[type][i];
 						globalType=type;
@@ -453,6 +445,10 @@
 				self.request(["*"],globalType);
 				self.setFilter(prevFilter);
 			}
+			if ( typeof Manager.widgets["provenance"] != "undefined") {
+				Manager.widgets["provenance"].addAction("Status Upoaded",self.id,json);
+			}
+
 		},
 		resetStatus:function(){
 			var self = this;

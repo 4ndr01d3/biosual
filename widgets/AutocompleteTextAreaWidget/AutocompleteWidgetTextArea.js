@@ -36,6 +36,9 @@
 					$(this).addClass("selected");
 					modes.find('span').html($(this).find("h3").html());
 					self.mode = $(this).find("h3").html().toLowerCase();
+					if ( typeof Manager.widgets["provenance"] != "undefined") {
+						Manager.widgets["provenance"].addAction("Search mode changed",self.id,self.mode);
+					}
 				});
 			}
 
@@ -72,6 +75,9 @@
 			}; // end callback
 
 			$("#"+this.target).find('button').click(function(e){
+				if ( typeof Manager.widgets["provenance"] != "undefined") {
+					Manager.widgets["provenance"].addAction("New search submitted",self.id,area.val());
+				}
 				var values=area.val().split(",");
 				var valuesClean=[];
 				for (var i=0; i<values.length; i++){

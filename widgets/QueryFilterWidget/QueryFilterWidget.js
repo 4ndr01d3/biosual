@@ -7,6 +7,7 @@
 		radius: 160 / 2,
 		defined:false,
 		currentFilter:"",
+		ruler:null,
 		
 		init: function(){
 			var self = this;
@@ -16,19 +17,45 @@
 			$('#filter_mask').show(); 
 			$('#filter_container').show();
 
-			$(".filter_img").click(function(){
-				$('#filter_mask').show(); 
-				$('#filter_container').show();
-			});
-			$("#filter_close").click(function(){
-				$('#filter_mask').hide(); 
-				$('#filter_container').hide();
-			});
-			self.ruler = new Biojs.Ruler({
-				target: self.target,
-				allowOrdering:false,
-				rules: self.rules
-			});	
+			if (self.ruler==null){
+				$(".filter_img").click(function(){
+					$('#filter_mask').show(); 
+					$('#filter_container').show();
+					if ( typeof Manager.widgets["provenance"] != "undefined") {
+						Manager.widgets["provenance"].addAction("Pre-Filters window opened",self.id);
+					}
+				});
+				$("#filter_close").click(function(){
+					$('#filter_mask').hide(); 
+					$('#filter_container').hide();
+					if ( typeof Manager.widgets["provenance"] != "undefined") {
+						Manager.widgets["provenance"].addAction("Pre-Filters window closed",self.id);
+					}
+				});
+				self.ruler = new Biojs.Ruler({
+					target: self.target,
+					allowOrdering:false,
+					rules: self.rules
+				});
+				self.ruler.onRuleCreated(function(obj){
+					self.refreshGraphicFromCurrentFilters(self);
+					if ( typeof Manager.widgets["provenance"] != "undefined") {
+						Manager.widgets["provenance"].addAction("Prefilter rule created",self.id,obj);
+					}
+				});
+				self.ruler.onRuleRemoved(function(obj){
+					self.refreshGraphicFromCurrentFilters(self);
+					if ( typeof Manager.widgets["provenance"] != "undefined") {
+						Manager.widgets["provenance"].addAction("Prefilter rule removed",self.id,obj);
+					}
+				});
+				self.ruler.onRuleEditing(function(obj){
+					self.refreshGraphicFromCurrentFilters(self);
+					if ( typeof Manager.widgets["provenance"] != "undefined") {
+						Manager.widgets["provenance"].addAction("Prefilter rule edition",self.id,obj);
+					}
+				});
+			}
 			$(".filter_div .ruler .add_rule a").html("Add Filter");
 
 			$(".filter_stats_chart").empty();
@@ -52,17 +79,11 @@
 
 
 
-			self.ruler.onRuleCreated(function(){
-				self.refreshGraphicFromCurrentFilters(self);
-			});
-			self.ruler.onRuleRemoved(function(){
-				self.refreshGraphicFromCurrentFilters(self);
-			});
-			self.ruler.onRuleEditing(function(){
-				self.refreshGraphicFromCurrentFilters(self);
-			});
 			$(".filter_button button").click(function(){
 				self.executeClick(self);
+				if ( typeof Manager.widgets["provenance"] != "undefined") {
+					Manager.widgets["provenance"].addAction("Prefilters executed",self.id);
+				}
 			});
 			self.refreshGraphicFromCurrentFilters(self);
 			if (modelrequester!=null) modelrequester.done(function(p){
@@ -199,39 +220,38 @@
 							if (rule.parameters[0]=="id"){
 								switch (rule.parameters[1]){
 									case "equals":
-										query ='(p1:'+rule.parameters[2]+' OR p2:'+rule.parameters[2]+')';
+										query ='(p1:'+rule.parameters[2]+' AND p2:'+rule.parameters[2]+')';
 										break;
 									case "contains":
-										query ='(p1:*'+rule.parameters[2]+'* OR p2:*'+rule.parameters[2]+'*)';
+										query ='(p1:*'+rule.parameters[2]+'* AND p2:*'+rule.parameters[2]+'*)';
 										break;
 									case "different":
-										query ='-(p1:'+rule.parameters[2]+' OR p2:'+rule.parameters[2]+')';
+										query ='-(p1:'+rule.parameters[2]+' AND p2:'+rule.parameters[2]+')';
 										break;
 									case "not contains":
-										query ='-(p1:*'+rule.parameters[2]+'* OR p2:*'+rule.parameters[2]+'*)';
+										query ='-(p1:*'+rule.parameters[2]+'* AND p2:*'+rule.parameters[2]+'*)';
 										break;
 								}
 								
 							}else{
-								rule.parameters[0]=self._solrScape(rule.parameters[0]);
 								switch (rule.parameters[1]){
 									case "equals":
-										query ='(p1_'+rule.parameters[0]+':'+rule.parameters[2]+' OR p2_'+rule.parameters[0]+':'+rule.parameters[2]+')';
+										query ='(p1_'+self._solrScape(rule.parameters[0])+':'+rule.parameters[2]+' AND p2_'+self._solrScape(rule.parameters[0])+':'+rule.parameters[2]+')';
 										break;
 									case "contains":
-										query ='(p1_'+rule.parameters[0]+':*'+rule.parameters[2]+'* OR p2_'+rule.parameters[0]+':*'+rule.parameters[2]+'*)';
+										query ='(p1_'+self._solrScape(rule.parameters[0])+':*'+rule.parameters[2]+'* AND p2_'+self._solrScape(rule.parameters[0])+':*'+rule.parameters[2]+'*)';
 										break;
 									case "different":
-										query ='-(p1_'+rule.parameters[0]+':'+rule.parameters[2]+' OR p2_'+rule.parameters[0]+':'+rule.parameters[2]+')';
+										query ='-(p1_'+self._solrScape(rule.parameters[0])+':'+rule.parameters[2]+' AND p2_'+self._solrScape(rule.parameters[0])+':'+rule.parameters[2]+')';
 										break;
 									case "not contains":
-										query ='-(p1_'+rule.parameters[0]+':*'+rule.parameters[2]+'* OR p2_'+rule.parameters[0]+':*'+rule.parameters[2]+'*)';
+										query ='-(p1_'+self._solrScape(rule.parameters[0])+':*'+rule.parameters[2]+'* AND p2_'+self._solrScape(rule.parameters[0])+':*'+rule.parameters[2]+'*)';
 										break;
 									case ">":
-										query ='(p1_'+rule.parameters[0]+':['+rule.parameters[2]+' TO *] OR p2_'+rule.parameters[0]+':['+rule.parameters[2]+' TO *])';
+										query ='(p1_'+self._solrScape(rule.parameters[0])+':['+rule.parameters[2]+' TO *] AND p2_'+self._solrScape(rule.parameters[0])+':['+rule.parameters[2]+' TO *])';
 										break;
 									case "<":
-										query ='(p1_'+rule.parameters[0]+':[* TO '+rule.parameters[2]+'] OR p2_'+rule.parameters[0]+':[* TO '+rule.parameters[2]+'])';
+										query ='(p1_'+self._solrScape(rule.parameters[0])+':[* TO '+rule.parameters[2]+'] AND p2_'+self._solrScape(rule.parameters[0])+':[* TO '+rule.parameters[2]+'])';
 										break;
 								}
 							}
@@ -320,7 +340,7 @@
 					var requestedProteins= self.manager.widgets["requester"].requestedProteins;
 					for (var i=0;i<qs.length;i++){
 						var q=qs[i],m=requestedProteins[qs[i]].type;
-						self.manager.widgets["requester"].removeQuery(q,false)();
+						self.manager.widgets["requester"].removeQuery(q);
 						self.manager.widgets["requester"].request(q,m);
 					}
 					break;

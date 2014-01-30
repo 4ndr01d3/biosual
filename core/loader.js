@@ -13,6 +13,9 @@ var Manager;
 			Manager.servlet=servlet;
 			Manager.store.servlet=servlet;
 		}
+//		if ( typeof Manager.widgets["provenance"] != "undefined") {
+//			Manager.widgets["provenance"].addAction("All the widgets have been loaded","loader",json);
+//		}
 		for (var name in params)
 			Manager.store.addByValue(name, params[name]);
 //		if ( typeof URLrequests == "undefined" || !Array.isArray(URLrequests) || URLrequests.length<1) {

@@ -477,7 +477,7 @@
 		{	"widget": "EmbedderWidget",
 			"parameters": {
 				"id": "embedder",
-				"hide":[".main","div.top","#tabs",".center>br","#size","#info","#qunit","footer"],
+				"hide":[".main","div.top","#tabs",".center>br","#size","#info","#qunit","footer","#wrap>.clearBoth","#graph_switch","label[for=\"graph_switch\"]",".provenance"],
 				"cssChanges":[	{	"selectors":["html","body",".center"],
 									"changes":	[{	"attribute":"margin",
 													"value":"0px"},
@@ -495,6 +495,15 @@
 				"uploader_URL":"http://biosual.cbio.uct.ac.za/uploader/",
 				"reinit":["requester","table","text","queryfilter"]
 			}
+		},
+		
+		{	"widget": "ProvenanceWidget",
+			"parameters": {
+				"id": "provenance",
+				"target": "provenance"
+			},
+			"templateTarget":"bottom",
+			"tags":{"title":"Actions executed by the user","id":"provenance"}
 		},
 
 		{	"widget": "EventManagerWidget",
@@ -671,6 +680,13 @@
 				   		},
 				   		{	"source":"graph",
 				   			"object":"graph",
+				   			"event":"transformOverSVG",
+				   			"listener":"graph",
+				   			"method":"transformOverSVG",
+				   			"type":"afterRequest"
+				   		},
+				   		{	"source":"graph",
+				   			"object":"graph",
 				   			"event":"proteinClick",
 				   			"listener":"info",
 				   			"method":"fillDetails",
@@ -716,6 +732,13 @@
 				   			"event":"interactionClick",
 				   			"listener":"graph2",
 				   			"method":"interactionClick",
+				   			"type":"afterRequest"
+				   		},
+				   		{	"source":"graph2",
+				   			"object":"graph",
+				   			"event":"transformOverSVG",
+				   			"listener":"graph2",
+				   			"method":"transformOverSVG",
 				   			"type":"afterRequest"
 				   		},
 				   		{	"source":"graph2",

@@ -80,6 +80,9 @@
 							oTable.fnSetColumnVis( j, bVis ? false : true );
 						}
 					}
+					if ( typeof Manager.widgets["provenance"] != "undefined") {
+						Manager.widgets["provenance"].addAction("Click on "+$(this).text(),self.id,$(this).attr("class"));
+					}
 					if ($(this).text()==self.textMore)
 						$(this).text(self.textLess);
 					else

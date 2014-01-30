@@ -14,6 +14,9 @@
 
 		onFileLoaded: function( objEvent ) {
 			var self=this;
+			if ( typeof Manager.widgets["provenance"] != "undefined") {
+				Manager.widgets["provenance"].addAction("A file with expression data was uploaded",self.id,objEvent);
+			}
 			self.expressions =objEvent.expressions;
 			self.colorData=objEvent.colorData;
 			self.column=objEvent.column;
@@ -23,6 +26,9 @@
 		onFileRemoved: function( objEvent ) {
 			var self=this;
 			self.active=false;
+			if ( typeof Manager.widgets["provenance"] != "undefined") {
+				Manager.widgets["provenance"].addAction("A file with expression data was removed",self.id,objEvent);
+			}
 		},
 		initTest: function(){
 			var self = this;
