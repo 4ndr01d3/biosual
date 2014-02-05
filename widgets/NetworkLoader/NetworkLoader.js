@@ -6,7 +6,8 @@
 		column:-1,
 		active:false,
 		excludeNames:[],
-		
+		textPublic: "The data set will be accessible for everybody and listed in the DATA SETS page.",
+		textPrivate: "A link will be sent to your email and only users who have the link can access the data set",
 		init: function(){
 			var self=this;
 			
@@ -29,6 +30,27 @@
 			};
 			$('#'+self.targetN+ " .textField2Validate").keydown(filter);
 
+			selected =$('#'+self.id+ " input[type='radio']").click(function(){
+				self._refreshPrivacyMessage();
+			});
+
+			var filterEmail= function(x){
+		        if (timeoutReference) clearTimeout(timeoutReference);
+		        timeoutReference = setTimeout(function() { 
+		        	if (self.isEmail($('#'+self.id+ " .email2Validate").val())){
+		        		$('#'+self.id+ " output.emailValidation").html("");
+						$("#"+self.id+" .emailTF .ok").show();
+						$("#"+self.id+" .emailTF .error").hide();
+						self.checkForm();
+		        	}else{
+		        		$('#'+self.id+ " output.emailValidation").html("The email syntax is not valid");
+						$("#"+self.id+" .emailTF .ok").hide();
+						$("#"+self.id+" .emailTF .error").show();
+						self.checkForm();
+		        	}
+		        }, 100);
+			};
+			$('#'+self.id+ " .email2Validate").keydown(filterEmail);
 			
 			
 			self.loaderI = new Biojs.FileLoader({
@@ -129,6 +151,8 @@
 				}
 			}); 
 			self.addInfoTip($('#'+self.targetN+ " .textField2Validate"),'<b>Dataset Name:</b><br/>The name is required to be unique. <br/>Spaces are discouraged. ');
+			self.addInfoTip($('#'+self.id+ " .privacy2"),'<b>Privacy settings:</b><br/>If you choose <b>Public</b> your dataset will be listed in the this website and anyone can use your data.<br/>Choosing <b>Private</b> makes the dataset only available for whom have the link to accessed. You can still view and share your visualizations, but only people with valid links will be able to get to it');
+			self.addInfoTip($('#'+self.id+ " .email2Validate"),'<b>Email:</b><br/>A valid email is required.');
 			self.addInfoTip($("#"+self.targetI+" .fakefile"),'<b>Interactions File:</b><br/>It should be a tab separated file.<br/>The first line correspond to the headers and should start with the character "#", spaces(besides the tabs) are discouraged.<br/>The first two column of the file should have the accession numbers of the interacting proteins. We sugest to use UniProt IDs.<br/>Any following column is expected to be a float number and will represent an evidence score<br/>The final score should be an aggreagete and this one is the only mandatory score. This implies you can use as many partial scores as you wish, as long as all the interactions have the same amount');
 			self.addInfoTip($("#"+self.targetF+" .fakefile"),'<b>Features File:</b><br/>It should be a tab separated file.<br/>The first line correspond to the headers and should start with the character "#", spaces(besides the tabs) are discouraged.<br/>The first column of the file should have the accession number of the protein. <br/>This IDs should correspond to the ones added in the interaction file.<br/>The following column should be the organism of the protein.<br/>Any following column is a protein feature <br/>Categorical features are encourage to exploit the "Color By" functionality<br/>Numeric features can be used to resize nodes.');
 		},
@@ -192,6 +216,20 @@
 		},
 		addInfoTip: function(selector,content){
 			selector.after('<span class="infoLink">i<span class="tooltip">'+content+'</span></span><br /> ');
+		},
+		_refreshPrivacyMessage:function(){
+			var self = this;
+			var selected =$('#'+self.id+ " input[name=type]:checked").val();
+			if (selected=="public")
+				$('#'+self.id+ " .typeMessage").html(self.textPublic);
+			else
+				$('#'+self.id+ " .typeMessage").html(self.textPrivate);
+			
+			$('#'+self.id+ " .privacy .ok").show();
+		},
+		isEmail: function (email) {
+			var regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+			return regex.test(email);
 		}
 	});
 })(jQuery);

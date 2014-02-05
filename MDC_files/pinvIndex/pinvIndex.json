@@ -52,11 +52,11 @@
 				"tabs": [
 				     { "title": "Data Sets",
 				       "target":"listofcores",
-				       "selected":true
+				       "selected":false
 				     },
 				     { "title": "Load Data",
 				       "target":"loader",
-				       "selected":false
+				       "selected":true
 				     },
 				     { "title": "Documentation",
 				       "target":"documentation",
