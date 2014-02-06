@@ -19,6 +19,7 @@
 			var self = this;
 			self.status=json;
 			coreURL=self.status.generalSettings.core;
+			private_key=self.status.generalSettings.key;
 			Manager.solrUrl=server+"/"+coreURL+"/";
 			reloadModel();
 			if (typeof self.reinit != "undefined")
@@ -98,6 +99,8 @@
 				}
 			}
 			self.status={"generalSettings":{"core":coreURL},"widgets":widgetsStatus};
+			if ( typeof private_key != "undefined" && private_key != null && private_key != "null")
+				self.status.generalSettings["key"]=private_key;
 			return JSON.stringify(self.status);
 		},
 		status2JSON:function(){

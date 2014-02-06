@@ -142,6 +142,8 @@
 		prequery:function(query,callback){
 			var self = this;
 			var suffix="&rows=0&facet=false&facet.limit=0&json.nl=map&wt=json&json.wrf=?";
+			if ( typeof private_key != "undefined" && private_key != null && private_key != "null")
+				suffix += "&key="+private_key;
 			jQuery.getJSON(this.manager.solrUrl + 'select?q=' +query + suffix, {}, callback);
 		},
 		queried:{},

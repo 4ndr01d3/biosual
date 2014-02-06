@@ -26,7 +26,7 @@
 		},
 		updateProgressBarValue: function(idOri,progress,total){
 			var id=idOri.replace(/[!"#$%&'()*+,.\/:;<=>?@\[\\\]^`{|}~]/g, '\\$&');
-			var per =100.0*progress/total;
+			var per =(total==0)?0:100.0*progress/total;
 			$("#pgb_"+id+" progress").attr("value",per);
 			$("#pgb_"+id+" progress .progress-bar span").css("width",per+"%");
 			$("#pgb_"+id+" progress .progress-bar span").html("Progress: "+per+"%");

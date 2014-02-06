@@ -96,6 +96,9 @@
 				self.fields = params['facet.field'];
 			for (var i = 0; i < self.fields.length; i++) 
 				paramsL.push('facet.field=' + self.fields[i]);
+			if ( typeof private_key != "undefined" && private_key != null && private_key != "null")
+				paramsL.push("key="+private_key);
+			
 			paramsL.push('q=' + this.manager.store.get('q').val());
 			jQuery.getJSON(this.manager.solrUrl + 'select?' + paramsL.join('&') + '&wt=json&json.wrf=?', {}, gotOptions);
 		},

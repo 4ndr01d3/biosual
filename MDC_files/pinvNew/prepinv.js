@@ -16,6 +16,7 @@ includeProteinsFromURLParameter(URLrequests,"prtExt","recursive");
 var coreURL=getURLParameter("core");
 if (coreURL==null || coreURL=="null" || jQuery.trim(coreURL)=="")
 	coreURL="";
+var private_key=getURLParameter("key");
 
 var model=[],
 	mainfields=["p1","p1_organism","p2","p2_organism","score"],
@@ -49,7 +50,10 @@ var callback = function (response) {
 };
 var modelrequester=null;
 var uploadModel =function(){
-	modelrequester=jQuery.getJSON(server+coreURL+'/admin/luke?wt=json&numTerms=0&Explicit=True&json.wrf=?');
+	var url_parameters='/admin/luke?wt=json&numTerms=0&Explicit=True&json.wrf=?';
+	if ( typeof private_key != "undefined" && private_key != null && private_key != "null")
+		url_parameters += "&key="+private_key;
+	modelrequester=jQuery.getJSON(server+coreURL+url_parameters);
 	modelrequester.done(callback);
 };
 var reloadModel =function(){
