@@ -499,11 +499,11 @@ Biojs.InteractionsD3 = Biojs.extend (
 			if (n!=-1)
 				return n;
 			if (typeof self.fixedProteins[protein.id]=="undefined"){
-				protein.x=Math.floor((Math.random()*self.opt.width));
-				protein.y=Math.floor((Math.random()*self.opt.width));
+				protein.px=Math.floor((Math.random()*self.opt.width));
+				protein.py=Math.floor((Math.random()*self.opt.width));
 			}else{
-				protein.x=self.fixedProteins[protein.id][0];
-				protein.y=self.fixedProteins[protein.id][1];
+				protein.px=self.fixedProteins[protein.id][0];
+				protein.py=self.fixedProteins[protein.id][1];
 				protein.fixed=true;
 				delete self.fixedProteins[protein.id];
 			}

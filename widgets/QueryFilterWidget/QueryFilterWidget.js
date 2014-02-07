@@ -285,6 +285,46 @@
 						case model.target[1].conditions[1].name: // type of evidence
 							query =rule.parameters[0]+':[0.01 TO *]';
 							break;
+						case model.target[1].conditions[2].name: //  one of its proteins
+							if (rule.parameters[0]=="id"){
+								switch (rule.parameters[1]){
+									case "equals":
+										query ='(p1:'+rule.parameters[2]+' OR p2:'+rule.parameters[2]+')';
+										break;
+									case "contains":
+										query ='(p1:*'+rule.parameters[2]+'* OR p2:*'+rule.parameters[2]+'*)';
+										break;
+									case "different":
+										query ='-(p1:'+rule.parameters[2]+' OR p2:'+rule.parameters[2]+')';
+										break;
+									case "not contains":
+										query ='-(p1:*'+rule.parameters[2]+'* OR p2:*'+rule.parameters[2]+'*)';
+										break;
+								}
+								
+							}else{
+								switch (rule.parameters[1]){
+									case "equals":
+										query ='(p1_'+self._solrScape(rule.parameters[0])+':'+rule.parameters[2]+' OR p2_'+self._solrScape(rule.parameters[0])+':'+rule.parameters[2]+')';
+										break;
+									case "contains":
+										query ='(p1_'+self._solrScape(rule.parameters[0])+':*'+rule.parameters[2]+'* OR p2_'+self._solrScape(rule.parameters[0])+':*'+rule.parameters[2]+'*)';
+										break;
+									case "different":
+										query ='-(p1_'+self._solrScape(rule.parameters[0])+':'+rule.parameters[2]+' OR p2_'+self._solrScape(rule.parameters[0])+':'+rule.parameters[2]+')';
+										break;
+									case "not contains":
+										query ='-(p1_'+self._solrScape(rule.parameters[0])+':*'+rule.parameters[2]+'* OR p2_'+self._solrScape(rule.parameters[0])+':*'+rule.parameters[2]+'*)';
+										break;
+									case ">":
+										query ='(p1_'+self._solrScape(rule.parameters[0])+':['+rule.parameters[2]+' TO *] OR p2_'+self._solrScape(rule.parameters[0])+':['+rule.parameters[2]+' TO *])';
+										break;
+									case "<":
+										query ='(p1_'+self._solrScape(rule.parameters[0])+':[* TO '+rule.parameters[2]+'] OR p2_'+self._solrScape(rule.parameters[0])+':[* TO '+rule.parameters[2]+'])';
+										break;
+								}
+							}
+
 					}
 				}				
 				if (typeof self.queried[query] == "undefined") {

@@ -219,6 +219,11 @@
 						"condition":1,
 						"widget":"requester",
 						"parameter":"scores"
+					},
+					{	"target": 1,
+						"condition":2,
+						"widget":"requester",
+						"parameter":"features"
 					}
 				],
 
@@ -250,7 +255,12 @@
 									"type": "selects",
 									"amount": 1,
 									"values": [ ]
+								},								
+								{	"name": "one of its proteins",
+									"type": "feature_comparison",
+									"values": []
 								} 
+
 
                              ]
                          }

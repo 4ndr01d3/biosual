@@ -79,7 +79,7 @@
 				var fq=(typeof json.responseHeader.params.fq=="undefined")?"":json.responseHeader.params.fq;
 				var prevF=self.currentFilter;
 				self.setFilter(fq);
-				self.requestPaging(self.manager.store.get('q').val(),1+ json.response.start+json.response.docs.length,json.response.numFound*1);
+				self.requestPaging(json.responseHeader.params.q,1+ json.response.start+json.response.docs.length,json.response.numFound*1);
 				self.setFilter(prevF);
 			} else{
 				if (typeof self._mapPagingIds[self.manager.store.get('q').val()] !="undefined" ){
