@@ -6,7 +6,8 @@
 			$("#"+self.id).remove();
 			var html ='<div id="'+self.id+'" class="svgexporter">';
 			if (getURLParameter("embedded")=="true"){
-				html += '<a  target="_parent" href ="'+Manager.widgets["requester"].getURL()+'" class="logo"><img src="biosual/widgets/SvgExporter/images/PINV_50.png" /></a>';
+				//TODO: Links to the status page... take the current URL and remove the embedded parameter
+				html += '<a  target="_parent" href ="'+location.href.replace("embedded=true","embedded=false")+'" class="logo"><img src="biosual/widgets/SvgExporter/images/PINV_50.png" /></a>';
 			}else
 
 				for (var i=0;i<self.formats.length;i++){

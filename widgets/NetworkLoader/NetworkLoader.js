@@ -51,6 +51,7 @@
 		        }, 100);
 			};
 			$('#'+self.id+ " .email2Validate").keydown(filterEmail);
+			$('#'+self.id+ " .email2Validate").bind("input",filterEmail);
 			
 			
 			self.loaderI = new Biojs.FileLoader({
@@ -118,7 +119,7 @@
 			        percent.html(percentVal);
 					//console.log(percentVal, position, total);
 			        if (percentComplete==100){
-						status.html("<p>File Loaded to our servers. Now the content is being proccessed.</p>");
+						status.html("<p>File Loaded to our servers. Now the content is being proccessed. Please don't close this window.</p>");
 				        bar.width("0%");
 				        percent.html("0% (0/"+self.loaderI.numberOfLines+")");
 				        self.checkInteractionsLoaded();
@@ -144,14 +145,18 @@
 						}
 					}else{
 						status.html("<p>Your Files have been updated to our servers.</p>");
-						status.append('<p>You can see your data set on PINV by clicking <a href="'+self.url+'?core='+$('#'+self.targetN+ " .textField2Validate").val()+'">HERE</a>.</p>');
+						var selected =$('#'+self.id+ " input[name=type]:checked").val();
+						if (selected=="public")
+							status.append('<p>You can see your data set on PINV by clicking <a href="'+self.url+'?core='+$('#'+self.targetN+ " .textField2Validate").val()+'">HERE</a>.</p><p>An email has been sent to <i>'+$('#'+self.id+ " .email2Validate").val()+'</i> with a link in case you decide to remove this data set.</p>');
+						else
+							status.append("<p>Your data set has been successfuly updated to our servers, you will recive an email in <i>"+$('#'+self.id+ " .email2Validate").val()+"</i> with the private link to access your data</p><p>The email also contains a link to remove this data set</p>");
 //						status.append('<p><b>WARNING:</b> Although we receive your files, we are busy processing them, therefore the link above might not containt all the information yet.</p>');
 						//TODO: Check the response to report about skipped interactions. 
 					}
 				}
 			}); 
 			self.addInfoTip($('#'+self.targetN+ " .textField2Validate"),'<b>Dataset Name:</b><br/>The name is required to be unique. <br/>Spaces are discouraged. ');
-			self.addInfoTip($('#'+self.id+ " .privacy2"),'<b>Privacy settings:</b><br/>If you choose <b>Public</b> your dataset will be listed in the this website and anyone can use your data.<br/>Choosing <b>Private</b> makes the dataset only available for whom have the link to accessed. You can still view and share your visualizations, but only people with valid links will be able to get to it');
+			self.addInfoTip($('#'+self.id+ " .privacy2"),'<b>Privacy settings:</b><br/>If you choose <b>Public</b> your dataset will be listed in the this website and anyone can use your data.<br/>Choosing <b>Protected</b> makes the dataset only available for whom have the link to accessed. You can still view and share your visualizations, but only people with valid links will be able to get to it');
 			self.addInfoTip($('#'+self.id+ " .email2Validate"),'<b>Email:</b><br/>A valid email is required.');
 			self.addInfoTip($("#"+self.targetI+" .fakefile"),'<b>Interactions File:</b><br/>It should be a tab separated file.<br/>The first line correspond to the headers and should start with the character "#", spaces(besides the tabs) are discouraged.<br/>The first two column of the file should have the accession numbers of the interacting proteins. We sugest to use UniProt IDs.<br/>Any following column is expected to be a float number and will represent an evidence score<br/>The final score should be an aggreagete and this one is the only mandatory score. This implies you can use as many partial scores as you wish, as long as all the interactions have the same amount');
 			self.addInfoTip($("#"+self.targetF+" .fakefile"),'<b>Features File:</b><br/>It should be a tab separated file.<br/>The first line correspond to the headers and should start with the character "#", spaces(besides the tabs) are discouraged.<br/>The first column of the file should have the accession number of the protein. <br/>This IDs should correspond to the ones added in the interaction file.<br/>The following column should be the organism of the protein.<br/>Any following column is a protein feature <br/>Categorical features are encourage to exploit the "Color By" functionality<br/>Numeric features can be used to resize nodes.');

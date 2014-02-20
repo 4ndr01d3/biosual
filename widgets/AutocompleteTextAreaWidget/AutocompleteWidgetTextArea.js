@@ -63,6 +63,8 @@
 						}
 					}
 				}
+				//TODO: Change because this widget should be agnostic of other widgets (i.e. queryfilter)
+				self.manager.widgets["queryfilter"].setTotalProteins(list.length);
 
 				self.requestSent = false;
 				$("#"+self.target).find('textarea').unautocomplete().autocomplete(list, {
@@ -101,6 +103,7 @@
 			
 			paramsL.push('q=' + this.manager.store.get('q').val());
 			jQuery.getJSON(this.manager.solrUrl + 'select?' + paramsL.join('&') + '&wt=json&json.wrf=?', {}, gotOptions);
+			
 		},
 		initTest: function(){
 			var self = this;

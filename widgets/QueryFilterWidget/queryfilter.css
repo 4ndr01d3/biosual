@@ -102,3 +102,45 @@ display: inline;
 	background-color: #EEE;
 	color: #D10000;
 }
+
+.explain_close {
+	position: absolute;
+	left: 73%;
+	background: #1fb477;
+	box-shadow: 0 0 2px 1px rgba(0, 0, 0, .8);
+	width: 25%;
+	padding: 4px;
+	margin: 10px 1px;
+	font: normal 13px/16px Arial, Sans-serif;
+	color: #fff;
+    
+	 
+	-moz-transition: opacity 200ms 50ms linear;
+	-webkit-transition: opacity 200ms 50ms linear;
+	-ms-transition: opacity 200ms 50ms linear;
+	-o-transition: opacity 200ms 50ms linear;
+	transition: opacity 200ms 50ms linear;
+}
+
+.explain_close::before
+{
+	position: absolute;
+	left: 95%;
+	background: #1fb477;
+	content: "";
+	width: 8px;
+	height: 8px;
+	margin: -9px 0 0 0px;
+        
+    -moz-transition: opacity 200ms 50ms linear;
+    -webkit-transition: opacity 200ms 50ms linear;
+    -ms-transition: opacity 200ms 50ms linear;
+    -o-transition: opacity 200ms 50ms linear;
+    transition: opacity 200ms 50ms linear;
+     
+    -moz-transform: rotate(45deg);
+    -webkit-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    -o-transform: rotate(45deg);
+    transform: rotate(45deg);
+}

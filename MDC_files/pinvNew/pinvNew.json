@@ -487,7 +487,7 @@
 		{	"widget": "EmbedderWidget",
 			"parameters": {
 				"id": "embedder",
-				"hide":[".main","div.top","#tabs",".center>br","#size","#info","#qunit","footer","#wrap>.clearBoth","#graph_switch","label[for=\"graph_switch\"]",".provenance"],
+				"hide":[".main","div.top","#tabs",".center>br","#size","#info","#qunit","footer","#wrap>.clearBoth","#graph_switch","label[for=\"graph_switch\"]","#provenance"],
 				"cssChanges":[	{	"selectors":["html","body",".center"],
 									"changes":	[{	"attribute":"margin",
 													"value":"0px"},

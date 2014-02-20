@@ -26,6 +26,7 @@
 					}
 				});
 				$("#filter_close").click(function(){
+					$('.explain_close').hide(); 
 					$('#filter_mask').hide(); 
 					$('#filter_container').hide();
 					if ( typeof Manager.widgets["provenance"] != "undefined") {
@@ -38,6 +39,7 @@
 					rules: self.rules
 				});
 				self.ruler.onRuleCreated(function(obj){
+					$('.explain_close').hide(); 
 					self.refreshGraphicFromCurrentFilters(self);
 					if ( typeof Manager.widgets["provenance"] != "undefined") {
 						Manager.widgets["provenance"].addAction("Prefilter rule created",self.id,obj);
@@ -80,6 +82,7 @@
 
 
 			$(".filter_button button").click(function(){
+				$('.explain_close').hide(); 
 				self.executeClick(self);
 				if ( typeof Manager.widgets["provenance"] != "undefined") {
 					Manager.widgets["provenance"].addAction("Prefilters executed",self.id);
@@ -90,6 +93,10 @@
 				self._fillDynamicFields();
 			});
 
+		},
+		setTotalProteins:function(total){
+			var self = this;
+			$("#"+self.id+" .filter_total_proteins").html(" "+total);
 		},
 		restart: function(){
 			var self = this;

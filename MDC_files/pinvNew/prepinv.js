@@ -23,6 +23,7 @@ var model=[],
 	prefix=["p1_",false,"p2_",false,"score_"];
 
 var callback = function (response) {
+	console.debug("callback from luke!!!");
 	for (var i=0;i<mainfields.length;i++) {
 		var subfields=[];
 		if (prefix[i]==="")
@@ -53,8 +54,37 @@ var uploadModel =function(){
 	var url_parameters='/admin/luke?wt=json&numTerms=0&Explicit=True&json.wrf=?';
 	if ( typeof private_key != "undefined" && private_key != null && private_key != "null")
 		url_parameters += "&key="+private_key;
-	modelrequester=jQuery.getJSON(server+coreURL+url_parameters);
+
+	modelrequester=$.ajax({
+		  error:  function() {
+			    	console.debug('a 403 was received');
+			     
+			    },
+		  dataType: "json",
+		  url: server+coreURL+url_parameters
+		});
+
+//	modelrequester=jQuery.getJSON(server+coreURL+url_parameters);
 	modelrequester.done(callback);
+	modelrequester.fail( function(jqXHR, exception) {
+        if (jqXHR.status === 0) {
+            alert('Not connect.\n Verify Network.');
+        } else if (jqXHR.status == 404) {
+            alert('Requested page not found. [404]');
+        } else if (jqXHR.status == 403) {
+            alert('ERROR: The requested core is protected or doesn\'t exists.');
+        } else if (jqXHR.status == 500) {
+            alert('Internal Server Error [500].');
+        } else if (exception === 'parsererror') {
+            alert('Requested JSON parse failed.');
+        } else if (exception === 'timeout') {
+            alert('Time out error.');
+        } else if (exception === 'abort') {
+            alert('Ajax request aborted.');
+        } else {
+            alert('Uncaught Error.\n' + jqXHR.responseText);
+        }
+    });
 };
 var reloadModel =function(){
 	model=[],
