@@ -1,0 +1,8 @@
+{
+    "name": "Interaction network through heatmaps",
+    "description": "A network using heatmaps viaD3",
+    "dependencies":["d3.v2.min.js","Biojs.InteractionsHeatmapD3.js"],
+    "js": "HeatmapWidget.js",
+    "html": "HeatmapWidget.html",
+    "css": "biojs.InteractionsheatmapD3.css"
+}

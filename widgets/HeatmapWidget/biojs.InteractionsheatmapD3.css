@@ -1,0 +1,40 @@
+.heatmap_network .background {
+  fill: #eee;
+}
+svg.heatmap_network  {
+	border: solid 1px #ddd;
+}
+.heatmap_network line {
+  stroke: #fff;
+  pointer-events: none;
+}
+
+.heatmap_network text.active {
+	fill: #3a3aad !important;
+	display:block;
+}
+.heatmap_network line.active {
+	stroke: #3a3aad;
+}
+.heatmap_network text.legend {
+	fill: rgba(50,50,200,0.1);
+}
+.heatmap_network text.legend:hover {
+	fill: rgba(50,50,200,1);
+}
+
+.heatmap_network line.transversal {
+}
+
+.heatmap_network text.info_title {
+	font-size:1.3em;
+	fill: #3A3A3A;
+}
+.heatmap_network rect.cell {
+	fill: #89B ;
+	stroke: #89B ;
+}
+.heatmap_network rect.highlight, .heatmap_network text.highlight{
+	fill: rgb(0, 255, 0) !important;
+	stroke: rgb(0, 255, 0) !important;
+}
