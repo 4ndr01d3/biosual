@@ -23,7 +23,7 @@ var model=[],
 	prefix=["p1_",false,"p2_",false,"score_"];
 
 var callback = function (response) {
-	console.debug("callback from luke!!!");
+//	console.debug("callback from luke!!!");
 	for (var i=0;i<mainfields.length;i++) {
 		var subfields=[];
 		if (prefix[i]==="")

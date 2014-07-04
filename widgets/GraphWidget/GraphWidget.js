@@ -237,24 +237,40 @@
 			self.graph.resetGraphic();
 			self.graph.restart();
 		},
-		resizeByFeature: function(self,feature,selector){
-			selector = (typeof selector=="undefined")?".figure":selector;
-			var from = 0.3, to =5.0;
-			
-			
-			//get max and min
-			var max=-99999999,min=999999999;
-			for (var i=0;i<self.graph.proteins.length;i++){
-				var c=(feature!="organism")?self.graph.proteins[i].features[feature]:self.graph.proteins[i].organism;
-				if (c=="Unknown" || c=="") break;
-				
-				if (typeof c=="undefined" || !isNumber(c))
-					throw "not a number"; 
-				if (c>max) max = c*1;
-				if (c<min) min = c*1;
-			}
+		getLineComponents: function(feature,from,to,isForProteins){
+			var self=this;
+			var max=Number.NEGATIVE_INFINITY,min=Number.POSITIVE_INFINITY;
+			var c="";
+			if (isForProteins)
+				for (var i=0;i<self.graph.proteins.length;i++){
+					c= (feature!="organism")?self.graph.proteins[i].features[feature]:self.graph.proteins[i].organism;
+					if (c=="Unknown" || c=="") break;
+					
+					if (typeof c=="undefined" || !isNumber(c))
+						throw "not a number"; 
+					if (c>max) max = c*1;
+					if (c<min) min = c*1;
+				}
+			else
+				for (var i=0;i<self.graph.interactions.length;i++){
+					c=(feature!="score")?self.graph.interactions[i].doc[feature]:self.graph.interactions[i].score;
+					if (c=="Unknown" || c=="") break;
+					
+					if (typeof c=="undefined" || !isNumber(c))
+						throw "not a number"; 
+					if (c>max) max = c*1;
+					if (c<min) min = c*1;
+				}
 			var m=(from-to)/(min-max);
 			var b=to-m*max;
+			return {m:m,b:b};
+		},
+		resizeByFeature: function(self,feature,selector){
+			selector = (typeof selector=="undefined")?".figure":selector;
+			
+			line =self.getLineComponents(feature,0.3,5.0,true);
+			var m=line.m, b=line.b;
+
 			
 			for (var i=0;i<self.graph.proteins.length;i++){
 				var c=(feature!="organism")?self.graph.proteins[i].features[feature]:self.graph.proteins[i].organism;
@@ -266,6 +282,31 @@
 			self.graph.refreshSizeScale(selector);
 			self.graph.addLegends([feature,(1-b)/m,1],"Resize By");
 			self.graph.addLegends([feature,max,to],"Resize By");
+		},
+		opacityByFeature: function(self,feature,selector,isForProteins){
+			selector = (typeof selector=="undefined")?".figure":selector;
+			
+			line =self.getLineComponents(feature,0.0,1.0,isForProteins);
+			var c="";
+			if (isForProteins){
+				for (var i=0;i<self.graph.proteins.length;i++){
+					c= (feature!="organism")?self.graph.proteins[i].features[feature]:self.graph.proteins[i].organism;
+						
+					if (c=="Unknown" || c=="") 
+						self.graph.proteins[i].alpha= line.m*(min-5)+line.b;
+					else
+						self.graph.proteins[i].alpha= line.m*c+line.b;
+				}
+			}else{
+				for (var i=0;i<self.graph.interactions.length;i++){
+					c=(feature!="score")?self.graph.interactions[i].doc[feature]:self.graph.interactions[i].score;
+					if (c=="Unknown" || c=="") 
+						self.graph.interactions[i].alpha= line.m*(min-5)+line.b;
+					else
+						self.graph.interactions[i].alpha= line.m*c+line.b;
+				}
+			}
+			self.graph.refreshOpacity(selector,isForProteins);
 		},
 		colorByFeature: function(self,feature,selector,type){
 			selector = (typeof selector=="undefined")?".figure":selector;
@@ -341,6 +382,9 @@
 			self.graph.vis.selectAll(".node").attr("visibility", 'visible').style("stroke","#fff");
 			self.graph.vis.selectAll("line").attr("visibility", 'visible').style("stroke","#999");
 			self.graph.vis.selectAll(".legend").attr("visibility",function(d) { return (d.showLegend)?"visible":"hidden";});
+			self.graph.vis.selectAll(".legend").style("font-size", "10px");
+			self.graph.setOpacity(".node",null);
+			self.graph.setOpacity(".link",null);
 			for (var i in self.stylers){
 //				console.debug("styler:"+i);
 				self.stylers[i]();

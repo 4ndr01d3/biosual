@@ -961,6 +961,10 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 					return d.features[d.typeLegend];
 				});
 		}, 
+		setLabelFontSize: function(selector,fontSize){
+			var self=this;
+			self.vis.selectAll(selector).selectAll(".legend").style("font-size", fontSize+"px");
+		}, 
 		
 		/**
 		 * Scales the area of a protein
@@ -981,6 +985,20 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 			});
 		}, 
 		/**
+		 * Set the opacity of the elements on the graphic that match the selector. 
+		 * Check the <a href="http://www.w3.org/TR/css3-selectors/">CSS3 selectors documentation</a> to build a selector string 
+		 * 
+		 * @param {string} selector a string to represent a set of elements. Check the <a href="http://www.w3.org/TR/css3-selectors/">CSS3 selectors documentation</a> to build a selector string
+		 * @param {string} value a value between 0(transparent) and 1(opaque)
+		 *  
+		 * @example 
+		 * instance.setOpacity(".figure",0.5);
+		 */
+		setOpacity: function(selector,value){
+			var self=this;
+			self.vis.selectAll(selector).style("opacity", value);
+		},
+		/**
 		 * Scales the size of the proteins which value has been modify by other means
 		 * 
 		 * @param {string} selector a CSS3 selector to choose the nodes to resize
@@ -997,7 +1015,20 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 				return self.opt.radius*Math.sqrt(d.size); 
 			});
 		}, 
-
+		/**
+		 * @param {string} selector a CSS3 selector to choose the nodes to resize
+		 *  
+		 * @example 
+		 * for (var i=0;i<instance.proteins.length;i++)
+		 * 	instance.proteins[i].size=i*0.1;
+		 * instance.refreshOpacity(".figure");
+		 */
+		refreshOpacity: function(selector){
+			var self=this;
+			self.vis.selectAll(selector).style("opacity", function(d) {
+				return d.alpha;
+			});
+		}, 
 		/**
 		 * Is the legend of the protein visible
 		 * 

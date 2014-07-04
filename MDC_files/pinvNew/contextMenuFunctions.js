@@ -5,45 +5,48 @@
 		 */
 		$.fn.context ={};
 		$.fn.context.interactions = function(t){
-			var protein= t.id.substr(5);
+			var protein= (t.id.indexOf("label")==0)?t.id.substring(t.id.lastIndexOf("_")+1):t.id.substr(5);
 			Manager.widgets["requester"].request([ protein ],Manager.widgets["requester"].basic);
 		};
 		$.fn.context.hideProtein = function(t){
-			var protein= t.id.substr(5);
+			var protein= (t.id.indexOf("label")==0)?t.id.substring(t.id.lastIndexOf("_")+1):t.id.substr(5);
 			var rule= {location:"",action:{name:"Hide",type:"single"},target:"Proteins",condition:"accession number",parameters:["equals",protein]};
 			Manager.widgets["ruler"].ruler.addActiveRule(rule);
 		};
 		$.fn.context.hideInteractions = function(t){
-			var protein= t.id.substr(5);
+			var protein= (t.id.indexOf("label")==0)?t.id.substring(t.id.lastIndexOf("_")+1):t.id.substr(5);
 			var rule= {location:"",action:{name:"Hide",type:"single"},target:"Interactions",condition:"protein",parameters:[protein]};
 			Manager.widgets["ruler"].ruler.addActiveRule(rule);
 		};
 		$.fn.context.hideBoth = function(t){
-			var protein= t.id.substr(5);
+			var protein= (t.id.indexOf("label")==0)?t.id.substring(t.id.lastIndexOf("_")+1):t.id.substr(5);
 			var rule= {location:"",action:{name:"Hide",type:"single"},target:"Interactions",condition:"protein",parameters:[protein]};
 			Manager.widgets["ruler"].ruler.addActiveRule(rule);
 			var rule= {location:"",action:{name:"Hide",type:"single"},target:"Proteins",condition:"accession number",parameters:["equals",protein]};
 			Manager.widgets["ruler"].ruler.addActiveRule(rule);
 		};
 		$.fn.context.label = function(t){
+			var protein= (t.id.indexOf("label")==0)?t.id.substring(t.id.lastIndexOf("_")+1):t.id.substr(5);
 			Manager.widgets["graph"].graph.swapShowLegend("#"+t.id);
+			Manager.widgets["graph2"].graph.swapShowLegend("#"+t.id);
+			Manager.widgets["graph3"].graph.swapShowLegend("#label_right_"+protein+",#label_left_"+protein);
 		};
 		$.fn.context.lock = function(t){
-			var protein= t.id.substr(5);
+			var protein= (t.id.indexOf("label")==0)?t.id.substring(t.id.lastIndexOf("_")+1):t.id.substr(5);
 			Manager.widgets["graph"].graph.swapFixed(protein);
 		};
 		$.fn.context.highlight = function(t){
-			var protein= t.id.substr(5);
+			var protein= (t.id.indexOf("label")==0)?t.id.substring(t.id.lastIndexOf("_")+1):t.id.substr(5);
 			var rule= {location:"Current Graphic",action:{name:"Highlight",type:"single"},target:"Proteins",condition:"accession number",parameters:["equals",protein]};
 			Manager.widgets["ruler"].ruler.addActiveRule(rule);
 		};
 		$.fn.context.highlight_p = function(t){
-			var protein= t.id.substr(5);
+			var protein= (t.id.indexOf("label")==0)?t.id.substring(t.id.lastIndexOf("_")+1):t.id.substr(5);
 			var rule= {location:"Current Graphic",action:{name:"Highlight",type:"single"},target:"Proteins",condition:"interactions with",parameters:[protein]};
 			Manager.widgets["ruler"].ruler.addActiveRule(rule);
 		};
 		$.fn.context.highlight_i = function(t){
-			var protein= t.id.substr(5);
+			var protein= (t.id.indexOf("label")==0)?t.id.substring(t.id.lastIndexOf("_")+1):t.id.substr(5);
 			var rule= {location:"Current Graphic",action:{name:"Highlight",type:"single"},target:"Interactions",condition:"protein",parameters:[protein]};
 			Manager.widgets["ruler"].ruler.addActiveRule(rule);
 		};

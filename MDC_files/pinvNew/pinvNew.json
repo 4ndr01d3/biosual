@@ -55,23 +55,24 @@
 				"target": "tabs",
 				"tabs": [
 				     { "title": "Network",
-				       "target":"graph",
-				       "selected":true
+				       "target":"graph"
 				     },
 				     { "title": "Circle",
-				       "target":"graph2",
-				       "selected":false
+				       "target":"graph2"
 				     },
+				     { "title": "Heatmap",
+					       "target":"graph3",
+					       "selected":true
+					 },
 				     { "title": "Table",
 				       "target":"table",
-				       "selected":false,
 				       "on_show":{"widget":"table","method":"refreshButtons"}
 				     }
 				],
 				"on_show":{"widget":"ruler","method":"triggerExecuters"},
 				"sideEffects":[
 				     { "target":"size",
-				       "visibleWith":["Network","Circle"] 
+				       "visibleWith":["Network","Circle","Heatmap"] 
 				     },
 				     { "target":"info",
 					       "visibleWith":["Network","Circle"] 
@@ -136,6 +137,32 @@
 				"css": "path.arc {  fill: #fff;}  .node {  font-size: 10px;}  .node:hover {  fill: #1f77b4;}  .link {  fill: none;  stroke: #1f77b4;  stroke-opacity: .4;  pointer-events: none;}  .link.source,   .link.target {  stroke-opacity: 1;  stroke-width: 2px;}  .node.target {  fill: #d62728 !important;}  .link.source {  stroke: #d62728;}  .node.source {  fill: #2ca02c;}  .link.target {  stroke: #2ca02c;}  .figure { fill: #46D;}  .legend {  stroke: transparent;  pointer-events: none;}"
 			}
 		},
+		{	"widget": "HeatmapWidget",
+			"parameters": {
+				"id": "graph3",
+				"target": "graph3",
+				"width":1400,
+				"height":600,
+				"predefined_stylers":[	{
+					"id":"ruler",
+					"method":"applyRulesHeatmap"
+				}, {
+					"id":"expression",
+					"method":"paintHeatmapProteins"
+				}
+			]
+			},
+			"templateTarget":"center",
+			"tags":{"id":"graph3"}
+		},
+		{	"widget": "SvgExporter",
+			"parameters": {
+				"id": "svggraph3",
+				"target": "#graph3",
+				"formats":["PNG","SVG","Share"],
+				"css": "svg{background-color: #FFF;} .background {fill: #eee;} svg.heatmap_network{ border: solid 1px #ddd;} line{ stroke: #fff; pointer-events: none;}text.active {fill: #3a3aad !important;display:block;} line.active {stroke: #3a3aad;} text.legend{ fill: rgba(50,50,200,0.1);} text.legend:hover {fill: rgba(50,50,200,1);} text.info_title { font-size:1.3em; fill: #3A3A3A;} rect.cell { fill: #89B; stroke: #89B;} rect.highlight, text.highlight{ fill: rgb(0, 255, 0) !important; stroke: rgb(0, 255, 0) !important;}"
+			}
+		},
 		{	"widget": "FewOptionsWidget",
 			"parameters": {
 			"id": "size",
@@ -155,6 +182,7 @@
 				"trigger":[
 				    { "widget":"graph",  "method":"setSize" },
 					{ "widget":"graph2", "method":"setSize" },
+					{ "widget":"graph3", "method":"setSize" },
 					{ "widget":"status", "method":"setSize" }
 				]
 			},
@@ -321,6 +349,18 @@
 						"parameter":"features",
 						"otherValues":["Protein Queried","organism"]
 					},
+					{	"target": 1,
+						"action":4,
+						"widget":"requester",
+						"parameter":"scores",
+						"otherValues":["score"]
+					},
+					{	"target": 1,
+						"action":6,
+						"widget":"requester",
+						"parameter":"scores",
+						"otherValues":["score"]
+					},
 					{	"target": 0,
 						"action":6,
 						"widget":"requester",
@@ -341,7 +381,14 @@
 						"action":10,
 						"widget":"requester",
 						"parameter":"features"
+					},
+					{	"target": 0,
+						"action":13,
+						"widget":"requester",
+						"parameter":"features",
+						"otherValues":[]
 					}
+
 				],
 				"rules": {
 					"location": [ ],
@@ -358,7 +405,10 @@
 									 {"name":"Show Label","type":"select","options":["ID","Functional Class","Organism","Gene Name"]},
 									 {"name":"Hide Label","type":"single"},
 									 {"name":"Resize","type":"scale","options":[0,3.1,0.1]},
-									 {"name":"Resize By","type":"select","options":[]}
+									 {"name":"Resize By","type":"select","options":[]},
+									 {"name":"Font Size","type":"scale","options":[10,30,2]},
+									 {"name":"Opacity","type":"scale","options":[0,1,0.1]},
+									 {"name":"Opacity By","type":"select","options":[]}
 							],
 							"conditions": [ 
 								{	"name": "no filters",
@@ -386,6 +436,10 @@
 									 {"name":"Highlight","type":"single"},
 									 {"name":"Show","type":"single"},
 									 {"name":"Hide","type":"single"},
+									 {"name":"Color","type":"color"},
+									 {"name":"Color By","type":"select","options":["Protein Queried","Functional Class","Organism","Gene Name"]},
+									 {"name":"Opacity","type":"scale","options":[0,1,0.1]},
+									 {"name":"Opacity By","type":"select","options":["Protein Queried","Functional Class","Organism","Gene Name"]},
 									 {"name":"Border","type":"color"}
 							],
 							"conditions": [ 
@@ -423,7 +477,7 @@
 			"parameters": {
 				"id": "context",
 				"target": "here",
-				"triggerer":".graphNetwork .node",
+				"triggerer":".graphNetwork .node,.graphCircle .node, .heatmap_network .legend",
 				"menuStyle": 		{"width" :		"150px"},
 				"itemStyle": 		{"font-size" :	"0.7em"},
 				"itemHoverStyle" : 	{"font-size":	"0.8em"},
@@ -440,26 +494,7 @@
 				}
 			}
 		},
-		{	"widget": "ContextMenuWidget",
-			"parameters": {
-				"id": "context2",
-				"target": "here",
-				"triggerer":".graphCircle .node",
-				"menuStyle":		{"width": "150px"},
-				"itemStyle":		{"font-size": "0.7em"},
-				"itemHoverStyle":	{"font-size": "0.8em"},
-				"menu": {
-					"interactions":		{"label":	"Get Interactions"},
-					"hideProtein" :		{ "label":	"Hide Protein"},
-					"hideInteractions":	{ "label":	"Hide Interactions"},
-					"hideBoth" :		{ "label":	"Hide Protein+Interactions"},
-					"label":			{"label":	"Show/Hide Label"},
-					"highlight":		{"label":	"Highlight"},
-					"highlight_p":		{"label":	"Highlight Interactors"},
-					"highlight_i":		{"label":	"Highlight Interactions"}
-				}
-			}
-		},
+
 		
 		{	"widget": "ExpressionWidget",
 			"parameters": {
@@ -477,8 +512,8 @@
 				"locations":["protein.features","interaction.doc"],
 				"defaultText": "Selection Empty",
 				"positionTarget": "ruler",
-				"myPosition":"right bottom",
-				"atPosition":"right bottom"
+				"myPosition":"left top",
+				"atPosition":"left top"
 			},
 			"templateTarget":"center",
 			"tags":{"id":"info"}
@@ -579,6 +614,34 @@
 				   		{	"source":"ruler",
 				   			"object":"ruler",
 				   			"event":"onRuleCreated",
+				   			"listener":"graph3",
+				   			"method":"executeStylers",
+				   			"type":"init"
+				   		},
+				   		{	"source":"ruler",
+				   			"object":"ruler",
+				   			"event":"onRuleRemoved",
+				   			"listener":"graph3",
+				   			"method":"executeStylers",
+				   			"type":"init"
+				   		},
+				   		{	"source":"ruler",
+				   			"object":"ruler",
+				   			"event":"onRuleEditing",
+				   			"listener":"graph3",
+				   			"method":"executeStylers",
+				   			"type":"init"
+				   		},
+				   		{	"source":"ruler",
+				   			"object":"ruler",
+				   			"event":"onOrderChanged",
+				   			"listener":"graph3",
+				   			"method":"executeStylers",
+				   			"type":"init"
+				   		},
+				   		{	"source":"ruler",
+				   			"object":"ruler",
+				   			"event":"onRuleCreated",
 				   			"listener":"table",
 				   			"method":"executeStylers",
 				   			"type":"init"
@@ -615,6 +678,20 @@
 				   			"object":"loader",
 				   			"event":"onFileLoaded",
 				   			"listener":"graph",
+				   			"method":"executeStylers",
+				   			"type":"init"
+				   		},
+				   		{	"source":"expression",
+				   			"object":"loader",
+				   			"event":"onFileLoaded",
+				   			"listener":"graph3",
+				   			"method":"executeStylers",
+				   			"type":"init"
+				   		},
+				   		{	"source":"expression",
+				   			"object":"loader",
+				   			"event":"onFileRemoved",
+				   			"listener":"graph3",
 				   			"method":"executeStylers",
 				   			"type":"init"
 				   		},
@@ -756,6 +833,55 @@
 				   			"event":"sizeChanged",
 				   			"listener":"context2",
 				   			"method":"afterRequest",
+				   			"type":"afterRequest"
+				   		},
+				   		{	"source":"graph2",
+				   			"object":"graph",
+				   			"event":"sizeChanged",
+				   			"listener":"events",
+				   			"method":"afterRequest",
+				   			"type":"afterRequest"
+				   		},
+				   		{	"source":"graph3",
+				   			"object":"graph",
+				   			"event":"proteinClick",
+				   			"listener":"graph3",
+				   			"method":"proteinClick",
+				   			"type":"afterRequest"
+				   		},
+				   		{	"source":"graph3",
+				   			"object":"graph",
+				   			"event":"proteinMouseOver",
+				   			"listener":"graph3",
+				   			"method":"proteinMouseOver",
+				   			"type":"afterRequest"
+				   		},
+				   		{	"source":"graph3",
+				   			"object":"graph",
+				   			"event":"proteinMouseOut",
+				   			"listener":"graph3",
+				   			"method":"proteinMouseOut",
+				   			"type":"afterRequest"
+				   		},
+				   		{	"source":"graph3",
+				   			"object":"graph",
+				   			"event":"interactionMouseOver",
+				   			"listener":"graph3",
+				   			"method":"interactionMouseOver",
+				   			"type":"afterRequest"
+				   		},
+				   		{	"source":"graph3",
+				   			"object":"graph",
+				   			"event":"interactionMouseOut",
+				   			"listener":"graph3",
+				   			"method":"interactionMouseOut",
+				   			"type":"afterRequest"
+				   		},
+				   		{	"source":"graph3",
+				   			"object":"graph",
+				   			"event":"interactionClick",
+				   			"listener":"graph3",
+				   			"method":"interactionClick",
 				   			"type":"afterRequest"
 				   		},
 				   		{	"source":"graph2",

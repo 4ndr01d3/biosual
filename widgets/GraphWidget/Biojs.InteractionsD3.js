@@ -6,7 +6,7 @@
  * @extends Biojs
  * 
  * @author <a href="mailto:gustavoadolfo.salazar@gmail.com">Gustavo A. Salazar</a>
- * @version 0.9.1_beta
+ * @version 0.1.0
  * @category 1
  * 
  * @requires <a href='http://code.jquery.com/query-1.7.2.min.js'>jQuery Core 1.7.2</a>
@@ -15,7 +15,7 @@
  * @requires <a href='http://d3js.org/'>D3</a>
  * @dependency <script src="http://d3js.org/d3.v2.min.js" type="text/javascript"></script>
  *
- * @requires <a href='http://www.ebi.ac.uk/~jgomez/biojs/biojs/css/biojs.InteractionsD3.css'>InteractionsD3 CSS</a>
+ * @requires <a href='../css/biojs.InteractionsD3.css'>InteractionsD3 CSS</a>
  * @dependency <link rel="stylesheet" href="../biojs/css/biojs.InteractionsD3.css" />
  * 
  * @param {Object} options An object with the options for the InteractionsD3 component.
@@ -997,6 +997,20 @@ Biojs.InteractionsD3 = Biojs.extend (
 			self.vis.selectAll(selector).style("fill", color);
 		},
 		/**
+		 * Set the opacity of the elements on the graphic that match the selector. 
+		 * Check the <a href="http://www.w3.org/TR/css3-selectors/">CSS3 selectors documentation</a> to build a selector string 
+		 * 
+		 * @param {string} selector a string to represent a set of elements. Check the <a href="http://www.w3.org/TR/css3-selectors/">CSS3 selectors documentation</a> to build a selector string
+		 * @param {string} value a value between 0(transparent) and 1(opaque)
+		 *  
+		 * @example 
+		 * instance.setOpacity(".figure",0.5);
+		 */
+		setOpacity: function(selector,value){
+			var self=this;
+			self.vis.selectAll(selector).style("opacity", value);
+		},
+		/**
 		 * Set the stroke's color of the elements on the graphic that match the selector. 
 		 * Check the <a href="http://www.w3.org/TR/css3-selectors/">CSS3 selectors documentation</a> to build a selector string 
 		 * 
@@ -1047,6 +1061,11 @@ Biojs.InteractionsD3 = Biojs.extend (
 				});
 //			self.restart();
 		}, 
+		
+		setLabelFontSize: function(selector,fontSize){
+			var self=this;
+			self.vis.selectAll(selector).selectAll(".legend").style("font-size", fontSize+"px");
+		}, 
 		/**
 		 * Scales the area of a protein
 		 * 
@@ -1088,6 +1107,20 @@ Biojs.InteractionsD3 = Biojs.extend (
 						return d3.svg.symbolTypes[self._figuresOrder[self.organisms[d.organism]]];
 					})
 				);
+		}, 
+		/**
+		 * @param {string} selector a CSS3 selector to choose the nodes to resize
+		 *  
+		 * @example 
+		 * for (var i=0;i<instance.proteins.length;i++)
+		 * 	instance.proteins[i].size=i*0.1;
+		 * instance.refreshOpacity(".figure");
+		 */
+		refreshOpacity: function(selector){
+			var self=this;
+			self.vis.selectAll(selector).style("opacity", function(d) {
+				return d.alpha;
+			});
 		}, 
 		/**
 		 * Hide the legend(id) of the protein

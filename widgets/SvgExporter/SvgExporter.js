@@ -27,6 +27,7 @@
 					if (typeof self.css != "undefined" && self.css!=null && self.css!="")
 						svgDom.prepend('<style type="text/css" ><![CDATA[  '+self.css+'  ]]></style>');
 					var svg = $("<div />").append(svgDom).html();
+					svg = svg.replace(/\)translate/g,") translate");
 					
 					if(/chrom(e|ium)/.test(navigator.userAgent.toLowerCase())){
 						$("body").append("<a id='"+self.id+"_link' download='pinv_export.svg' title='pinv_export.svg' target='_blank'>downloading...</a>");
@@ -53,7 +54,8 @@
 				var canvas = document.createElement("canvas");
 				document.body.appendChild(canvas);
 				
-				canvg(canvas, svg);
+				canvg(canvas,svg, { log:true, ignoreMouse: true, ignoreAnimation: true }) ;
+				
 				
 				var img = canvas.toDataURL("image/png");
 				if(/chrom(e|ium)/.test(navigator.userAgent.toLowerCase())){

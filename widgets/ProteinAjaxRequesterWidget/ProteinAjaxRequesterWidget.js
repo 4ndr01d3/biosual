@@ -3,7 +3,7 @@
 		proteins: Array(), 
 		proteinsInGraphic: Array(), 
 		numOfInteracts:{},
-		previousRequest:null,
+		previousRequest:null,ids:[],
 		features:["id"],
 		scores:[],
 		
@@ -29,6 +29,8 @@
 				response=this.manager.response;
 			
 			if (response !=null && typeof response.responseHeader.params.q != 'undefined'){
+				if (self.previousRequest!=null)// && self.previousRequest=="*:*")
+					self.ids=[];
 				var protein =response.responseHeader.params.q.substr(5);
 				self.requestedProteins[protein].doc=response;
 				var pos=jQuery.inArray(protein,self.proteins);
@@ -61,12 +63,15 @@
 				self._tagIfInJointQuery(protein);
 			
 			
-			if (recursive) {
-				for (var i = 0, l = json.response.docs.length; i < l; i++) {
-					var doc = json.response.docs[i];
+			for (var i = 0, l = json.response.docs.length; i < l; i++) {
+				var doc = json.response.docs[i];
+				if (self.ids.indexOf(doc[self.fields["p1"]])==-1)
+					self.ids.push(doc[self.fields["p1"]]);
+				if (self.ids.indexOf(doc[self.fields["p2"]])==-1)
+					self.ids.push(doc[self.fields["p2"]]);
+				
+				if (recursive)
 					self.getNextInternalInteractions(self,doc);
-				}
-				self.manager.response =json;
 			}
 			
 	

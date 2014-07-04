@@ -83,7 +83,7 @@
 				var values=area.val().split(",");
 				var valuesClean=[];
 				for (var i=0; i<values.length; i++){
-					var value=$.trim(values[i]);
+					var value=$.trim(values[i]).replace(/"/g,"red");
 					if (value!="")
 						valuesClean.push(value);
 				}
