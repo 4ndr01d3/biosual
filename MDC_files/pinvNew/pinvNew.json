@@ -831,13 +831,6 @@
 				   		{	"source":"graph2",
 				   			"object":"graph",
 				   			"event":"sizeChanged",
-				   			"listener":"context2",
-				   			"method":"afterRequest",
-				   			"type":"afterRequest"
-				   		},
-				   		{	"source":"graph2",
-				   			"object":"graph",
-				   			"event":"sizeChanged",
 				   			"listener":"events",
 				   			"method":"afterRequest",
 				   			"type":"afterRequest"

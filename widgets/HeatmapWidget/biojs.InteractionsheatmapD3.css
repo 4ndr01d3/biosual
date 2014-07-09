@@ -38,3 +38,17 @@ svg.heatmap_network  {
 	fill: rgb(0, 255, 0) !important;
 	stroke: rgb(0, 255, 0) !important;
 }
+.heatmap_network .legendBlock {
+	font-size: 0.8em;
+}
+.heatmap_network .legendBlock .button circle{
+	fill:#00ff00;
+	stroke: #000;
+	opacity:0.4;
+}
+.heatmap_network .legendBlock .button circle:hover{
+	opacity:1;
+}
+.heatmap_network .legendBlock .button path{
+	fill:url(#linearGradient);
+}

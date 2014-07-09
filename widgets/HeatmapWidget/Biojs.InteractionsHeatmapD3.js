@@ -72,15 +72,17 @@ Biojs.InteractionsHeatmapD3 = Biojs.extend (
 			    .attr('fill', 'white')
 			    .attr('stroke','white');
 
+			self.info=self.svg_p.append("g")
+			.attr("class","info");
+	
+			self._createInfoFrame("left");
+			self._createInfoFrame("right");
+		
+			
 			self.svg=self.svg_p.append("g")
 			    	.attr("transform", "translate(" + (width/2 -self.h/2) +"," + (height)+ ")rotate(-45)");
 			self.perspective=d3.select("#"+self.opt.target + " svg").append('svg:g');
 
-			self.info=self.svg_p.append("g")
-					.attr("class","info");
-			
-			self._createInfoFrame("left");
-			self._createInfoFrame("right");
 		},
 		initialize: function(){
 			var self =this;
@@ -502,6 +504,19 @@ Biojs.InteractionsHeatmapD3 = Biojs.extend (
 			self.interactions=[];
 			self.restart();
 		},
+		selectAdded:false,
+		_addSelect: function(){
+			var self=this;
+			var select ="<select id=\""+self.opt.target+"_sort\" >";
+			if (self.proteins.length>0){
+				for (var f in self.proteins[0].features){
+					select += "<option value='"+f+"'>"+f+"</option>";
+				}
+			}
+			select += "</select>";
+		    $("#"+self.opt.target).before("<label for=\""+self.target+"_sort\">Sort By:</label>"+select);
+			self.selectAdded=true;
+		},
 		/**
 		 * Restart the graphic to materialize the changes done on it(e.g. add/remove proteins)
 		 * It is here where the SVG elemnts are created.
@@ -544,7 +559,18 @@ Biojs.InteractionsHeatmapD3 = Biojs.extend (
 			});
 
 			// Precompute the orders.
-//			self.orders = {
+			self.orders = {};
+			if (self.proteins.length>0){
+				if (!self.selectAdded) self._addSelect();
+				
+				for (var f in self.proteins[0].features){
+					self.orders[f] = d3.range(n).sort(function(a, b) { 
+						if (!isNaN(self.nodes[a].features[f]) && !isNaN(self.nodes[b].features[f]))
+							return self.nodes[b].features[f] - self.nodes[a].features[f] ;
+						return d3.ascending(self.nodes[a].features[f],self.nodes[b].features[f]); 
+					});
+				}
+			}
 //					name: d3.range(n).sort(function(a, b) { return d3.ascending(self.nodes[a].name, self.nodes[b].name); }),
 //					count: d3.range(n).sort(function(a, b) { return self.nodes[b].count - self.nodes[a].count; }),
 //					group: d3.range(n).sort(function(a, b) { return self.nodes[b].group - self.nodes[a].group; })
@@ -710,9 +736,9 @@ Biojs.InteractionsHeatmapD3 = Biojs.extend (
 			}
 
 
-		  d3.select("#order").on("change", function() {
+		  d3.select("#"+self.opt.target+"_sort").on("change", function() {
 //		    clearTimeout(timeout);
-		    order(this.value);
+		    order(self.orders[this.value]);
 		  });
 
 		  function order(value) {
@@ -834,10 +860,10 @@ Biojs.InteractionsHeatmapD3 = Biojs.extend (
 				return a[0]-b[0];
 			});
 		},
-		_paintLegend:function(legend,type){
+		_paintLegend:function(legend,type,w){
 			var self = this;
 			legend.filter(function(d) { return d[0]== "label" && d[1]==type; }).append("text")
-				.attr("x", self.opt.width - 6)
+				.attr("x", self.opt.width/2 +w/2- 6)
 				.attr("y", 7)
 				.attr("dy", ".35em")
 				.style("text-anchor", "end")
@@ -852,13 +878,13 @@ Biojs.InteractionsHeatmapD3 = Biojs.extend (
 							return "M0,0L0,10M0,5L"+h+",5M"+h+",0L"+h+",10 ";
 					})
 					.attr("transform", function(d) { 
-						return "translate(" +  (self.opt.width - 18 - 2*self.opt.radius*Math.sqrt(d[0][2])) + "," +  0 + ")"; 
+						return "translate(" +  (self.opt.width/2+w/2 - 18 - 2*self.opt.radius*Math.sqrt(d[0][2])) + "," +  0 + ")"; 
 					})
 					.style("fill", "transparent")
 					.style("stroke", "black");
 				legend.filter(function(d) { return d[0]!="label" && d[1]== type; }).append("text")
 					.attr("x", function(d) { 
-						return (self.opt.width - 22 - 5*self.opt.radius); 
+						return (self.opt.width/2+w/2 - 22 - 5*self.opt.radius); 
 					})
 					.attr("y", 7)
 					.attr("dy", ".35em")
@@ -867,7 +893,7 @@ Biojs.InteractionsHeatmapD3 = Biojs.extend (
 				
 			}else{
 				legend.filter(function(d) { return d[0]!="label" && d[1]==type; }).append("rect")
-					.attr("x", self.opt.width - 18) 
+					.attr("x", self.opt.width/2 +w/2- 18) 
 					.attr("width", 13)
 					.attr("height", 13)
 					.style("fill", function(d,i) {
@@ -876,7 +902,7 @@ Biojs.InteractionsHeatmapD3 = Biojs.extend (
 						return d[2];
 					});
 				legend.filter(function(d) { return d[0]!="label" && d[1]== type; }).append("text")
-					.attr("x", self.opt.width - 24)
+					.attr("x", self.opt.width/2+w/2 - 24)
 					.attr("y", 7)
 					.attr("dy", ".35em")
 					.style("text-anchor", "end")
@@ -890,11 +916,35 @@ Biojs.InteractionsHeatmapD3 = Biojs.extend (
 				.attr("class", "legendBlock");
 			self._sortLegends();
 			legendBlock.append("rect")
-				.attr("x", self.opt.width -w)
+				.attr("class", "bg")
+				.attr("x", self.opt.width/2 -w/2)
 				.attr("height", 6 + self.legends.length *16)
 				.attr("width", w)
-				.style("fill", "#ddd")
-				.style("fill-opacity","0.4");
+				.style("fill", "#eee")
+				.style("stroke", "#000");
+
+			var button =legendBlock.append("g")
+		      .attr("class", "button");
+			button.visible=true;
+			
+			button.append("circle")
+				.attr("r", 4)
+				.attr("cx",self.opt.width/2 -w/2+6)
+				.attr('cy', 6)
+				.on("click",function(){
+					button.visible= !button.visible;
+					button.selectAll("circle").style("fill",function(){ 
+						return (button.visible)?"#0f0":"#f00";
+					});
+					legendBlock.selectAll("rect.bg").transition()
+						.attr("height", (button.visible)?6 + self.legends.length *16:10);
+					legendBlock.selectAll(".mainLegend")
+						.style("display", (button.visible)?"block":"none");
+				});
+			
+//			button.append("path")
+//				.attr("d","m 50,15 140,0 c 11.08,0 22.51667,10.914 20,20 C 208.16563,41.622482 201.08,40 190,40 L 50,40 C 38.92,40 31.834332,41.622512 30,35 27.483323,25.914 38.92,15 50,15 z");
+//			button.attr("transform","scale(0.3)");
 
 			var legend = legendBlock.selectAll(".mainLegend") 
 				.data(self.legends)
@@ -904,7 +954,7 @@ Biojs.InteractionsHeatmapD3 = Biojs.extend (
 					return "translate(0," + (3 + i * 16) + ")"; 
 				});
 			for (var i=0; i< self.legendTypes.length; i++)
-				self._paintLegend(legend,self.legendTypes[i]);
+				self._paintLegend(legend,self.legendTypes[i],w);
 
 		},
 		longestLegend:4,
