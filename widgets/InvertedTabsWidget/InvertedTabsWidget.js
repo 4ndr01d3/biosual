@@ -12,9 +12,9 @@
 				else
 					for (var j=0;j<self.sideEffects.length;j++){
 						if ( self.sideEffects[j].visibleWith.indexOf(self.tabs[i].title)==-1)
-							$("#"+self.sideEffects[j].target).hide();
+							$(self.sideEffects[j].target).hide();
 						else
-							$("#"+self.sideEffects[j].target).show();
+							$(self.sideEffects[j].target).show();
 					}
 				
 				
@@ -44,9 +44,9 @@
 					if (typeof self.sideEffects !="undefined") 
 						for (var i=0;i<self.sideEffects.length;i++){
 							if ( self.sideEffects[i].visibleWith.indexOf($(this).attr("title"))==-1)
-								$("#"+self.sideEffects[i].target).hide();
+								$(self.sideEffects[i].target).hide();
 							else
-								$("#"+self.sideEffects[i].target).show();
+								$(self.sideEffects[i].target).show();
 						}
 					
 				});

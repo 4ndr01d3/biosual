@@ -72,7 +72,7 @@ class Widget {
 			return "//Not HTML file includedc in the JSON config file.";
 		
 		if (file_exists($path)){
-			$html=str_replace("\n","",getFile($path));
+			$html=str_replace("\n","",getFile($path,true));
 			$html=str_replace("'","\"",$html);
 			
 			//replacing the tags 

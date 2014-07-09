@@ -507,14 +507,15 @@ Biojs.InteractionsHeatmapD3 = Biojs.extend (
 		selectAdded:false,
 		_addSelect: function(){
 			var self=this;
-			var select ="<select id=\""+self.opt.target+"_sort\" >";
+			var select ="<select id=\""+self.opt.target+"_sort\" style='display:none;' class='sort-select'>";
+			select += "<option value='default'>default</option>";
 			if (self.proteins.length>0){
 				for (var f in self.proteins[0].features){
 					select += "<option value='"+f+"'>"+f+"</option>";
 				}
 			}
 			select += "</select>";
-		    $("#"+self.opt.target).before("<label for=\""+self.target+"_sort\">Sort By:</label>"+select);
+		    $("#"+self.opt.target).before("<label for=\""+self.opt.target+"_sort\"  style='display:none;'>Sort By:</label>"+select);
 			self.selectAdded=true;
 		},
 		/**
@@ -560,6 +561,7 @@ Biojs.InteractionsHeatmapD3 = Biojs.extend (
 
 			// Precompute the orders.
 			self.orders = {};
+			self.orders["default"]=d3.range(n);
 			if (self.proteins.length>0){
 				if (!self.selectAdded) self._addSelect();
 				
@@ -756,7 +758,8 @@ Biojs.InteractionsHeatmapD3 = Biojs.extend (
 		        .attr("transform", function(d, i) { return "translate(" + self.x(i) + ")rotate(-90)"; });
 		  }
 
-		  order(d3.range(n));
+		  if (d3.select("#"+self.opt.target+"_sort").node()!=null)
+			  order(self.orders[d3.select("#"+self.opt.target+"_sort").node().value]);
 		},
 		updateInfoFrame: function(protein,side){
 			var self = this;
@@ -928,7 +931,7 @@ Biojs.InteractionsHeatmapD3 = Biojs.extend (
 			button.visible=true;
 			
 			button.append("circle")
-				.attr("r", 4)
+				.attr("r", 3)
 				.attr("cx",self.opt.width/2 -w/2+6)
 				.attr('cy', 6)
 				.on("click",function(){

@@ -23,6 +23,8 @@ $mandatoryLocal	= array('lib/jquery-1.7.2.min.js',
 $cssWeb		=array();
 $cssLocal	=array(	'css/jquery-ui.css',
 					'css/ui.theme.css');
+$addedFilesMD5	=array();
+
 
 $MDCpath="MDC_files/";
 if ($_GET['id'] != ''){
@@ -68,17 +70,17 @@ switch ($_GET['type']){
 		//Adding all the mandatory dependencies that are local files
 		foreach ($mandatoryLocal as $path){
 						
-			echo "\n//".$path."\n".getFile($path);
+			echo "\n//".$path."\n".getFile($path,true);
 		}
 		
 		//Adding utility functions 
-		echo "//Utility functions\n".getFile("core/util.js");
+		echo "//Utility functions\n".getFile("core/util.js",true);
 		
 		
 		//Adding the template
 		$path="templates/".$json->template->name."/markup.html";
 		if (file_exists($path) ){
-			$htmlT=str_replace("\n","",getFile($path));
+			$htmlT=str_replace("\n","",getFile($path,true));
 			
 			//replacing the tags of the template
 			foreach ($json->template->tags as $key => $value)
@@ -87,7 +89,7 @@ switch ($_GET['type']){
 			echo "\nvar htmlTemplate = '".$htmlT."';\n"; //the HTML content as a JS variable
 			echo "\nvar target = '".$_GET['target']."';\n"; // the target div as a JS variable
 			
-			echo getFile("core/templateLoader.js");
+			echo getFile("core/templateLoader.js",true);
 		}
 		
 		//Adding the dependencies included in the MDC json
@@ -124,10 +126,10 @@ switch ($_GET['type']){
 		
 		echo "//pre-loader script".$json->preloader;
 		if (isset($json->preloader) && $json->preloader!=null && strlen(trim($json->preloader))>0 && file_exists($MDCpath.$json->preloader))
-			echo getFile($MDCpath.$json->preloader);
+			echo getFile($MDCpath.$json->preloader,true);
 			
 		//Adding the AJAX SOLR manager and configuring all the widgets 
-		echo "//Manager loader\n".getFile("core/loader.js");
+		echo "//Manager loader\n".getFile("core/loader.js",true);
 
 		if (isset($json->postloader) && $json->postloader!=null && strlen(trim($json->postloader))>0 && file_exists($MDCpath.$json->postloader))
 			echo "//postloader script\n".getFile($MDCpath.$json->postloader);
@@ -184,11 +186,15 @@ function getUrl($url) {
     return $file_contents;
 }
 
-function getFile($path,$forceMinify=0){
-	global $useMinify;
+function getFile($path,$forcetoAdd=false){
+	global $addedFilesMD5;
 	if (file_exists($path)){
 		$fh = fopen($path, 'r');
 		$content = "\n".fread($fh, filesize($path))."\n";
+		$md5 =md5($content);
+		if (!$forcetoAdd && in_array($md5,$addedFilesMD5))
+			return "// The content of [".$path."] has been already added to the script";
+		$addedFilesMD5[] =$md5;
 		fclose($fh);
 		return $content;
 	}

@@ -45,10 +45,17 @@ svg.heatmap_network  {
 	fill:#00ff00;
 	stroke: #000;
 	opacity:0.4;
+	stroke-width: 2;
 }
 .heatmap_network .legendBlock .button circle:hover{
 	opacity:1;
 }
 .heatmap_network .legendBlock .button path{
 	fill:url(#linearGradient);
+}
+.sort-select {
+	font-size: 16px;
+	border: 0px;
+	height: 28px;
+	margin: 0 0 2px 4px;
 }

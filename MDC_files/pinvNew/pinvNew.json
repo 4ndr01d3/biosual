@@ -55,14 +55,14 @@
 				"target": "tabs",
 				"tabs": [
 				     { "title": "Network",
-				       "target":"graph"
+				       "target":"graph",
+				       "selected":true
 				     },
 				     { "title": "Circle",
 				       "target":"graph2"
 				     },
 				     { "title": "Heatmap",
-					       "target":"graph3",
-					       "selected":true
+					       "target":"graph3"
 					 },
 				     { "title": "Table",
 				       "target":"table",
@@ -71,11 +71,17 @@
 				],
 				"on_show":{"widget":"ruler","method":"triggerExecuters"},
 				"sideEffects":[
-				     { "target":"size",
+				     { "target":"#size",
 				       "visibleWith":["Network","Circle","Heatmap"] 
 				     },
-				     { "target":"info",
+				     { "target":"#info",
 					       "visibleWith":["Network","Circle"] 
+				     },
+				     { "target":"#graph_switch,label[for=graph_switch]",
+					       "visibleWith":["Network"] 
+				     },
+				     { "target":"#graph3_sort,label[for=graph3_sort]",
+					       "visibleWith":["Heatmap"] 
 					 }
 
 				]
