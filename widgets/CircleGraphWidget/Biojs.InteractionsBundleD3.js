@@ -96,7 +96,7 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 		    var tmpR=(rx<ry)?rx:ry;
 			self.cluster = d3.layout.cluster()
 				.size([360, tmpR-self.opt.textLength] )
-				.sort(function(a, b) { return d3.ascending(a.key, b.key); });
+				.sort(function(a,b){ return self.comparison(self,a,b);});
 
 			self.bundle = d3.layout.bundle();
 			self.line = d3.svg.line.radial()
@@ -330,7 +330,9 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 			 * ); 
 			 * 
 			 * */
-			"transformOverSVG"
+			"transformOverSVG",
+			
+			"onSorted"
 			
 		], 
 		/**
@@ -653,11 +655,85 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 		 * instance.restart();
 		 * 
 		 */
+		selectAdded:false,
+		_addSelect: function(){
+			var self=this;
+			var select ="<select id=\""+self.opt.target+"_sort\" style='display:none;'>";
+			select += "<option value='default'>default</option>";
+			for (var prot in self.proteins){
+				for (var f in self.proteins[prot].features){
+					select += "<option value='"+f+"'>"+f+"</option>";
+				}
+				break;
+			}
+			select += "</select>";
+			self._container.before("<label for=\""+self.opt.target+"_sort\"  style='display:none;'>Sort By:</label>"+select);
+			self.selectAdded=true;
+		},
+	    sortedBy:"default",
+	    sortModel: function () {
+	    	var self = this;
+	        var nodes = [self.model], nodes2 = [];
+	        while ((node = nodes.pop()) != null) {
+	          nodes2.push(node);
+	          if ((children = node.children) && (n = children.length)) {
+	            var i = -1, n, children;
+	            while (++i < n) nodes.push(children[i]);
+	          }
+	        }
+	        while ((node = nodes2.pop()) != null) {
+	        	if (childs = node.children) childs.sort(function(a,b){ return self.comparison(self,a,b);});
+	        }
+	      },
+	    comparison: function(self,a, b) { 
+			var loc_with_ch = /^(\d+)\((\d+)...(\d+)\)/;
+			var loc_without_ch = /^(\d+)...(\d+)$/;
+			if (self.sortedBy=="default")
+				return d3.ascending(a.key,b.key);
+			var x=a.features[self.sortedBy],y=b.features[self.sortedBy];
+			if (isNaN(x)||isNaN(y)){
+				if (loc_with_ch.test(x)&&loc_with_ch.test(y)){
+					var pX = loc_with_ch.exec(x),
+						pY = loc_with_ch.exec(y);
+					return (pX[1]-pY[1]!=0)?pX[1]-pY[1]:pX[2]-pY[2];
+				}else if (loc_without_ch.test(x)&&loc_without_ch.test(y)){
+					var pX = loc_without_ch.exec(x),
+						pY = loc_without_ch.exec(y);
+					return pX[1]*1-pY[1]*1;
+				} 
+
+				return d3.ascending(x,y);
+			}else
+				return x-y;
+		},
 		restart: function(){
 			var self = this;
 
-			var nodes = self.cluster.nodes(self.model),
-				links = self.imports(nodes);
+			if (Object.keys(self.proteins).length>0 && (!self.selectAdded)){
+				  self._addSelect();
+				
+				  d3.select("#"+self.opt.target+"_sort").on("change", function() {
+					  self.sortedBy=this.value;
+						self.svg.selectAll("path.link").remove();
+						self.svg.selectAll("g.node").remove();
+						self.svg.selectAll("circle.figure").remove();
+					  self.restart();
+						self.raiseEvent('onSorted', {
+							sortedBy: self.sortedBy
+						});
+				  });
+			}
+			self.sortModel();
+			var nodes = self.cluster.nodes(self.model);
+//			if (typeof self.old_nodes != "undefined"){
+//				for (var i=0;i<nodes.length;i++){
+//					console.debug(nodes[i],self.old_nodes[i]);
+//				}
+//				if (self.old_nodes.length>2)
+//					nodes=self.old_nodes;
+//			}
+//			self.old_nodes=nodes;
+			var links = self.imports(nodes);
 			
 			if (typeof self.model.children == "undefined") self.model.children=[];
 			self.splines = self.bundle(links);
@@ -667,8 +743,7 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 			
 			path.enter().append("svg:path")
 				.attr("id", function(d) { return "link-" + d.source.key + "-" + d.target.key; })
-				.attr("class", function(d) { return "link source-" + d.source.key + " target-" + d.target.key; })
-				.attr("d", function(d, i) { return self.line(self.splines[i]); })
+				.attr("class", function(d) { return "circle_link link source-" + d.source.key + " target-" + d.target.key; })
 				.style("pointer-events","visibleStroke")
 				.on("mouseover",  function(d){ 
 					self.raiseEvent('interactionMouseOver', {
@@ -685,6 +760,10 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 						interaction: d
 					});
 				});
+			path
+				.attr("d", function(d, i) {return (typeof $(this).attr("d")=="undefined")?"M0 0 L5 5":$(this).attr("d");})
+				.transition()
+				.attr("d", function(d, i) { return self.line(self.splines[i]); });
 
 			path.exit().remove();
 
@@ -693,7 +772,10 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 			
 			var svgNode=gnodes.enter().append("svg:g")
 					.attr("class", "node")
-					.attr("id", function(d) { return "node-" + d.key; })
+					.attr("id", function(d) { return "node-" + d.key; });
+			self.svg.selectAll("g.node")
+					.attr("transform", function(d) { return (typeof $(this).attr("transform")=="undefined")?"rotate(0)translate(0)":$(this).attr("transform");})
+					.transition()
 					.attr("transform", function(d) { return "rotate(" + (d.x - 90) + ")translate(" + d.y + ")"; });
 			
 			svgNode.append("svg:text")
@@ -711,6 +793,10 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 							else
 								return d[d.typeLegend];
 							});
+			self.svg.selectAll("g.node .legend")
+						.attr("dx", function(d) { return d.x < 180 ? 8 : -8; })
+						.attr("text-anchor", function(d) { return d.x < 180 ? "start" : "end"; })
+						.attr("transform", function(d) { return d.x < 180 ? null : "rotate(180)"; });
 
 			svgNode.append("circle")
 				.attr("class", "figure")

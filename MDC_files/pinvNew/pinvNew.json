@@ -55,11 +55,11 @@
 				"target": "tabs",
 				"tabs": [
 				     { "title": "Network",
-				       "target":"graph",
-				       "selected":true
+				       "target":"graph"
 				     },
 				     { "title": "Circle",
-				       "target":"graph2"
+				       "target":"graph2",
+				       "selected":true
 				     },
 				     { "title": "Heatmap",
 					       "target":"graph3"
@@ -82,6 +82,9 @@
 				     },
 				     { "target":"#graph3_sort,label[for=graph3_sort]",
 					       "visibleWith":["Heatmap"] 
+					 },
+				     { "target":"#graph2_sort,label[for=graph2_sort]",
+					       "visibleWith":["Circle"] 
 					 }
 
 				]
@@ -888,6 +891,13 @@
 				   			"event":"sizeChanged",
 				   			"listener":"events",
 				   			"method":"afterRequest",
+				   			"type":"afterRequest"
+				   		},
+				   		{	"source":"graph2",
+				   			"object":"graph",
+				   			"event":"onSorted",
+				   			"listener":"graph2",
+				   			"method":"executeStylers",
 				   			"type":"afterRequest"
 				   		}
 				   	]

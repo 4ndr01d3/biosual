@@ -52,6 +52,16 @@
 				});
 			}
 		},
+		afterRequest:function(){
+			var self = this;
+			var title = $("#"+self.target+ " ul li.current a").attr("title");
+			for (var j=0;j<self.sideEffects.length;j++){
+				if ( self.sideEffects[j].visibleWith.indexOf(title)==-1)
+					$(self.sideEffects[j].target).hide();
+				else
+					$(self.sideEffects[j].target).show();
+			}
+		},
 		initTest: function(){
 			var self = this;
 			var tabsLI=$("#"+self.target+ " ul li");

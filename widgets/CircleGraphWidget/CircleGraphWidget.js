@@ -170,9 +170,9 @@
 		outOfProtein: function( objEvent ) {
 			var self=this;
 			self.graph.setColor("#node-" + objEvent.protein.key,'');
-			self.graph.setColor("path.link.target-" + objEvent.protein.key,"");
-			self.graph.setColor("path.link.source-" + objEvent.protein.key,"");
-			self.executeStylers();
+			self.graph.setColor("path.link.target-" + objEvent.protein.key,"rgb(153, 153, 153)");
+			self.graph.setColor("path.link.source-" + objEvent.protein.key,"rgb(153, 153, 153)");
+//			self.executeStylers();
 			if (typeof self.proteinLabelVisibility[objEvent.protein.key] != "undefined" && !self.proteinLabelVisibility[objEvent.protein.key]){
 				self.graph.swapShowLegend("#node-"+objEvent.protein.key);
 				self.proteinLabelVisibility[objEvent.protein.key]=false;

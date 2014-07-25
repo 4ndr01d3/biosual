@@ -572,6 +572,9 @@ Biojs.InteractionsHeatmapD3 = Biojs.extend (
 						return d3.ascending(self.nodes[a].features[f],self.nodes[b].features[f]); 
 					});
 				}
+			  d3.select("#"+self.opt.target+"_sort").on("change", function() {
+				    order(self.orders[this.value]);
+			  });
 			}
 //					name: d3.range(n).sort(function(a, b) { return d3.ascending(self.nodes[a].name, self.nodes[b].name); }),
 //					count: d3.range(n).sort(function(a, b) { return self.nodes[b].count - self.nodes[a].count; }),
@@ -738,10 +741,6 @@ Biojs.InteractionsHeatmapD3 = Biojs.extend (
 			}
 
 
-		  d3.select("#"+self.opt.target+"_sort").on("change", function() {
-//		    clearTimeout(timeout);
-		    order(self.orders[this.value]);
-		  });
 
 		  function order(value) {
 		    self.x.domain(value);
