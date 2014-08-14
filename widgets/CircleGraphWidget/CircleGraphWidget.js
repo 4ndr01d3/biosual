@@ -377,6 +377,8 @@
 			self.graph.addLegends(null);
 			self.graph.setFillColor(".figure",null);
 			self.graph.setColor(".figure",null);
+			self.graph.setFillColor(".link",null);
+			self.graph.setColor(".link",null);
 			self.graph.setSizeScale(".figure",1);
 			self.graph.vis.selectAll(".node").attr("visibility", 'visible').style("stroke","#fff");
 			self.graph.vis.selectAll(".link").attr("visibility", 'visible').style("stroke","#999");

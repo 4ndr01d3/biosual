@@ -55,11 +55,11 @@
 				"target": "tabs",
 				"tabs": [
 				     { "title": "Network",
-				       "target":"graph"
+				       "target":"graph",
+				       "selected":true
 				     },
 				     { "title": "Circle",
-				       "target":"graph2",
-				       "selected":true
+				       "target":"graph2"
 				     },
 				     { "title": "Heatmap",
 					       "target":"graph3"
@@ -78,6 +78,9 @@
 					       "visibleWith":["Network","Circle"] 
 				     },
 				     { "target":"#graph_switch,label[for=graph_switch]",
+					       "visibleWith":["Network"] 
+				     },
+				     { "target":"#graph_bundling,label[for=graph_bundling]",
 					       "visibleWith":["Network"] 
 				     },
 				     { "target":"#graph3_sort,label[for=graph3_sort]",

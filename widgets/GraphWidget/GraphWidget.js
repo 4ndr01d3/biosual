@@ -28,14 +28,43 @@
 		    		};
 		    	}(styler));
 		    }		
-		    $("#"+self.target).before("<label for=\""+self.target+"_switch\">Stop Animation</label><input type='checkbox' id='"+self.target+"_switch' checked='checked'/>");
+		    $("#"+self.target).before('<input type="checkbox" id="'+self.target+'_bundling" class="toggle" /><label for="'+self.target+'_bundling"><span>&#9679;</span> Bundle Links</label><input id="'+self.target+'_bundling_slider" type="range" min="0" max="200" value="100" style="display:none"/>');
+		    $("#"+self.target).before("<input type='checkbox' id='"+self.target+"_switch' checked='checked'/><label for=\""+self.target+"_switch\"><span>&#9679;</span> Animation</label>");
 		    $("#"+self.target+"_switch").change(function(e){
 		    	self.animateOnSwitch();
 		    });
+		    $("#"+self.target+"_bundling").change(function(e){
+		    	$("label[for="+self.target+"_bundling] span").toggleClass("indicator_on");
+				if (this.checked){
+					$("#"+self.target+"_bundling_slider").show();
+			    	$("#"+self.target+"_switch").prop("checked",false);
+			    	$("label[for="+self.target+"_switch] span").removeClass("indicator_on");
+					self.graph.bundleLinks();
+				}else{
+					$("#"+self.target+"_bundling_slider").hide();
+			    	$("#"+self.target+"_switch").prop("checked",true);
+			    	$("label[for="+self.target+"_switch] span").addClass("indicator_on");
+					self.graph.unbundleLinks();
+				}
+		    });
+		    $("#"+self.target+"_bundling_slider").change(function(e){
+		    	self.graph.changeBundlingStrength(this.value / 100);
+		    });
+
+		    
 		},
 		animateOnSwitch:function(){
 			var self = this;
+	    	$("label[for="+self.target+"_switch] span").toggleClass("indicator_on");
 	    	if ($("#"+self.target+"_switch").is(':checked')){
+	    		if ($("#"+self.target+"_bundling").is(':checked')){
+			    	$("#"+self.target+"_bundling").prop("checked",false);
+					$("#"+self.target+"_bundling_slider").hide();
+			    	$("label[for="+self.target+"_bundling] span").removeClass("indicator_on");
+//					self.graph.unbundleLinks();
+	    			
+	    		}
+	    			
 	    		self.graph.enableAnimation();
 	    		self.executeStylers();
 	    	}else
@@ -378,6 +407,8 @@
 			self.graph.addLegends(null);
 			self.graph.setFillColor(".figure",null);
 			self.graph.setColor(".figure",null);
+			self.graph.setFillColor(".link",null);
+			self.graph.setColor(".link",null);
 			self.graph.setSizeScale(".figure",1);
 			self.graph.vis.selectAll(".node").attr("visibility", 'visible').style("stroke","#fff");
 			self.graph.vis.selectAll("line").attr("visibility", 'visible').style("stroke","#999");

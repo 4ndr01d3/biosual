@@ -13,9 +13,10 @@
   stroke: #000; 
   stroke-width: 0px;
 }
-.graphNetwork line.link {
+.graphNetwork line.link,.graphNetwork path.link {
 	stroke: #999;
 	stroke-opacity: .6;
+	fill-opacity: 0;
 }
 .graphNetwork  svg{
 	background-color: #FFF;
@@ -30,4 +31,31 @@
 .graphNetwork .mainLegend{
 	font-size: 70%;
 	text-transform: capitalize;
+}
+input[type="checkbox"] {
+    opacity: 0;
+    margin: 0 0 7px -7px;
+}
+input[type="checkbox"] + label {
+	padding: 2px 8px;
+	color: #aaa;
+	background-color: #fafafa;
+	border: 0px #888 solid;
+	border-radius: 10px;
+	box-shadow: 1px -1px 1px #888888;
+	top: 0px;
+	position: relative;
+}
+input[type="checkbox"] + label:hover, input[type="checkbox"] + label:focus, input[type="checkbox"] + label:active {
+	background-color: #f4f4f4;
+	color: #999;
+}
+input[type="checkbox"]:checked + label {
+	color: #444;
+	box-shadow: 0px 0px 0px #888888;
+	top: -1px;
+	left: 1px;
+} 
+.indicator_on {
+	color: #0f0;
 }

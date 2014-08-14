@@ -1,7 +1,7 @@
 {
     "name": "Interaction network in a circle layout",
     "description": "A network graph using D3 bundle layout",
-    "dependencies":["d3.js","Biojs.InteractionsBundleD3.js"],
+    "dependencies":["d3.v2.min.js","Biojs.InteractionsBundleD3.js"],
     "js": "CircleGraphWidget.js",
     "html": "CircleGraphWidget.html",
     "css": "CircleGraphWidget.css"

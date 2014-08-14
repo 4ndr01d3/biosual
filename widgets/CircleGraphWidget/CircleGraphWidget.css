@@ -52,3 +52,10 @@
 .graphCircle .mainLegend{
 	font-size: 70%;
 }
+
+.styled-select {
+	font-size: 16px;
+	border: 0px;
+	height: 28px;
+	margin: 0 0 2px 4px;
+}

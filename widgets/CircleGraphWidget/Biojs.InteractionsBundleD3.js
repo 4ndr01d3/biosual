@@ -658,7 +658,7 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 		selectAdded:false,
 		_addSelect: function(){
 			var self=this;
-			var select ="<select id=\""+self.opt.target+"_sort\" style='display:none;'>";
+			var select ="<select id=\""+self.opt.target+"_sort\" style='display:none;' class='styled-select'>";
 			select += "<option value='default'>default</option>";
 			for (var prot in self.proteins){
 				for (var f in self.proteins[prot].features){
@@ -688,8 +688,9 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 	    comparison: function(self,a, b) { 
 			var loc_with_ch = /^(\d+)\((\d+)...(\d+)\)/;
 			var loc_without_ch = /^(\d+)...(\d+)$/;
-			if (self.sortedBy=="default")
+			if (self.sortedBy=="default" ||  typeof a.features=="undefined" ||  typeof b.features=="undefined")
 				return d3.ascending(a.key,b.key);
+			
 			var x=a.features[self.sortedBy],y=b.features[self.sortedBy];
 			if (isNaN(x)||isNaN(y)){
 				if (loc_with_ch.test(x)&&loc_with_ch.test(y)){

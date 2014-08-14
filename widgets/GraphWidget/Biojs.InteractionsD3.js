@@ -54,6 +54,7 @@ Biojs.InteractionsD3 = Biojs.extend (
 		node_drag:null,
 		foci: [],
 		organisms: {},
+		bundlingStrength:1.0,
 		
 		//Transformation values
 		tTranslate:null,
@@ -124,6 +125,12 @@ Biojs.InteractionsD3 = Biojs.extend (
 			self.perspective=d3.select("#"+self.opt.target + " svg").append('svg:g');
 			
 			 
+			 self.line = d3.svg.line()
+		        .interpolate("basis")
+		        .x(function(d) { 
+		        	return d.x; })
+		        	
+		        .y(function(d) { return d.y; });
 			
 			function redraw(x,y,scaleP) {
 				var trans=null,scale=null;
@@ -238,6 +245,14 @@ Biojs.InteractionsD3 = Biojs.extend (
 						.attr("y1", function(d) { return d.source.y; })
 						.attr("x2", function(d) { return d.target.x; })
 						.attr("y2", function(d) { return d.target.y; });
+
+				self.vis.selectAll("path.link")
+					.attr("d",// self.line);
+					function(d) { 
+						return self.line([ {x: d.source.x, y: d.source.y },{x: d.target.x, y: d.target.y }]);
+					});
+
+
 			};
 			self.tick=tick;
 			//Binding the _resize method when resizing the window! 
@@ -668,6 +683,120 @@ Biojs.InteractionsD3 = Biojs.extend (
 			var self = this;
 			self._isAnimationEnabled=false;			
 		},
+		// Must be a better way to do this without duplicating links and paths
+		generateSegments:function(graph_links) {
+			var self = this;
+		    var nodes = []; // needed for force directed layout
+		    var links = []; // needed for force directed layout
+		    var paths = []; // needed for drawing smooths paths
+
+		    // number of segments depends on distance of nodes
+		    var numNodes = d3.scale.linear()
+		        .domain([0, self.width])
+		        .range([5, 15]);
+
+		    graph_links.forEach(function(d, i) {
+		        // distance between nodes
+		        var dist = Math.sqrt(
+		            Math.pow(d.target.x - d.source.x, 2) +
+		            Math.pow(d.target.y - d.source.y, 2));
+
+		        // start index
+		        var start = nodes.length;
+		        var total = Math.round(numNodes(dist));
+
+		        // use to calculate nodes between source and target
+		        var xscale = d3.scale.linear()
+		            .domain([0, total + 1])
+		            .range([d.source.x, d.target.x]);
+
+		        var yscale = d3.scale.linear()
+		            .domain([0, total + 1])
+		            .range([d.source.y, d.target.y]);
+
+		        // collect all nodes into a local path
+		        var local = [];
+
+		        // push source node
+		        var start = {x: d.source.x, y: d.source.y, fixed: true};
+		        nodes.push(start);
+		        local.push(start);
+
+		        // push middle nodes
+		        for (var j = 1; j <= total; j++) {
+		            var node = {
+		                x: xscale(j),
+		                y: yscale(j)
+		            };
+
+		            local.push(node);
+		            nodes.push(node);
+		            links.push({
+		                source: nodes[nodes.length - 2],
+		                target: nodes[nodes.length - 1]
+		            });
+		        }
+
+		        // push target node
+		        var target = {x: d.target.x, y: d.target.y, fixed: true};
+		        local.push(target);
+		        nodes.push(target);
+		        links.push({
+		            source: nodes[nodes.length - 2],
+		            target: nodes[nodes.length - 1]
+		        });
+		        d.path=local;
+
+		        paths.push(local);
+		    });
+
+		    return {nodes: nodes, links: links, paths: paths};
+		},
+		changeBundlingStrength: function(bundlingStrength){
+			var self = this;
+			self.bundlingStrength=bundlingStrength;
+			if (self.bundling!=null){
+				self.bundling
+					.charge(0)
+					.resume()
+					.charge(self.bundlingStrength);
+				
+			}
+//			self.unbundleLinks();
+//			self.bundleLinks();
+		},
+		bundleLinks:function(){
+			var self = this;
+			self.disableAnimation();
+			self.bundles = self.generateSegments(self.interactions);
+
+			var link =self.vis.selectAll(".graphNetwork path.link")
+				.data(self.interactions, function(d) { return d.source.id + "-" + d.target.id; });
+			self.bundling = d3.layout.force()
+		    	.size([self.width, self.width])
+		        .charge(self.bundlingStrength)
+		        .gravity(0)
+		        .linkDistance(0)
+		        .nodes(self.bundles.nodes)
+		        .links(self.bundles.links)
+		        .start();
+			self.bundling.on("tick", function() {
+				if (self.bundling==null)
+					return;
+				link.attr("d", //self.line)
+						function(d) { 
+					return self.line(d.path);
+				});
+		    });
+		},
+		unbundleLinks:function(){
+			var self = this;
+			self.bundles=[];
+			if (self.bundling!=null) self.bundling.stop;
+			self.bundling=null;
+			self.enableAnimation();
+		},
+
 		/**
 		 * Restart the graphic to materialize the changes done on it(e.g. add/remove proteins)
 		 * It is here where the SVG elemnts are created.
@@ -682,12 +811,14 @@ Biojs.InteractionsD3 = Biojs.extend (
 			    .nodes(self.proteins)
 			    .links(self.interactions)
 				.charge(-self.opt.radius*(3+self.proteins.length))
-				.linkDistance(self.opt.radius*(3+self.proteins.length*0.05)).start();
+				.linkDistance(self.opt.radius*(3+self.proteins.length*0.05))
+				.start();
 
-			var link =self.vis.selectAll(".graphNetwork line.link")
+			var link =self.vis.selectAll(".graphNetwork path.link")
 				.data(self.interactions, function(d) { return d.source.id + "-" + d.target.id; });
+//				.data(bundles.paths);
 			
-			link.enter().insert("line" , ".node") //insert before the .node so lines won't hide the nodes
+			link.enter().insert("path" , ".node") //insert before the .node so lines won't hide the nodes
 				.attr("class", "link")
 				.attr("id", function(d) { return "link_"+d.source.id+"_"+d.target.id; })
 				.on("mouseover", function(d){ 
@@ -704,12 +835,17 @@ Biojs.InteractionsD3 = Biojs.extend (
 					self.raiseEvent('interactionClick', {
 						interaction: d
 					});
-				})
-				.attr("x1", function(d) { return d.source.x; })
-				.attr("y1", function(d) { return d.source.y; })
-				.attr("x2", function(d) { return d.target.x; })
-				.attr("y2", function(d) { return d.target.y; });
+				});
+//				.attr("x1", function(d) { return d.source.x; })
+//				.attr("y1", function(d) { return d.source.y; })
+//				.attr("x2", function(d) { return d.target.x; })
+//				.attr("y2", function(d) { return d.target.y; });
 			
+			link.attr("d", //self.line)
+					function(d) { 
+				return self.line([ {x: d.source.x, y: d.source.y },{x: d.target.x, y: d.target.y }]);
+			})
+
 			link.exit().remove();
 	
 			var nodes= self.vis.selectAll(".graphNetwork .node")
@@ -756,7 +892,7 @@ Biojs.InteractionsD3 = Biojs.extend (
 				.attr("class", "legend")
 				.attr("id", function(d) { return "legend_"+d.id; })
 				.text(function(d) { 
-					if (d.typeLegend=="id") 
+					if (typeof d.typeLegend=="undefined"|| d.typeLegend=="id") 
 						return d.id;
 					else if (d.typeLegend.indexOf("features.")==0)
 						return d.features[d.typeLegend.substr(9)];
