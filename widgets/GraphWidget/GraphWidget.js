@@ -30,8 +30,18 @@
 		    }		
 		    $("#"+self.target).before('<input type="checkbox" id="'+self.target+'_bundling" class="toggle" /><label for="'+self.target+'_bundling"><span>&#9679;</span> Bundle Links</label><input id="'+self.target+'_bundling_slider" type="range" min="0" max="200" value="100" style="display:none"/>');
 		    $("#"+self.target).before("<input type='checkbox' id='"+self.target+"_switch' checked='checked'/><label for=\""+self.target+"_switch\"><span>&#9679;</span> Animation</label>");
+		    $("#"+self.target).before("<input type='checkbox' id='"+self.target+"_cluster' class='toggle'/><label for=\""+self.target+"_cluster\"><span>&#9679;</span> Cluster</label><input id='"+self.target+"_cluster_slider' type='range' min='1' max='8' value='2' style='display:none'/>");
 		    $("#"+self.target+"_switch").change(function(e){
 		    	self.animateOnSwitch();
+		    });
+		    $("#"+self.target+"_cluster").change(function(e){
+		    	self.graph._shouldCluster = this.checked;
+		    	self.graph.restart();
+				if (this.checked){
+					$("#"+self.target+"_cluster_slider").show();
+				}else{
+					$("#"+self.target+"_cluster_slider").hide();					
+				}
 		    });
 		    $("#"+self.target+"_bundling").change(function(e){
 		    	$("label[for="+self.target+"_bundling] span").toggleClass("indicator_on");
@@ -49,6 +59,10 @@
 		    });
 		    $("#"+self.target+"_bundling_slider").change(function(e){
 		    	self.graph.changeBundlingStrength(this.value / 100);
+		    });
+		    $("#"+self.target+"_cluster_slider").change(function(e){
+		    	self.graph._howDeep =this.value;
+		    	self.graph.restart();
 		    });
 
 		    

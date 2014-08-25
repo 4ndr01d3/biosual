@@ -97,12 +97,11 @@ Biojs.InteractionsD3 = Biojs.extend (
 			self.zoom=d3.behavior.zoom().
     					scaleExtent([(self.opt.enableEdges)?1:0.05, 10])
     					.on("zoom", redraw);
-			
 			self.vis = d3.select("#"+self.opt.target).append("svg")
 			    .attr("width", width)
 			    .attr("height", height)
 			    .attr("pointer-events", "all")
-			    .call(self.zoom)
+			    .call(self.zoom).on("dblclick.zoom", null)
 			    .append('svg:g');
 			
 			self.vis.append('svg:rect')
@@ -168,8 +167,8 @@ Biojs.InteractionsD3 = Biojs.extend (
 			self.redraw=redraw;
 			
 			self.force = d3.layout.force()
-			    .nodes(self.proteins)
-			    .links(self.interactions)
+//			    .nodes(self.proteins)
+//			    .links(self.interactions)
 			    .size([width, height]);
 			
 			
@@ -201,9 +200,11 @@ Biojs.InteractionsD3 = Biojs.extend (
 
 				if (e.type=="tick"){
 					var k = .1 * e.alpha;
-					self.proteins.forEach(function(o, i) {
-						o.y += (self.foci[self.organisms[o.organism]].y - o.y) * k;
-						o.x += (self.foci[self.organisms[o.organism]].x - o.x) * k;
+					self._currentProteins.forEach(function(o, i) {
+						if (o.organism!="CLUSTER"){
+							o.y += (self.foci[self.organisms[o.organism]].y - o.y) * k;
+							o.x += (self.foci[self.organisms[o.organism]].x - o.x) * k;
+						}
 					});
 				}
 				self.vis.selectAll("path.figure")
@@ -241,7 +242,8 @@ Biojs.InteractionsD3 = Biojs.extend (
 						.attr("y2", function(d) { return d.target.y+r; });
 				else
 					self.vis.selectAll("line.link")
-						.attr("x1", function(d) { return d.source.x; })
+						.attr("x1", function(d) { 
+							return d.source.x; })
 						.attr("y1", function(d) { return d.source.y; })
 						.attr("x2", function(d) { return d.target.x; })
 						.attr("y2", function(d) { return d.target.y; });
@@ -404,7 +406,8 @@ Biojs.InteractionsD3 = Biojs.extend (
 			 * ); 
 			 * 
 			 * */
-			"transformOverSVG"
+			"transformOverSVG",
+			"clustering"
 
 		], 
 		jumpToStable:function(){
@@ -514,11 +517,11 @@ Biojs.InteractionsD3 = Biojs.extend (
 			if (n!=-1)
 				return n;
 			if (typeof self.fixedProteins[protein.id]=="undefined"){
-				protein.px=Math.floor((Math.random()*self.opt.width));
-				protein.py=Math.floor((Math.random()*self.opt.width));
+				protein.x = protein.px=Math.floor((Math.random()*self.opt.width));
+				protein.y =protein.py=Math.floor((Math.random()*self.opt.width));
 			}else{
-				protein.px=self.fixedProteins[protein.id][0];
-				protein.py=self.fixedProteins[protein.id][1];
+				protein.x = protein.px=self.fixedProteins[protein.id][0];
+				protein.y = protein.py=self.fixedProteins[protein.id][1];
 				protein.fixed=true;
 				delete self.fixedProteins[protein.id];
 			}
@@ -669,7 +672,7 @@ Biojs.InteractionsD3 = Biojs.extend (
 			self.interactions=[];
 			self.restart();
 		},
-		_figuresOrder:[0,3,2,5,4,1],
+		_figuresOrder:[0,3,2,5,1],
 		_isAnimationEnabled: true,
 		enableAnimation:function(){
 			var self = this;
@@ -768,10 +771,10 @@ Biojs.InteractionsD3 = Biojs.extend (
 		bundleLinks:function(){
 			var self = this;
 			self.disableAnimation();
-			self.bundles = self.generateSegments(self.interactions);
+			self.bundles = self.generateSegments(self._currentInteractions);
 
 			var link =self.vis.selectAll(".graphNetwork path.link")
-				.data(self.interactions, function(d) { return d.source.id + "-" + d.target.id; });
+				.data(self._currentInteractions, function(d) { return d.source.id + "-" + d.target.id; });
 			self.bundling = d3.layout.force()
 		    	.size([self.width, self.width])
 		        .charge(self.bundlingStrength)
@@ -797,6 +800,159 @@ Biojs.InteractionsD3 = Biojs.extend (
 			self.enableAnimation();
 		},
 
+		_shouldCluster:false,
+		_howDeep:2,
+		_nthCluster:0,//number of clusters
+		_shouldGoDeeper: function(node){
+			var self = this;
+			return self._quadrantsToDisplay.indexOf(node.quadrant)!=-1  || self._howDeep>node.depth;
+		},
+		_quadrantsToDisplay: [],
+		_newCluster: function(x1,y1,q){
+			var self = this;
+			return {
+				features:{
+					id:"Cluster_"+self._nthCluster,
+					proteins:""
+				},
+				proteins:[],
+				id: "Cluster_"+self._nthCluster,
+				name: "cluster "+ (self._nthCluster++),
+				organism: "CLUSTER",
+				quadrant:q,
+				px: x1,
+				py: y1,
+				size: 1,
+				weight: 1,
+				typeLegend: "id",
+				x: x1,
+				y: y1,
+				fixed:true
+			};
+		},
+		pruneProteins: function(){
+			var self = this, 
+				nodes =[],q; 
+			
+			//when the clustering is disable return all the proteins
+			if (!self._shouldCluster)
+				return self.proteins;
+			
+			//get the current quadtree
+			q = d3.geom.quadtree(self.proteins);
+			
+			
+			q.depth = 0; // root
+			q.quadrant="0";
+			
+			//To use in quadtree.visit, to select what to show.
+			var what2show = function(node, x1, y1, x2, y2){
+				//determine the depth of the children 
+				for (var i=0; i<4; i++) {
+					if (node.nodes[i]){
+						node.nodes[i].depth = node.depth+1;
+						node.nodes[i].quadrant = node.quadrant+i;
+					}
+				}
+				if (node.leaf && node.point!=null) {
+					node.point.toshow = true; //tag the node to show if has reach a leaf
+				}else{
+					node.cluster=null;
+					//takes the decision of going deeper into the tree
+					if (!self._shouldGoDeeper(node)){// && node.cluster==null){
+						//in case it is determined to stop at this node, it creates a new cluster in that node.
+						node.cluster= self._newCluster(x1,y1,node.quadrant);
+						nodes.push(node.cluster);
+						return true;
+					}
+				}
+				return false;
+			};
+			
+			//Tag all the proteins to be hidden
+			self.proteins.forEach(function(o, i) { o.toshow=false; });
+			//goes trhought the tree marking what to show and creating clusters.
+			q.visit(what2show);
+			
+			//To use in quadtree.visit, to find the cluster that a protein belongs to.
+			var addCurrentProteinToCluster = function(node, x1, y1, x2, y2){
+				if (currentProtein==null)
+					return true;
+				if (x1<=currentProtein.x && currentProtein.x<=x2 && y1<=currentProtein.y && currentProtein.y<=y2){
+					if (node.cluster != null){
+						node.cluster.proteins.push(currentProtein);
+						node.cluster.features.proteins += "<br/>"+currentProtein.id ;
+						currentProtein.cluster=node.cluster;
+						return true;
+					}
+					if (node.leaf)
+						return true;
+					return false;
+				}
+				return true;
+			};
+			
+			var currentProtein=null;
+			//Goes through alll the proteins to include the ones to show in the nodes array() or to find its cluster 
+			self.proteins.forEach(function(o, i) {
+				if (o.toshow){
+					nodes.push(o);
+				}else{
+					currentProtein=o;
+					currentProtein.cluster=null;
+					q.visit(addCurrentProteinToCluster);
+					self._calculateCentroid(currentProtein.cluster);
+					currentProtein=null;
+				}
+			});
+
+			return nodes;
+		},
+		_calculateCentroid: function(cluster){
+			var centroid ={x:0,y:0};
+			cluster.proteins.forEach(function(p,i){
+				centroid.x +=p.px;
+				centroid.y +=p.py;
+			});
+			cluster.px=cluster.x= centroid.x/cluster.proteins.length;
+			cluster.py=cluster.y= centroid.y/cluster.proteins.length;
+		},
+		pruneLinks: function(){
+			var self = this, 
+				links =[];
+			if (!self._shouldCluster)
+				return self.interactions;
+			self.interactions.forEach(function(o, i) {
+				if (o.source.toshow){
+					if (o.target.toshow){
+						links.push(o);
+					}else{
+						links.push({
+							score: 1,
+							source: o.source,
+							target: o.target.cluster
+						});
+					}
+				}else{
+					if (o.target.toshow){
+						links.push({
+							score: 1,
+							source: o.source.cluster,
+							target: o.target
+						});
+					}else{
+						if (o.source.cluster.id != o.target.cluster.id)
+							links.push({
+								score: 1,
+								source: o.source.cluster,
+								target: o.target.cluster
+							});
+					}
+
+				}
+			});
+			return links;
+		},
 		/**
 		 * Restart the graphic to materialize the changes done on it(e.g. add/remove proteins)
 		 * It is here where the SVG elemnts are created.
@@ -804,56 +960,58 @@ Biojs.InteractionsD3 = Biojs.extend (
 		 * @example 
 		 * instance.restart();
 		 */
+		_currentProteins:[],
+		_currentInteractions:[],
 		restart: function(){
 			var self = this;
 			
+			self._currentProteins = self.pruneProteins();
+			self._currentInteractions = self.pruneLinks();
 			self.force
-			    .nodes(self.proteins)
-			    .links(self.interactions)
+			    .nodes(self._currentProteins)
+			    .links(self._currentInteractions)
 				.charge(-self.opt.radius*(3+self.proteins.length))
 				.linkDistance(self.opt.radius*(3+self.proteins.length*0.05))
 				.start();
-
 			var link =self.vis.selectAll(".graphNetwork path.link")
-				.data(self.interactions, function(d) { return d.source.id + "-" + d.target.id; });
+				.data(self._currentInteractions, function(d) { return d.source.id + "-" + d.target.id; });
 //				.data(bundles.paths);
 			
 			link.enter().insert("path" , ".node") //insert before the .node so lines won't hide the nodes
 				.attr("class", "link")
-				.attr("id", function(d) { return "link_"+d.source.id+"_"+d.target.id; })
-				.on("mouseover", function(d){ 
-					self.raiseEvent('interactionMouseOver', {
-						interaction: d
-					});
-				})
-				.on("mouseout",  function(d){ 
-					self.raiseEvent('interactionMouseOut', {
-						interaction: d
-					});
-				})
-				.on("click", function(d){ 
-					self.raiseEvent('interactionClick', {
-						interaction: d
-					});
-				});
-//				.attr("x1", function(d) { return d.source.x; })
-//				.attr("y1", function(d) { return d.source.y; })
-//				.attr("x2", function(d) { return d.target.x; })
-//				.attr("y2", function(d) { return d.target.y; });
+				.attr("id", function(d) { return "link_"+d.source.id+"_"+d.target.id; });
+
 			
-			link.attr("d", //self.line)
-					function(d) { 
-				return self.line([ {x: d.source.x, y: d.source.y },{x: d.target.x, y: d.target.y }]);
+			link.attr("d", 
+				function(d) { 
+					return self.line([ {x: d.source.x, y: d.source.y },{x: d.target.x, y: d.target.y }]);
+				})				
+			.on("mouseover", function(d){ 
+				self.raiseEvent('interactionMouseOver', {
+					interaction: d
+				});
 			})
+			.on("mouseout",  function(d){ 
+				self.raiseEvent('interactionMouseOut', {
+					interaction: d
+				});
+			})
+			.on("click", function(d){ 
+				self.raiseEvent('interactionClick', {
+					interaction: d
+				});
+			});
 
 			link.exit().remove();
 	
-			var nodes= self.vis.selectAll(".graphNetwork .node")
-				.data(self.proteins, function(d) { return d.id;});
+			var nodes= self.vis.selectAll(".graphNetwork g")
+				.data(self._currentProteins, function(d) { return d.id;});
 			
 			var node=nodes
 				.enter().append("g")
-				.attr("class", "node")
+				.attr("class",function(d) {
+					return (d.organism=="CLUSTER")?"cluster":"node";
+				}) 
 				.attr("id", function(d) { return "node_"+d.id; })
 				.attr("organism", function(d) { return d.organism; })
 				.call(self.node_drag);
@@ -862,10 +1020,10 @@ Biojs.InteractionsD3 = Biojs.extend (
 				.attr("class", "figure")
 				.attr("d", d3.svg.symbol()
 						.size(function(d) {
-							return (2*self.opt.radius)*(2*self.opt.radius)*d.size*d.size;
+							return (d.organism=="CLUSTER")?(2*self.opt.radius)*(2*self.opt.radius)*d.proteins.length:(2*self.opt.radius)*(2*self.opt.radius)*d.size*d.size;
 						})
 						.type(function(d) {
-							return d3.svg.symbolTypes[self._figuresOrder[self.organisms[d.organism]]];
+							return d3.svg.symbolTypes[(d.organism=="CLUSTER")?4:self._figuresOrder[self.organisms[d.organism]]];
 						})
 					)
 				.attr("id", function(d) { return "figure_"+d.id; })
@@ -884,7 +1042,19 @@ Biojs.InteractionsD3 = Biojs.extend (
 						protein: d
 					});
 				})
-				.attr("stroke-width",self.opt.radius*0.3);
+				.on("dblclick", function(d) { 
+					if (d.organism=="CLUSTER"){
+						self._quadrantsToDisplay.push(d.quadrant);
+						self._quadrantsToDisplay.push(d.quadrant+"0");
+						self._quadrantsToDisplay.push(d.quadrant+"1");
+						self._quadrantsToDisplay.push(d.quadrant+"2");
+						self._quadrantsToDisplay.push(d.quadrant+"3");
+						self.restart();
+					}
+				})
+				.attr("stroke-width",self.opt.radius*0.3)
+				.style("fill",function(d){return (d.organism=="CLUSTER")?"#eee":null;})
+				.style("stroke",function(d){return (d.organism=="CLUSTER")?"#D10000":null});
 			
 
 			node
@@ -911,6 +1081,8 @@ Biojs.InteractionsD3 = Biojs.extend (
 				self._paintLegends();
 			
 			self._paintZoomLegend();
+			if (self.proteins != self._currentProteins)
+				self.raiseEvent('clustering');
 		},
 		_sortLegends:function(){
 			var self = this;
@@ -1216,10 +1388,10 @@ Biojs.InteractionsD3 = Biojs.extend (
 			self.vis.selectAll(selector).attr("d", d3.svg.symbol()
 					.size(function(d) {
 						d.size=scale;
-						return (2*self.opt.radius)*(2*self.opt.radius)*scale;
+						return (d.organism=="CLUSTER")?(2*self.opt.radius)*(2*self.opt.radius)*d.proteins.length:(2*self.opt.radius)*(2*self.opt.radius)*scale;
 					})
 					.type(function(d) {
-						return d3.svg.symbolTypes[self._figuresOrder[self.organisms[d.organism]]];
+						return d3.svg.symbolTypes[(d.organism=="CLUSTER")?4:self._figuresOrder[self.organisms[d.organism]]];
 					})
 				);
 		}, 
@@ -1237,10 +1409,10 @@ Biojs.InteractionsD3 = Biojs.extend (
 			var self=this;
 			self.vis.selectAll(selector).attr("d", d3.svg.symbol()
 					.size(function(d) {
-						return (2*self.opt.radius)*(2*self.opt.radius)*d.size;
+						return (d.organism=="CLUSTER")?(2*self.opt.radius)*(2*self.opt.radius)*d.proteins.length:(2*self.opt.radius)*(2*self.opt.radius)*d.size;
 					})
 					.type(function(d) {
-						return d3.svg.symbolTypes[self._figuresOrder[self.organisms[d.organism]]];
+						return d3.svg.symbolTypes[(d.organism=="CLUSTER")?4:self._figuresOrder[self.organisms[d.organism]]];
 					})
 				);
 		}, 

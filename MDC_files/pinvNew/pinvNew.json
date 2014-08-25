@@ -902,6 +902,13 @@
 				   			"listener":"graph2",
 				   			"method":"executeStylers",
 				   			"type":"afterRequest"
+				   		},
+				   		{	"source":"graph",
+				   			"object":"graph",
+				   			"event":"clustering",
+				   			"listener":"context",
+				   			"method":"afterRequest",
+				   			"type":"afterRequest"
 				   		}
 				   	]
 
