@@ -1,0 +1,9 @@
+{
+    "name": "QuickStart",
+    "description": "A Wizard pop-up to use a dataset for the first time",
+    "dependencies":[],
+    "dependenciesCSS":[],
+    "js": "QuickStartWidget.js",
+    "html": "QuickStartWidget.html",
+    "css": "QuickStartWidget.css"
+}

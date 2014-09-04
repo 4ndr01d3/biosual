@@ -83,6 +83,9 @@
 				     { "target":"#graph_bundling,label[for=graph_bundling]",
 					       "visibleWith":["Network"] 
 				     },
+				     { "target":"#graph_cluster,label[for=graph_cluster]",
+					       "visibleWith":["Network"] 
+				     },
 				     { "target":"#graph3_sort,label[for=graph3_sort]",
 					       "visibleWith":["Heatmap"] 
 					 },
@@ -180,23 +183,23 @@
 			"id": "size",
 				"target": "size",
 				"options": [
-				     { "title": "1400x600", "selected":true  },
-				     { "title": "1200x600", "selected":false },
-				     { "title": "1000x600", "selected":false },
-				     { "title": "800x600",  "selected":false },
-				     { "title": "600x600",  "selected":false },
-				     { "title": "1400x800", "selected":false },
-				     { "title": "1200x800", "selected":false },
-				     { "title": "1000x800", "selected":false },
-				     { "title": "800x800",  "selected":false },
-				     { "title": "600x800",  "selected":false }
+				     { "title": "1400x600" },
+				     { "title": "1200x600", "selected":true  },
+				     { "title": "1000x600" },
+				     { "title": "800x600"  },
+				     { "title": "1400x800" },
+				     { "title": "1200x800" },
+				     { "title": "1000x800" },
+				     { "title": "800x800"  }
 				],
 				"trigger":[
 				    { "widget":"graph",  "method":"setSize" },
 					{ "widget":"graph2", "method":"setSize" },
 					{ "widget":"graph3", "method":"setSize" },
 					{ "widget":"status", "method":"setSize" }
-				]
+				],
+				"optionFormat": "^[0-9][0-9]+x[0-9][0-9]+$",
+				"explainFormat": "The new option has to be a number followed by a character 'x' and then another number. All together no spaces."
 			},
 			"templateTarget":"center",
 			"tags":{"id":"size"}
@@ -552,6 +555,11 @@
 				"uploader_URL":"http://biosual.cbio.uct.ac.za/uploader/",
 				"reinit":["requester","table","text","queryfilter"]
 			}
+		},
+		{	"widget": "QuickStartWidget",
+			"parameters": {},
+			"templateTarget":"top",
+			"tags":{"title":"","id":"quickstart"}
 		},
 		
 		{	"widget": "ProvenanceWidget",

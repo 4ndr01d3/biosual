@@ -178,6 +178,7 @@ Biojs.InteractionsD3 = Biojs.extend (
 				.on("dragend", dragend);
 
 			function dragstart(d, i) {
+				d3.event.sourceEvent.stopPropagation();
 				self.force.stop(); // stops the force auto positioning before you start dragging
 			}
 

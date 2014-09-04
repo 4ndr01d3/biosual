@@ -876,17 +876,17 @@ Biojs.InteractionsHeatmapD3 = Biojs.extend (
 				legend.filter(function(d) { return d[0]!="label" && d[1]==type; }).append("path")
 					.attr("class", "figure")
 					.attr("d", function(d) {
-							var h=2*self.opt.radius*Math.sqrt(d[0][2]);
+							var h=16*d[0][2];
 							return "M0,0L0,10M0,5L"+h+",5M"+h+",0L"+h+",10 ";
 					})
 					.attr("transform", function(d) { 
-						return "translate(" +  (self.opt.width/2+w/2 - 18 - 2*self.opt.radius*Math.sqrt(d[0][2])) + "," +  0 + ")"; 
+						return "translate(" +  (self.opt.width/2+w/2 - 18 - 16*d[0][2]) + "," +  0 + ")"; 
 					})
 					.style("fill", "transparent")
 					.style("stroke", "black");
 				legend.filter(function(d) { return d[0]!="label" && d[1]== type; }).append("text")
 					.attr("x", function(d) { 
-						return (self.opt.width/2+w/2 - 22 - 5*self.opt.radius); 
+						return (self.opt.width/2+w/2 - 22 - 5*16); 
 					})
 					.attr("y", 7)
 					.attr("dy", ".35em")

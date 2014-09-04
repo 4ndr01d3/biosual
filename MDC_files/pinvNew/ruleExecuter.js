@@ -3,7 +3,9 @@
 	  	$.fn.ruler={};
 		$.fn.ruler.applyRules = function(self){
 			//not apply rules on a non visible target
-			if (!$("#"+self.target).is(':visible')) return;
+			if (	!$("#"+self.target).is(':visible') ||
+					!Manager.widgets["ruler"].ruler) 
+				return;
 			
 			var rules = Manager.widgets["ruler"].ruler.getActiveRules();
 			var model = Manager.widgets["ruler"].rules;
@@ -227,7 +229,9 @@
 		};	  	
 		$.fn.ruler.applyRules2 = function(self){
 			//not apply rules on a non visible target
-			if (!$("#"+self.target).is(':visible')) return;
+			if (!$("#"+self.target).is(':visible') ||
+					!Manager.widgets["ruler"].ruler) 
+				return;
 
 			var rules = Manager.widgets["ruler"].ruler.getActiveRules();
 			var model = Manager.widgets["ruler"].rules;
@@ -441,7 +445,9 @@
 		};
 		$.fn.ruler.applyRules3 = function(self){
 			//not apply rules on a non visible target
-			if (!$("#"+self.target).is(':visible')) return;
+			if (!$("#"+self.target).is(':visible') ||
+					!Manager.widgets["ruler"].ruler) 
+				return;
 
 			var rules = Manager.widgets["ruler"].ruler.getActiveRules();
 			var model = Manager.widgets["ruler"].rules;

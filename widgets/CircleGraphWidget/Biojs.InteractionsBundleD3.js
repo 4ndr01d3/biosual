@@ -761,12 +761,12 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 						interaction: d
 					});
 				});
+			path.exit().remove();
 			path
 				.attr("d", function(d, i) {return (typeof $(this).attr("d")=="undefined")?"M0 0 L5 5":$(this).attr("d");})
 				.transition()
-				.attr("d", function(d, i) { return self.line(self.splines[i]); });
+				.attr("d", function(d, i) { return i<self.splines.length ? self.line(self.splines[i]) : null; });
 
-			path.exit().remove();
 
 			var gnodes=self.svg.selectAll("g.node")
 				.data(nodes.filter(function(n) { return !n.children; }));

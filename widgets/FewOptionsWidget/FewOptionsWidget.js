@@ -3,28 +3,54 @@
 		init: function () {
 			var self =this;
 			$("#"+self.target).empty();
-			$("#"+self.target).html("<ul />");
+			$("#"+self.target).html("<ul class='options'/>");
 			for (var i=0;i<self.options.length;i++){
-				var def=(self.options[i].selected)?' class="current"':"";
-				$("#"+self.target+ " ul").append('<li'+def+'><a title="'+self.options[i].title+'">'+self.options[i].title+'</a></li>');
-
-				$("#"+self.target+ " ul a[title='"+self.options[i].title+"']").click(function(d){ 
-					
-					$("#"+self.target+ " ul li").removeClass("current");
-					for (var i=0;i<self.options.length;i++){
-						$("#"+self.options[i].target).hide();
-						if ($(this).attr("title")==self.options[i].title){
-							$(this).parent().addClass("current");
-						}
-					}
-					for (var i=0;i<self.trigger.length;i++){
-						var toTrigger= self.manager.widgets[self.trigger[i].widget];
-						toTrigger[self.trigger[0].method]($(this).attr("title"));
-					}
-				});
+				self.addOption(self.options[i]);
 			}
+			$("#"+self.target).append("<ul><li><a class='other_option'>Other...</a><span class='other_option'><input type='text'><button>add</button></span></li></ul>");
+			$("#"+self.target+" span.other_option").hide();
+			$("#"+self.target+ " a.other_option").click(function(d){ 
+				$("#"+self.target+" span.other_option").show();
+			});
+			$("#"+self.target+ " span.other_option button").click(function(d){
+				var newoption=$("#"+self.target+ " span.other_option input").val();
+				if (self.optionFormat){
+					var regexp=new RegExp(self.optionFormat);
+					if (regexp.test(newoption)){
+						self.addOption({"title":newoption});
+						$("#"+self.target+ " ul.options a[title='"+newoption+"']").click();
+						$("#"+self.target+" span.other_option").hide();
+					}else{
+						alert(self.explainFormat);
+					}
+						
+				}
+			});
+			$("ul.options .current a").click();
 		},
+		addOption: function(option){
+			var self = this;
+			var def=(option.selected)?' class="current"':"";
+			$("#"+self.target+ " ul.options").append('<li'+def+'><a title="'+option.title+'">'+option.title+'</a></li>');
 
+			$("#"+self.target+ " ul.options a[title='"+option.title+"']").click(function(d){ 
+				
+				$("#"+self.target+ " ul.options li").removeClass("current");
+				for (var i=0;i<self.options.length;i++){
+					$("#"+option.target).hide();
+					if ($(this).attr("title")==option.title){
+						$(this).parent().addClass("current");
+					}
+				}
+				for (var i=0;i<self.trigger.length;i++){
+					var toTrigger= self.manager.widgets[self.trigger[i].widget];
+					toTrigger[self.trigger[0].method]($(this).attr("title"));
+				}
+			});
+		},
+		onceOff:true,
+		afterRequest: function(){
+		},
 		initTest: function(){
 			var self = this;
 			ok($("#"+self.target+" ul").length>0,"Widget("+self.id+"-FewOptionsWidget): The target contains at least a UL element");

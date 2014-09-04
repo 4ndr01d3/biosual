@@ -10,6 +10,8 @@ margin-left: 20px; /*margin between first menu item and left browser edge*/
 margin-right: 20px; /*margin between first menu item and left browser edge*/
 padding: 0;
 list-style: none;
+display: inline-block;
+
 }
 
 .fewoptionswidget li{

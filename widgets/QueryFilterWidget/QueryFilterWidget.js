@@ -8,6 +8,7 @@
 		defined:false,
 		currentFilter:"",
 		ruler:null,
+		mode:"",
 		
 		init: function(){
 			var self = this;
@@ -83,6 +84,8 @@
 
 			$(".filter_button button").click(function(){
 				$('.explain_close').hide(); 
+
+				self.mode = $(this).val();
 				self.executeClick(self);
 				if ( typeof Manager.widgets["provenance"] != "undefined") {
 					Manager.widgets["provenance"].addAction("Prefilters executed",self.id);
@@ -93,6 +96,8 @@
 				self._fillDynamicFields();
 			});
 
+			$('#filter_mask').hide(); 
+			$('#filter_container').hide();
 		},
 		setTotalProteins:function(total){
 			var self = this;
@@ -229,13 +234,13 @@
 							if (rule.parameters[0]=="id"){
 								switch (rule.parameters[1]){
 									case "equals":
-										query ='(p1:'+rule.parameters[2]+' AND p2:'+rule.parameters[2]+')';
+										query = (rule.parameters[2]=="")?'(-p1:["" TO *] AND -p2:["" TO *])':'(p1:'+rule.parameters[2]+' AND p2:'+rule.parameters[2]+')';
 										break;
 									case "contains":
 										query ='(p1:*'+rule.parameters[2]+'* AND p2:*'+rule.parameters[2]+'*)';
 										break;
 									case "different":
-										query ='-(p1:'+rule.parameters[2]+' AND p2:'+rule.parameters[2]+')';
+										query = (rule.parameters[2]=="")?'*':'-(p1:'+rule.parameters[2]+' AND p2:'+rule.parameters[2]+')';
 										break;
 									case "not contains":
 										query ='-(p1:*'+rule.parameters[2]+'* AND p2:*'+rule.parameters[2]+'*)';
@@ -245,12 +250,12 @@
 							}else{
 								switch (rule.parameters[1]){
 									case "equals":
-										query ='(p1_'+self._solrScape(rule.parameters[0])+':'+rule.parameters[2]+' AND p2_'+self._solrScape(rule.parameters[0])+':'+rule.parameters[2]+')';
+										query = (rule.parameters[2]=="")?'(-p1_'+self._solrScape(rule.parameters[0])+':["" TO *] AND -p2_'+self._solrScape(rule.parameters[0])+':["" TO *])':'(p1_'+self._solrScape(rule.parameters[0])+':'+rule.parameters[2]+' AND p2_'+self._solrScape(rule.parameters[0])+':'+rule.parameters[2]+')';
 										break;
 									case "contains":
 										query ='(p1_'+self._solrScape(rule.parameters[0])+':*'+rule.parameters[2]+'* AND p2_'+self._solrScape(rule.parameters[0])+':*'+rule.parameters[2]+'*)';
 										break;
-									case "different":
+									case "different": //TODO: solar query not working as expected: * AND !(-p1_gpl51\-01_\(gsm854\)_heat_shock_05_min:["" TO *] AND -p2_gpl51\-01_\(gsm854\)_heat_shock_05_min:["" TO *])
 										query ='-(p1_'+self._solrScape(rule.parameters[0])+':'+rule.parameters[2]+' AND p2_'+self._solrScape(rule.parameters[0])+':'+rule.parameters[2]+')';
 										break;
 									case "not contains":
@@ -371,14 +376,16 @@
 		    }			
 		},
 		executeClick:function(self){
-			var option = $("input[name='filter_action']:checked").val();
+			var option = self.mode;//$("input[name='filter_action']:checked").val();
 			var rules = self.ruler.getActiveRules();
 			self.defined = (rules.length>0);
-			if (!self.defined)
+			if (!self.defined){
 				$(".filter_img").attr("src","biosual/widgets/QueryFilterWidget/filter1.png");
-			else
+				alert("WARNING! No Filter have been defined.");
+				return;
+			}else {
 				$(".filter_img").attr("src","biosual/widgets/QueryFilterWidget/filter2.png");
-
+			}
 			switch(option){
 				case "future":
 					self.manager.widgets["requester"].setFilter(self.currentFilter);
@@ -394,10 +401,20 @@
 					}
 					break;
 				case "explicit":
+					if (self.filtered>2000){
+						if(!confirm("The current filter is going to fetch "+self.filtered+" interactions. This might take a while. Are you sure?"))
+							return;
+					}
+						
 					self.manager.widgets["requester"].setFilter(self.currentFilter);
 					self.manager.widgets["requester"].request("*","explicit");
 					break;
 				case "full":
+					if (self.filtered>1000){
+						if(!confirm("The current filter is going to fetch "+self.filtered+" interactions. This might take a while. Are you sure?"))
+							return;
+					}
+					
 					self.manager.widgets["requester"].setFilter(self.currentFilter);
 					self.manager.widgets["requester"].request("*");
 					break;
@@ -408,7 +425,7 @@
 			var self = this;
 			return {
 				"rules":self.ruler.getActiveRules(),
-				"option":$("input[name='filter_action']:checked").val()
+				"option":self.mode//$("input[name='filter_action']:checked").val()
 			};
 		},
 		onceOffStatus:null,
@@ -421,7 +438,8 @@
 			for (var i=0;i<json.rules.length;i++){
 				self.ruler.addActiveRule(json.rules[i]);
 			}
-			$("#"+json.option).attr('checked', 'checked');
+			//$("#"+json.option).attr('checked', 'checked');
+			self.mode = json.option;
 			self.defined = (self.ruler.getActiveRules().length>0);
 			if (!self.defined)
 				$(".filter_img").attr("src","biosual/widgets/QueryFilterWidget/filter1.png");

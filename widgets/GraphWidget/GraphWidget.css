@@ -57,5 +57,5 @@ input[type="checkbox"]:checked + label {
 	left: 1px;
 } 
 .indicator_on {
-	color: #0f0;
+	color: limegreen;
 }

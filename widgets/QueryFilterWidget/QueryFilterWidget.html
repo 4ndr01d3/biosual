@@ -21,18 +21,17 @@
 				</table>
 			</div><br/>
 			<div id="label_svg_filter"></div><br class="clearboth" />
-			<div>
-				<input type="radio" name="filter_action" id="future" value="future" checked="checked">
-				<label for="future">Apply on future queries</label><br>
-				<input type="radio" name="filter_action" id="past" value="past">
-				<label for="past">Re-execute previous queries and apply on future queries</label><br>
-				<input type="radio" name="filter_action" id="explicit" value="explicit">
-				<label for="explicit">Execute filters over the current graphic(Explicit mode)</label><br>
-				<input type="radio" name="filter_action" id="full" value="full">
-				<label for="full">Execute filters over the full network</label><br>
-			</div>
 		</div>
+			<div class="filter_button">
+				<div>	<button value="future">Create Filter For FUTURE queries</button>
+						<section class="explain">The defined filters won't be used right away, but any future query will include them.</section></div>
+				<div>	<button value="past">Filter CURRENT Network</button>
+						<section class="explain">The queries on your current network, will be executed again but filtered</section></div>
+				<div>	<button value="explicit">Fetch Interactions in CONTEXT</button>
+						<section class="explain">The whole dataset will be queried but only the interactions related with the current graphic will be displayed</section></div>
+				<div>	<button value="full">Fetch Filtered Interactions</button>
+						<section class="explain">It queries the whole database with the selected filters.<br>Make sure to have a subset of less than 1000 proteins to have a good performance</section></div>
+			</div>
   	</div>
-	<div class="filter_button"><button>Execute</button></div>
   </div>
 </div>
