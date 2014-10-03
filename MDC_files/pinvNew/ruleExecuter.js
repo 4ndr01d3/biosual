@@ -70,6 +70,12 @@
 								case "not contains":
 									selector =prefix2+":not([id *="+rule.parameters[1]+"])";
 									break;
+								case "in list":
+									var list = rule.parameters[1].split(",");
+									for (var j in list)
+										selector += "#"+prefix+(list[j].trim())+",";
+									if (selector.length>0) selector = selector.substring(0, selector.length-1);
+									break;
 							}
 							break;
 						case model.target[0].conditions[4].name: // features
@@ -94,6 +100,12 @@
 									case "not contains":
 										if (value.indexOf(rule.parameters[2])==-1)
 											selector +="[id="+prefix+node.id+"],";
+										break;
+									case "in list":
+										var list = rule.parameters[2].split(",");
+										for (var j in list)
+											if  (value == list[j].trim() )
+												selector +="[id="+prefix+node.id+"],";
 										break;
 								}
 							}
@@ -296,6 +308,12 @@
 								case "not contains":
 									selector =prefix2+":not([id *="+rule.parameters[1]+"])";
 									break;
+								case "in list":
+									var list = rule.parameters[1].split(",");
+									for (var j in list)
+										selector += "#"+prefix+(list[j].trim())+",";
+									if (selector.length>0) selector = selector.substring(0, selector.length-1);
+									break;
 							}
 							break;
 						case model.target[0].conditions[4].name: // features
@@ -320,6 +338,12 @@
 									case "not contains":
 										if (value.indexOf(rule.parameters[2])==-1)
 											selector +="[id="+prefix+node.id+"],";
+										break;
+									case "in list":
+										var list = rule.parameters[2].split(",");
+										for (var j in list)
+											if  (value == list[j].trim() )
+												selector +="[id="+prefix+node.id+"],";
 										break;
 								}
 							}

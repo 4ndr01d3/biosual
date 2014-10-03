@@ -112,8 +112,9 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 			    .style("width", w + "px")
 			    .style("height", h + "px");
 
+			self.tScale = 10;
 			self.zoom=d3.behavior.zoom().
-	    		scaleExtent([1, 10])
+	    		scaleExtent([1, self.tScale])
 	    		.on("zoom", redraw);
 			self.svg=self.vis.append('svg:svg')
 				    .attr("width", w)
@@ -162,6 +163,8 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 						"translate":trans.slice(0),
 						"scale":scale*1
 					});
+				self._refreshZoomLegend();
+
 
 			};
 			self.redraw=redraw;
@@ -787,13 +790,20 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 						.attr("transform", function(d) { return d.x < 180 ? null : "rotate(180)"; })
 						.attr("visibility",function(d) { return (d.showLegend)?"visible":"hidden";})
 						.text(function(d) { 
-							if (d.typeLegend=="id") 
-								return d.id;
-							else if (d.typeLegend.indexOf("features.")==0)
-								return d.features[d.typeLegend.substr(9)];
-							else
-								return d[d.typeLegend];
-							});
+							switch (d.typeLegend){
+								case "id":
+									d.fullLegend= d.id;
+									break;
+								case "short":
+									d.fullLegend=(d.fullLegend)?d.fullLegend:d.id;
+									break;
+								case "full":
+									return (d.fullLegend)?d.fullLegend:d.id;;
+								default:
+									d.fullLegend= d.features[d.typeLegend];
+							}
+							return (d.fullLegend.length>10)?d.fullLegend.substring(0, 9)+"...":d.fullLegend;
+						});
 			self.svg.selectAll("g.node .legend")
 						.attr("dx", function(d) { return d.x < 180 ? 8 : -8; })
 						.attr("text-anchor", function(d) { return d.x < 180 ? "start" : "end"; })
@@ -823,8 +833,12 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 
 //			self.hide("g.node .legend");
 			self.svg.selectAll(".legendBlock").remove();
+			d3.selectAll(".legendZoomCBlock").remove();
 			if (typeof self.legends!="undefined" && self.legends!=null)
 				self._paintLegends();
+			
+			self._paintZoomLegend();
+
 		},
 		
 		_sortLegends:function(){
@@ -959,6 +973,45 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 				}
 		},
 		
+		_paintZoomLegend: function(){
+			var self = this;
+			var w=70;
+
+			var legendBlock = d3.select("#"+self.opt.target+" svg").insert("g")
+				.attr("class", "legendZoomCBlock");
+			legendBlock.append("rect")
+				.attr("x", 0)
+				.attr("height", 22)
+				.attr("width", w)
+				.style("fill", "#fff")
+				.style("fill-opacity","0.0");
+
+			
+
+			self.zoomLegend = legendBlock.selectAll(".mainLegend") 
+				.data(["1.00 :",self.tScale])
+				.enter().insert("g")
+				.attr("class", "mainLegend")
+				.attr("transform", function(d,i){
+					return "translate("+i*30+",15)";
+				}) 
+				.append("text");
+			self.zoomScale= d3.scale.linear()
+				.domain([1,10])
+				.range([1,1.5]);
+			self._refreshZoomLegend();
+//			for (var i=0; i< self.legendTypes.length; i++)
+//				self._paintLegend(legend,self.legendTypes[i]);
+
+		},
+		_refreshZoomLegend: function(){
+			var self = this;
+			self.zoomLegend.text(function(d,i) { 
+				return (i==0)?d:(self.tScale*1.0).toFixed(2); 
+			}).attr("font-size", function(d,i){
+				return (i==0)?"1em":self.zoomScale(self.tScale)+"em";
+			});		
+		},
 		/**
 		 * Hides the elements on the graphic that match the selector. 
 		 * Check the <a href="http://www.w3.org/TR/css3-selectors/">CSS3 selectors documentation</a> to build a selector string 
@@ -1040,13 +1093,20 @@ Biojs.InteractionsBundleD3 = Biojs.extend (
 			var self=this;
 			self.vis.selectAll(selector).selectAll(".legend").attr("visibility", "visible").text(function(d) {
 				d.typeLegend=typeLegend;
-				if (d.typeLegend=="id") 
-					return d.id;
-//				else if (d.typeLegend.indexOf("features.")==0)
-//					return d.features[d.typeLegend.substr(9)];
-				else
-					return d.features[d.typeLegend];
-				});
+				switch (d.typeLegend){
+					case "id":
+						d.fullLegend= d.id;
+						break;
+					case "short":
+						d.fullLegend=(d.fullLegend)?d.fullLegend:d.id;
+						break;
+					case "full":
+						return d.fullLegend;
+					default:
+						d.fullLegend= d.features[d.typeLegend];
+				}
+				return (d.fullLegend.length>10)?d.fullLegend.substring(0, 9)+"...":d.fullLegend;
+			});
 		}, 
 		setLabelFontSize: function(selector,fontSize){
 			var self=this;

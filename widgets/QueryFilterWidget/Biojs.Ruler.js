@@ -381,7 +381,7 @@ Biojs.Ruler = Biojs.extend (
 			visible="none";
 		}
 		code_rule+=	'	</td> ';
-		code_rule+=	'		<td><span class="action" id="'+target+'_apply_rule_'+number+'">APPLY</span></td> ';
+		code_rule+=	'		<td><div class="option apply" id="'+target+'_apply_rule_'+number+'"><span class="tooltip">Apply</span></div></td> ';
 		code_rule+=	'		<td class="rights"><div class="close" ><span class="tooltip">Remove from list</span></div></td>';
 		code_rule+=	'</tr></table></li>';
 		$("#"+target+'_list_to_add').append(code_rule);
@@ -463,10 +463,10 @@ Biojs.Ruler = Biojs.extend (
 		}
 
 		var locText = (typeof rule.location == 'undefined')?'':'In <i>'+rule.location+'</i> ';
-		$("#"+target+'_list').append('<li id="'+target+'_rule_'+n+'" class="rule_item"><table><tr><td class="rule"'+locText+'<i>'+rule.action.name+'</i> '+parameter_span+' the <i>'+rule.target+'</i> with <i>'+rule.condition+' '+rule.parameters.join(" ")+' </i>  </td> <td><span class="action remove">remove</span> <span class="action edit">edit</span></td> <td class="rights"><span class="affected">0</span></td></tr></table></li>');
+		$("#"+target+'_list').append('<li id="'+target+'_rule_'+n+'" class="rule_item"><table><tr><td class="rule"'+locText+'<i>'+rule.action.name+'</i> '+parameter_span+' the <i>'+rule.target+'</i> with <i>'+rule.condition+' '+rule.parameters.join(" ")+' </i>  </td> <td><div class="option remove" ><span class="tooltip">Remove from list</span></div> <div class="option edit" ><span class="tooltip">Edit the rule</span></div><div class="option duplicate" ><span class="tooltip">Duplicate</span></div>  </td> <td class="rights"><span class="affected">0</span></td></tr></table></li>');
 		
 		$('#'+target+'_rule_'+n).data("rule",rule);//{location:location,action:action,target:target1,condition:condition,parameters:parameters,id:target+'_rule_'+n, color:color})
-		$('#'+target+'_rule_'+n+' span.remove').click(function(){
+		$('#'+target+'_rule_'+n+' div.remove').click(function(){
 			var removed = $(this).parent().parent().parent().parent().parent().data("rule");
 			$(this).parent().parent().parent().parent().parent().remove();
 			self.raiseEvent('onRuleRemoved', {
@@ -474,7 +474,7 @@ Biojs.Ruler = Biojs.extend (
 				removed: removed
 			});
 		});
-		$('#'+target+'_rule_'+n+' span.edit').click(function(){
+		$('#'+target+'_rule_'+n+' div.edit').click(function(){
 			var editing = $(this).parent().parent().parent().parent().parent().data("rule");
 			$(this).parent().parent().parent().parent().parent().remove();
 			self.addRule(editing);
@@ -482,6 +482,10 @@ Biojs.Ruler = Biojs.extend (
 				rules : self.getActiveRules(),
 				editing: editing
 			});
+		});
+		$('#'+target+'_rule_'+n+' div.duplicate').click(function(){
+			var editing = $(this).parent().parent().parent().parent().parent().data("rule");
+			self.addRule(editing);
 		});
 		self.raiseEvent('onRuleCreated', {
 			rules : self.getActiveRules(),
@@ -569,7 +573,7 @@ Biojs.Ruler = Biojs.extend (
 				break;
 
 			case "text_comparison":
-				code_rule+=self._getSelect('condition_params_'+n+'_'+target_id+'_'+condition_id+'_0',["equals","contains","different","not contains"],"",
+				code_rule+=self._getSelect('condition_params_'+n+'_'+target_id+'_'+condition_id+'_0',["equals","contains","different","not contains","in list"],"",
 						gotRule?rule.parameters[0]:rule
 				);
 				var value = gotRule?rule.parameters[1]:"";
@@ -579,7 +583,7 @@ Biojs.Ruler = Biojs.extend (
 				code_rule+=self._getSelect('condition_params_'+n+'_'+target_id+'_'+condition_id+'_0',condition.values,"",
 						gotRule?rule.parameters[0]:rule
 				);
-				code_rule+=self._getSelect('condition_params_'+n+'_'+target_id+'_'+condition_id+'_1',["equals","contains","different","not contains"],"",
+				code_rule+=self._getSelect('condition_params_'+n+'_'+target_id+'_'+condition_id+'_1',["equals","contains","different","not contains","in list"],"",//,">","<"],"",
 						gotRule?rule.parameters[1]:rule
 				);
 				var value = gotRule?rule.parameters[2]:"";
@@ -656,7 +660,7 @@ Biojs.Ruler = Biojs.extend (
 	},
 	_addColorSelector: function(n,parameter,color){
 		color  = (typeof color!="undefined")?color:'#56992F';
-		$("#action_parameters_"+n).append('<input type="hidden" id="action_parameters_'+parameter+'_'+n+'" name="color4" class="color-picker" size="6" />')
+		$("#action_parameters_"+n).append('<input id="action_parameters_'+parameter+'_'+n+'" name="color4" class="color-picker" size="6" />')
 		$("#action_parameters_"+parameter+"_"+n).miniColors({
 			letterCase: 'uppercase'
 		}).miniColors('value',color);
@@ -673,6 +677,12 @@ Biojs.Ruler = Biojs.extend (
 		    	}
 		    }
 		}
+	},
+	triggerOrderChange: function(){
+		var self = this;
+		self.raiseEvent('onOrderChanged', {
+			rules : self.getActiveRules()
+		});
 	}
 
 });

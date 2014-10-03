@@ -9,7 +9,7 @@ class Widget {
 		$this->tags			= $widget->tags;
 		
 		
-		$theData = getFile("widgets/".$this->id."/widget.json");
+		$theData = getFile("widgets/".$this->id."/widget.json",true);
 		if ($theData==false) throw new RuntimeException("JSON FILE couldn't be opened.");
 		
 		try {

@@ -28,7 +28,7 @@
 				if (self.isPrivate(facet, self.manager.response.status)) continue;
 				var label = facet;
 				var interactions = self.manager.response.status[facet].index.numDocs;
-				var date = self.manager.response.status[facet].index.lastModified.substring(0,10);
+				var date ="";// self.manager.response.status[facet].index.lastModified.substring(0,10);
 				html += '<li><a href="'+self.url+'?core='+facet+'"><b>'+label+'</b> ('+interactions+' Interactions) - <i>'+date+'</i></a></li>';
 			}
 			$('#'+self.target+ " ul").html(html);

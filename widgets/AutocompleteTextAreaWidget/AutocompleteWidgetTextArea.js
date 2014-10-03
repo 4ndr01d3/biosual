@@ -80,7 +80,7 @@
 				if ( typeof Manager.widgets["provenance"] != "undefined") {
 					Manager.widgets["provenance"].addAction("New search submitted",self.id,area.val());
 				}
-				var values=area.val().split(",");
+				var values=area.val().split(/[,\s]+/);
 				var valuesClean=[];
 				for (var i=0; i<values.length; i++){
 					var value=$.trim(values[i]).replace(/"/g,"red");

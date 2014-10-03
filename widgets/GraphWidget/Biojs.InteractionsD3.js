@@ -1237,6 +1237,9 @@ Biojs.InteractionsD3 = Biojs.extend (
 					return "translate("+i*30+",15)";
 				}) 
 				.append("text");
+			self.zoomScale= d3.scale.linear()
+				.domain([0.05,1,10])
+				.range([0.5,1,1.5]);
 			self._refreshZoomLegend();
 					
 //			for (var i=0; i< self.legendTypes.length; i++)
@@ -1248,8 +1251,9 @@ Biojs.InteractionsD3 = Biojs.extend (
 			self.zoomLegend.text(function(d,i) { 
 				return (i==0)?d:(self.tScale*1.0).toFixed(2); 
 			}).attr("font-size", function(d,i){
-				return (i==0)?"1em":((self.tScale*1<1)?"0.8em":"1.5em");
-			});		},
+				return (i==0)?"1em":self.zoomScale(self.tScale)+"em";
+			});		
+		},
 		/**
 		 * Hides the elements on the graphic that match the selector. 
 		 * Check the <a href="http://www.w3.org/TR/css3-selectors/">CSS3 selectors documentation</a> to build a selector string 
@@ -1361,13 +1365,21 @@ Biojs.InteractionsD3 = Biojs.extend (
 			var self=this;
 			self.vis.selectAll(selector).selectAll(".legend").attr("visibility", "visible").text(function(d) {
 				d.typeLegend=typeLegend;
-				if (d.typeLegend=="id") 
-					return d.id;
-				else //if (d.typeLegend.indexOf("features.")==0)
-					return d.features[d.typeLegend];
-//				else
-//					return d[d.typeLegend];
-				});
+				switch (d.typeLegend){
+					case "id":
+						d.fullLegend= d.id;
+						break;
+					case "short":
+						d.fullLegend=(d.fullLegend)?d.fullLegend:d.id;
+						break;
+					case "full":
+						return (d.fullLegend)?d.fullLegend:d.id;
+					default:
+						d.fullLegend= d.features[d.typeLegend];
+				}
+				return (d.fullLegend.length>10)?d.fullLegend.substring(0, 9)+"...":d.fullLegend;
+			})
+			.attr("fullLegend",function(d){return d.fullLegend;});
 //			self.restart();
 		}, 
 		
@@ -1465,7 +1477,8 @@ Biojs.InteractionsD3 = Biojs.extend (
 		 */
 		swapShowLegend: function(selector){
 			var self=this;
-			self.vis.selectAll(selector).selectAll(".legend").attr("visibility", function(d) {
+			self.vis.selectAll(selector).selectAll(".legend")
+			.attr("visibility", function(d) {
 				d.showLegend = !d.showLegend;
 				return (d.showLegend)?"visible":"hidden";
 			});

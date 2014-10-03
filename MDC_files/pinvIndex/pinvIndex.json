@@ -6,7 +6,7 @@
 			"logoURL":"biosual/MDC_files/pinvIndex/images/PINV_240.png"
 		}
 	},
-	"server":"http://biosual.cbio.uct.ac.za/solr/", 
+	"server":"http://localhost:8080/solr/", 
 	"servlet":"admin/cores",
 	"ajaxsolr_parameters":{
 		"json.nl": "map",
@@ -35,7 +35,7 @@
 				"url":"./pinViewer.html"
 			},
 			"templateTarget":"center",
-			"tags":{"id":"loader","formTarget":"http://biosual.cbio.uct.ac.za/uploader/upload"}
+			"tags":{"id":"loader","formTarget":"http://localhost:8080/upload"}
 		},
 		{	"widget": "IFrameWidget",
 			"templateTarget":"center",

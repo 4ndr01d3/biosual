@@ -52,19 +52,22 @@
 .ruler .rights {
 	text-align:right;
 }
-.ruler .close {
+.ruler .option {
 	width:20px;
 	height:20px;
 	text-align:right;
-/*	background-image:url('images/close.png');
-*/	opacity:0.7;
+	opacity:0.7;
 	font-size:1.5em;
+	display: inline-block;
 }
-.ruler .close:before{ content: "\2716"; }
-.ruler .close:hover{
+.ruler .remove:before{ content: "\2716"; }
+.ruler .edit:before{ content: "\270E"; }
+.ruler .duplicate:before{ content: "\2750"; }
+.ruler .apply:before{ content: "\2714"; }
+.ruler .option:hover{
 	opacity:1.0;
 	cursor:pointer;
-	}
+}
 .ruler .affected {
 	width:9%;
 	text-align:center;
@@ -138,9 +141,10 @@
 .ruler  span.tooltip {
     z-index:10;display:none; padding:14px 20px;
     margin-top:-30px; margin-left:28px;
-    width:240px; line-height:16px;
+    line-height:16px;
 }
-.ruler .active_rules ul.sortable li:hover span.tooltip,.ruler  .close:hover span.tooltip{
+.ruler .active_rules ul.sortable li .affected:hover span.tooltip,
+.ruler  .option:hover span.tooltip{
     display:inline; position:absolute; color:#111;
     border:1px solid #DCA; background:#fffAF0;}
     

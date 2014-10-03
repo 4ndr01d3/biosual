@@ -245,6 +245,10 @@
 									case "not contains":
 										query ='-(p1:*'+rule.parameters[2]+'* AND p2:*'+rule.parameters[2]+'*)';
 										break;
+									case "in list":
+										var list = rule.parameters[2].split(/\s*,\s*/);
+										query = '(p1:('+list.join(" OR ")+') AND p2:('+list.join(" OR ")+'))';
+										break;
 								}
 								
 							}else{
@@ -312,6 +316,10 @@
 									case "not contains":
 										query ='-(p1:*'+rule.parameters[2]+'* OR p2:*'+rule.parameters[2]+'*)';
 										break;
+									case "in list":
+										var list = rule.parameters[2].split(/\s*,\s*/);
+										query = '(p1:('+list.join(" ")+') OR p2:('+list.join(" ")+'))';
+										break;
 								}
 								
 							}else{
@@ -333,6 +341,10 @@
 										break;
 									case "<":
 										query ='(p1_'+self._solrScape(rule.parameters[0])+':[* TO '+rule.parameters[2]+'] OR p2_'+self._solrScape(rule.parameters[0])+':[* TO '+rule.parameters[2]+'])';
+										break;
+									case "in list":
+										var list = rule.parameters[2].split(/\s*,\s*/);
+										query = '(p1_'+self._solrScape(rule.parameters[0])+':('+list.join(" ")+') OR p2_'+self._solrScape(rule.parameters[0])+':('+list.join(" ")+'))';
 										break;
 								}
 							}

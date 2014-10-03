@@ -231,11 +231,13 @@
 		proteinMouseOver: function(d){
 			var self = this;
 			self.proteinLabelVisibility[d.protein.id]=self.graph.isLegendVisible("#node_"+d.protein.id);
+			self.graph.showLegend("#node_"+d.protein.id,"full");
 			if (!self.proteinLabelVisibility[d.protein.id])
 				self.graph.swapShowLegend("#node_"+d.protein.id);
 		},
 		proteinMouseOut: function(d){
 			var self = this;
+			self.graph.showLegend("#node_"+d.protein.id,"short");
 			if (typeof self.proteinLabelVisibility[d.protein.id] != "undefined" && !self.proteinLabelVisibility[d.protein.id]){
 				self.graph.swapShowLegend("#node_"+d.protein.id);
 				self.proteinLabelVisibility[d.protein.id]=false;

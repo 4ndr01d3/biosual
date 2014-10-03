@@ -102,13 +102,15 @@ switch ($_GET['type']){
 		$widgetsScriptsAdded =array();
 		foreach ($json->widgets as $widgetObj){
 			try{
-//				echo "\n//WIDGET: ".$widgetObj->widget;
+				echo "\n//-WIDGET: ".$widgetObj->widget;
 				$widget= new Widget($widgetObj);
+				echo "\n//-1: ".$widgetObj->widget;
 				if (!in_array($widgetObj->widget,$widgetsScriptsAdded)){
 					echo "\n//Dependencies for WIDGET: ".$widget->id."\n".$widget->getDependenciesText()."\n";
 					echo "\n//WIDGET: ".$widget->id."\n".$widget->getJavaScriptText()."\n";
 					array_push($widgetsScriptsAdded,$widgetObj->widget);
 				}
+				echo "\n//-2: ".$widgetObj->widget;
 				echo "\n//Injecting HTML for WIDGET: ".$widget->id."\n".$widget->getHTMLinjector()."\n";
 				//TODO: add Markup to the page
 			} catch(Exception $e) {

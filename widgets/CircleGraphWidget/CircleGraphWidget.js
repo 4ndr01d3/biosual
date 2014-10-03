@@ -164,6 +164,7 @@
 			self.graph.highlight("path.link.source-" + objEvent.protein.key);
 			self.graph.setColor("#node-" + objEvent.protein.key,'#0f0');
 			self.proteinLabelVisibility[objEvent.protein.key]=self.graph.isLegendVisible("#node-"+objEvent.protein.key);
+			self.graph.showLegend("#node-"+objEvent.protein.key,"full");
 			if (!self.proteinLabelVisibility[objEvent.protein.key])
 				self.graph.swapShowLegend("#node-"+objEvent.protein.key);
 		},
@@ -172,6 +173,7 @@
 			self.graph.setColor("#node-" + objEvent.protein.key,'');
 			self.graph.setColor("path.link.target-" + objEvent.protein.key,"rgb(153, 153, 153)");
 			self.graph.setColor("path.link.source-" + objEvent.protein.key,"rgb(153, 153, 153)");
+			self.graph.showLegend("#node-"+objEvent.protein.key,"short");
 //			self.executeStylers();
 			if (typeof self.proteinLabelVisibility[objEvent.protein.key] != "undefined" && !self.proteinLabelVisibility[objEvent.protein.key]){
 				self.graph.swapShowLegend("#node-"+objEvent.protein.key);
