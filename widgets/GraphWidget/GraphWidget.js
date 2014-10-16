@@ -89,25 +89,12 @@
 		afterRequest: function () {
 			var self =this;
 			var currentQ=this.manager.response.responseHeader.params.q;
-//			if(currentQ=="*:*")
-//				self.resetGraphic();
-//			else
 				currentQ=currentQ.substr(5);
 			
-//			if (self.previousRequest!=null && self.previousRequest=="*:*"){
-//				$("#"+this.target).empty();
-//				self.graph.resetGraphic();
-//				self.graph = new Biojs.InteractionsD3({
-//					target: self.target,
-//					radius: 10,
-//					enableEdges:self.enableEdges,
-//					width: (typeof self.width == "undefined")?"800":self.width,
-//					height: (typeof self.height == "undefined")?"800":self.height 
-//				});			
-//			}
-				
-//			var type = (currentQ=="*:*")?"normal":self.manager.widgets["requester"].requestedProteins[currentQ].type;
-			var type = self.manager.widgets["requester"].requestedProteins[currentQ].type;
+
+
+			var filter=(typeof this.manager.response.responseHeader.params.fq=="undefined")?"":this.manager.response.responseHeader.params.fq;
+			var type = self.manager.widgets["requester"].requestedProteins[currentQ][filter].type;
 
 			for (var i = 0, l = this.manager.response.response.docs.length; i < l; i++) {
 				var doc = this.manager.response.response.docs[i];

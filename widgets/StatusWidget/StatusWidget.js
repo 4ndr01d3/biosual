@@ -60,7 +60,7 @@
 			if (json==self.previousStatus)
 				self._fillElements(elements,window.location.href.toString().split("?")[0]+"?status="+self.previousID);
 			else{
-				var form=	"<form id=\"tmpstatusform233\" name=\"comment_form\" controller=\"comment\" action=\""+self.uploader_URL+"save_settings\">";
+				var form=	"<form id=\"tmpstatusform233\" method=\"POST\" name=\"comment_form\" controller=\"comment\" action=\""+self.uploader_URL+"save_settings\">";
 				form += 	"	<textarea name=\"json_settings\">";
 				form += 	json;
 				form += 	"	</textarea><input type=\"submit\" value=\"Submit\"></form>";

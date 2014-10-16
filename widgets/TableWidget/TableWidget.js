@@ -131,7 +131,9 @@
 //				type = "normal";
 //			else{
 				currentQ=currentQ.substr(5);
-				type =self.manager.widgets["requester"].requestedProteins[currentQ].type;
+			var filter=(typeof self.manager.response.responseHeader.params.fq=="undefined")?"":self.manager.response.responseHeader.params.fq;
+			var type = self.manager.widgets["requester"].requestedProteins[currentQ][filter].type;
+					
 //			}
 			this.manager.response.type=type;
 			this.manager.response.currentQ=currentQ;

@@ -407,9 +407,12 @@
 					var qs= self.manager.widgets["requester"].getQueries().slice(0);
 					var requestedProteins= self.manager.widgets["requester"].requestedProteins;
 					for (var i=0;i<qs.length;i++){
-						var q=qs[i],m=requestedProteins[qs[i]].type;
-						self.manager.widgets["requester"].removeQuery(q);
-						self.manager.widgets["requester"].request(q,m);
+						var q=qs[i]; 
+						for(filter in requestedProteins[qs[i]]){
+							var m=requestedProteins[qs[i]][filter].type;
+							self.manager.widgets["requester"].removeQuery(q);
+							self.manager.widgets["requester"].request(q,m);
+						}
 					}
 					break;
 				case "explicit":

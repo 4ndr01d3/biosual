@@ -5,11 +5,11 @@
 			"title":"Protein Interaction Network Visualizer",
 			"subtitle":"",
 			"logo":"biosual/images/pinv/PINV_50.png",
-			"parent_link":"http://localhost/~4ndr01d3//pinv.html"
+			"parent_link":"http://localhost/~4ndr01d3/pinv.html"
 		}
 	},
 	"js":	["ruleExecuter.js","contextMenuFunctions.js","expressionExecuter.js","pinvUnitTests.js"],
-	"server":"http://localhost:8080/solr/",
+	"server":"http://localhost/solr/",
 	"url_parameters":["core","proteins"],
 	"preloader":"prepinv.js",
 	"postloader":"",
@@ -552,7 +552,7 @@
 			"parameters": {
 				"id": "status",
 				"server_URL":"http://localhost/~4ndr01d3/biosual/saves/",
-				"uploader_URL":"http://biosual.cbio.uct.ac.za/uploader/",
+				"uploader_URL":"http://localhost/uploader/",
 				"reinit":["requester","table","text","queryfilter"]
 			}
 		},

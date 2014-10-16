@@ -590,7 +590,8 @@ Biojs.InteractionsHeatmapD3 = Biojs.extend (
 				.enter().append("rect")
 				.attr("class", "background")
 				.attr("width", self.side)
-				.attr("height", self.side);
+				.attr("height", self.side)
+				.style("fill","#eee");
 
 			var row = self.svg.selectAll(".row")
 				.data(self.matrix);

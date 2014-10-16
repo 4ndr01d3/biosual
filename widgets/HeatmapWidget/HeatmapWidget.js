@@ -35,7 +35,9 @@
 			var currentQ=this.manager.response.responseHeader.params.q;
 				currentQ=currentQ.substr(5);
 
-			var type = self.manager.widgets["requester"].requestedProteins[currentQ].type;
+			var filter=(typeof this.manager.response.responseHeader.params.fq=="undefined")?"":this.manager.response.responseHeader.params.fq;
+			var type = self.manager.widgets["requester"].requestedProteins[currentQ][filter].type;
+//			var type = self.manager.widgets["requester"].requestedProteins[currentQ].type;
 
 			for (var i = 0, l = this.manager.response.response.docs.length; i < l; i++) {
 				var doc = this.manager.response.response.docs[i];

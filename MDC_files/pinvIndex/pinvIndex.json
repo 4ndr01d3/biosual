@@ -6,7 +6,7 @@
 			"logoURL":"biosual/MDC_files/pinvIndex/images/PINV_240.png"
 		}
 	},
-	"server":"http://localhost:8080/solr/", 
+	"server":"http://localhost/solr/", 
 	"servlet":"admin/cores",
 	"ajaxsolr_parameters":{
 		"json.nl": "map",
@@ -35,7 +35,7 @@
 				"url":"./pinViewer.html"
 			},
 			"templateTarget":"center",
-			"tags":{"id":"loader","formTarget":"http://localhost:8080/upload"}
+			"tags":{"id":"loader","formTarget":"http://localhost/uploader/upload"}
 		},
 		{	"widget": "IFrameWidget",
 			"templateTarget":"center",

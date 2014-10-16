@@ -46,9 +46,9 @@
 //			}
 				
 			self.interactions = Array(); 
-			
-//			var type = (currentQ=="*:*")?"normal":self.manager.widgets["requester"].requestedProteins[currentQ].type;
-			var type = self.manager.widgets["requester"].requestedProteins[currentQ].type;
+
+			var filter=(typeof this.manager.response.responseHeader.params.fq=="undefined")?"":this.manager.response.responseHeader.params.fq;
+			var type = self.manager.widgets["requester"].requestedProteins[currentQ][filter].type;
 			
 			for (var i = 0, l = this.manager.response.response.docs.length; i < l; i++) {
 				var doc = this.manager.response.response.docs[i];

@@ -14,13 +14,13 @@
 			var qs= self.manager.widgets["requester"].getQueries();
 			var requestedProteins= self.manager.widgets["requester"].requestedProteins;
 			qs.sort(function(a,b){
-				if (requestedProteins[a].type=="recursive")
+				if (requestedProteins[a.query][a.filter].type=="recursive")
 					return -1;
-				else if (requestedProteins[b].type=="recursive")
+				else if (requestedProteins[b.query][b.filter].type=="recursive")
 					return 1;
-				else if (requestedProteins[a].type=="normal")
+				else if (requestedProteins[a.query][a.filter].type=="normal")
 					return -1;
-				else if (requestedProteins[b].type=="normal")
+				else if (requestedProteins[b.query][b.filter].type=="normal")
 					return 1;
 				return 0;
 			});
@@ -47,13 +47,13 @@
 				for (var i = 0, l = links.length; i < l; i++) {
 					var item = $("<div class='item' >").appendTo($(this.target+" .items")); 
 					if (i<links.length-1 || links.length==1){
-						item.append(qs[i]);
-						var num = self.manager.widgets["requester"].getNumberOfResponsesPerQuery(qs[i]);
-						var mode=requestedProteins[qs[i]].type;
-						num =(requestedProteins[qs[i]].type=="explicit")?" ":' ('+num+') ';
+						item.append(qs[i].query);
+						var num = self.manager.widgets["requester"].getNumberOfResponsesPerQuery(qs[i].query,qs[i].filter);
+						var mode=requestedProteins[qs[i].query][qs[i].filter].type;
+						num =(mode=="explicit")?" ":' ('+num+') ';
 						var filter="";
-						if (requestedProteins[qs[i]].doc!=null && typeof requestedProteins[qs[i]].doc.responseHeader.params.fq!="undefined" )
-							filter = '<span><img src="biosual/images/filter.png" /><span class="tooltip">'+requestedProteins[qs[i]].doc.responseHeader.params.fq+'</span></span>';
+						if (qs[i].filter!="")
+							filter = '<span><img src="biosual/images/filter.png" /><span class="tooltip">'+qs[i].filter+'</span></span>';
 						if (num!=null) item.append(num+filter+' <span><img src="biosual/images/mode_'+mode+'.png" /><span class="tooltip">Mode: '+mode+'</span></span>');
 					}
 					item.append(links[i]);
