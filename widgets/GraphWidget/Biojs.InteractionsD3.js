@@ -191,6 +191,7 @@ Biojs.InteractionsD3 = Biojs.extend (
 			}
 
 			function dragend(d, i) {
+				d3.event.sourceEvent.stopPropagation();
 				d.fixed = true; // of course set the node to fixed so the force doesn't include the node in its auto positioning stuff
 				tick(d3.event);
 				self.force.resume();
@@ -208,7 +209,7 @@ Biojs.InteractionsD3 = Biojs.extend (
 						}
 					});
 				}
-				self.vis.selectAll("path.figure")
+				self.vis.selectAll("path.figure, circle.highlighter")
 						.attr("transform", function(d) { 
 							if (self._onceOffFixedRefresh && typeof self.fixedProteins[d.id]!="undefined"){
 								d.px= self.fixedProteins[d.id][0];
@@ -1061,6 +1062,7 @@ Biojs.InteractionsD3 = Biojs.extend (
 			node
 				.append("svg:text")
 				.attr("class", "legend")
+				.attr("text-anchor", "middle")
 				.attr("id", function(d) { return "legend_"+d.id; })
 				.text(function(d) { 
 					if (typeof d.typeLegend=="undefined"|| d.typeLegend=="id") 
@@ -1070,10 +1072,10 @@ Biojs.InteractionsD3 = Biojs.extend (
 					else
 						return d[d.typeLegend];
 					})
-				.attr("visibility",function(d) { return (d.showLegend)?"visible":"hidden";})
-				.attr("transform",function(d) {
-					return (self.organisms[d.organism] == 0)?"translate(-"+(self.opt.radius*1.9)+","+(self.opt.radius*0.4)+")":"translate(-"+(self.opt.radius*0.9)+","+(self.opt.radius*1.3)+")";
-				});
+				.attr("visibility",function(d) { return (d.showLegend)?"visible":"hidden";});
+//				.attr("transform",function(d) {
+//					return (self.organisms[d.organism] == 0)?"translate(-"+(self.opt.radius*1.9)+","+(self.opt.radius*0.4)+")":"translate(-"+(self.opt.radius*0.9)+","+(self.opt.radius*1.3)+")";
+//				});
 
 			nodes.exit().remove();
 			
@@ -1294,6 +1296,20 @@ Biojs.InteractionsD3 = Biojs.extend (
 		highlight: function(selector){
 			var self=this;
 			self.vis.selectAll(selector).style("stroke", '#0f0');
+		},
+		addAura: function(selector){
+			var self = this;	//<circle class="highlighter" cx="751.6213729066255" cy="248.43638259548342" r="30"/>
+			self.vis.selectAll(selector)
+				.insert("circle", ":first-child")
+					.attr("class","highlighter")
+					.attr("r",30)
+					.attr("transform",function(d,i){
+						return "translate("+d.px+","+d.py+")";
+					});
+		},
+		removeAura: function(selector){
+			var self = this;
+			self.vis.selectAll(selector+" circle.highlighter").remove();
 		},
 		/**
 		 * Set the fill's color of the elements on the graphic that match the selector. 

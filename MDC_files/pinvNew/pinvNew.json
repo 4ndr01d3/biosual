@@ -123,7 +123,7 @@
 				"id": "svggraph",
 				"target": "#graph",
 				"formats":["PNG","SVG","Share"],
-				"css":"svg{background-color: #FFF;} .figure {fill: #89B; stroke: #fff;} text {font: 10px sans-serif; font-weight:normal; stroke: #000; stroke-width: 0px;  stroke: transparent;}"
+				"css":"svg{background-color: #FFF;} .figure {fill: #89B; stroke: #fff;} text {font: 10px sans-serif; font-weight:normal; stroke: #000; stroke-width: 0px;  stroke: transparent;} path.link { stroke: #999; stroke-opacity: .6; fill-opacity: 0; }"
 			}
 		},
 		{	"widget": "CircleGraphWidget",
@@ -421,7 +421,7 @@
 									 {"name":"Hide Label","type":"single"},
 									 {"name":"Resize","type":"scale","options":[0,3.1,0.1]},
 									 {"name":"Resize By","type":"select","options":[]},
-									 {"name":"Font Size","type":"scale","options":[10,30,2]},
+									 {"name":"Font Size","type":"scale","options":[6,30,2]},
 									 {"name":"Opacity","type":"scale","options":[0,1,0.1]},
 									 {"name":"Opacity By","type":"select","options":[]}
 							],

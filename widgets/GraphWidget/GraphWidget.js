@@ -195,16 +195,20 @@
 				Manager.widgets["provenance"].addAction("Click on protein",self.id,d.protein.name);
 			}
 			if (d.protein.name==self.selected){
-				$('[id="node_'+self.selected+'"] .figure').css("stroke",'');
+				d3.select("#node_"+self.selected).classed("selected",false);
+				self.graph.removeAura("#node_"+self.selected);
 				self.selected=null;
 			}else{
 				if (self.selected!=null){
-					if (self.selected.indexOf("_")==-1)
-						$('[id="node_'+self.selected+'"] .figure').css("stroke",'');
-					else
-						self.graph.setColor('[id="link_'+self.selected+'"]',"#999");
+					if (self.selected.indexOf("_")==-1){
+						d3.select("#node_"+self.selected).classed("selected",false);
+						self.graph.removeAura("#node_"+self.selected);
+					}else
+						d3.select("#link_"+self.selected).classed("selected",false);
 				}
-				self.graph.setColor('[id="node_'+d.protein.name+'"] .figure',"#000");
+
+				d3.select("#node_"+d.protein.name).classed("selected",true);
+				self.graph.addAura("#node_"+d.protein.name);
 				self.selected=d.protein.name;
 			}
 		},
@@ -499,10 +503,10 @@
 		onceOffStatus:null,
 		uploadStatus:function(json){
 			var self = this;
-//			if (self.previousRequest=="*:*"){
-//				self.onceOffStatus=json;
-//				return;
-//			}
+			if (self.previousRequest==null){
+				self.onceOffStatus=json;
+				return;
+			}
 			if (typeof json.organisms != "undefined" && json.organisms != null){
 				self.graph.organisms=json.organisms;
 			}
@@ -514,8 +518,12 @@
 			}
 			if (typeof json.selected != "undefined" && json.selected != null){
 				if (json.selected.indexOf("_")==-1){ // the selection is a node
-					self.graph.setColor('[id="node_'+json.selected+'"] .figure',"#000");
-					self.selected=json.selected;
+					var tmp ={};
+					tmp.protein ={}
+					tmp.protein.name =json.selected;
+					self.proteinClick(tmp);
+//					self.graph.setColor('[id="node_'+json.selected+'"] .figure',"#000");
+//					self.selected=json.selected;
 				}else{
 					self.graph.setColor('[id="link_'+json.selected+'"]',"#000");
 					self.selected=json.selected;

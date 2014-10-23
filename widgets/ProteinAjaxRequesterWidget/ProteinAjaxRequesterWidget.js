@@ -444,7 +444,7 @@
 //					}
 					var prevFilter=self.currentFilter;
 					self.setFilter("");
-					if (typeof json.filters != "undefined") 
+					if (typeof json.filters != "undefined" && typeof json.filters[type] != "undefined" && typeof json.filters[type][i] != "undefined") 
 						self.setFilter(json.filters[type][i]);
 					self.request(json.queried[type][i],type);
 					self.setFilter(prevFilter);

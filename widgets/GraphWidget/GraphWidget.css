@@ -59,3 +59,14 @@ input[type="checkbox"]:checked + label {
 .indicator_on {
 	color: limegreen;
 }
+
+.graphNetwork .highlighter {
+	fill: #F7FF00;
+	opacity: 0.5;
+}
+.graphNetwork .selected text {
+	font-weight: bold;
+}
+.graphNetwork .selected path, .graphNetwork path.selected  {
+	stroke-width: 5;
+}
