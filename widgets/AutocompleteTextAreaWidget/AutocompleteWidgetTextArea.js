@@ -1,6 +1,7 @@
 (function ($) {
 	AjaxSolr.AutocompleteTextAreaWidget = AjaxSolr.AbstractTextWidget.extend({
 		mode:"",
+		hasLevels:false,
 		init: function () {
 			var self = this;
 
@@ -102,7 +103,17 @@
 				paramsL.push("key="+private_key);
 			
 			paramsL.push('q=' + this.manager.store.get('q').val());
-			jQuery.getJSON(this.manager.solrUrl + 'select?' + paramsL.join('&') + '&wt=json&json.wrf=?', {}, gotOptions);
+			
+			if (modelrequester!=null) modelrequester.done(function(p){
+				for (var i=0;i<model.length;i++){
+					if (typeof model[i].id != "undefined" && model[i].id=="level")
+						self.hasLevels = true;
+				}
+				var level = (self.hasLevels)?"&fq=level:0":"";
+					
+				jQuery.getJSON(self.manager.solrUrl + 'select?' + paramsL.join('&') + '&wt=json&json.wrf=?'+level, {}, gotOptions);
+			});
+
 			
 		},
 		initTest: function(){

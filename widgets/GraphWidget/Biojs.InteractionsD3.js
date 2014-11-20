@@ -282,7 +282,7 @@ Biojs.InteractionsD3 = Biojs.extend (
 		 * @name Biojs.InteractionsD3-eventTypes
 		 */
 		eventTypes : [
-			/**
+  			/**
 			 * @name Biojs.InteractionsD3#proteinClick
 			 * @event
 			 * @param {function} actionPerformed It is triggered when the user clicks on a protein
@@ -298,6 +298,22 @@ Biojs.InteractionsD3 = Biojs.extend (
 			 * 
 			 * */
 			"proteinClick",
+			/**
+			 * @name Biojs.InteractionsD3#proteinClick
+			 * @event
+			 * @param {function} actionPerformed It is triggered when the user clicks on a protein
+			 * @eventData {@link Biojs.Event} objEvent Object containing the information of the event
+			 * @eventData {Object} objEvent.source The component which did triggered the event.
+			 * @eventData {Object} objEvent.protein the information of the protein that has been clicked.
+			 * @example 
+			 * proteinDoubleClick(
+			 *    function( objEvent ) {
+			 *       alert("The protein " + objEvent.protein.id + " was double clicked.");
+			 *    }
+			 * ); 
+			 * 
+			 * */
+			"proteinDoubleClick",
 			/**
 			 * @name Biojs.InteractionsD3#proteinMouseOver
 			 * @event
@@ -532,7 +548,7 @@ Biojs.InteractionsD3 = Biojs.extend (
 			self.proteinsA[protein.id]=protein;
 			if (typeof self.interactionsA[protein.id] == "undefined")
 				self.interactionsA[protein.id]=[];
-			if (typeof self.organisms[protein.organism] == 'undefined'){
+			if (protein.organism!="CLUSTER" && typeof self.organisms[protein.organism] == 'undefined'){
 				var numberOfOrganism =Object.keys(self.organisms).length;
 				self.organisms[protein.organism] = numberOfOrganism++;
 				self.foci=[];
@@ -541,6 +557,14 @@ Biojs.InteractionsD3 = Biojs.extend (
 				}
 			}
 			return n;
+		},
+		replaceProtein: function(newNonde,oldId){
+			var self = this;
+			if ((typeof self.interactionsA[oldId] != "undefined"))
+				for (var i=0;i<self.interactionsA[oldId].length;i++){
+					self.addInteraction(newNonde.id,self.interactionsA[oldId][i].id);
+				}
+			self.removeProtein(oldId);
 		},
 		refreshFixedproteins: function(){
 			var self = this;
@@ -972,7 +996,10 @@ Biojs.InteractionsD3 = Biojs.extend (
 			self.force
 			    .nodes(self._currentProteins)
 			    .links(self._currentInteractions)
-				.charge(-self.opt.radius*(3+self.proteins.length))
+				.charge(function(d) { 
+							var ch=-self.opt.radius*(3+self.proteins.length);
+							return ch*((d.organism=="CLUSTER")?d.numClustered:1);
+						})
 				.linkDistance(self.opt.radius*(3+self.proteins.length*0.05))
 				.start();
 			var link =self.vis.selectAll(".graphNetwork path.link")
@@ -1029,6 +1056,11 @@ Biojs.InteractionsD3 = Biojs.extend (
 						})
 					)
 				.attr("id", function(d) { return "figure_"+d.id; })
+				.attr("stroke-width",self.opt.radius*0.3)
+				.style("fill",function(d){
+					return (d.organism=="CLUSTER")?"#eee":null;
+					})
+				.style("stroke",function(d){return (d.organism=="CLUSTER")?"#D10000":null;})
 				.on("click", function(d){ 
 					self.raiseEvent('proteinClick', {
 						protein: d
@@ -1045,6 +1077,10 @@ Biojs.InteractionsD3 = Biojs.extend (
 					});
 				})
 				.on("dblclick", function(d) { 
+					self.raiseEvent('proteinDoubleClick', {
+						protein: d
+					});
+
 					if (d.organism=="CLUSTER"){
 						self._quadrantsToDisplay.push(d.quadrant);
 						self._quadrantsToDisplay.push(d.quadrant+"0");
@@ -1053,10 +1089,7 @@ Biojs.InteractionsD3 = Biojs.extend (
 						self._quadrantsToDisplay.push(d.quadrant+"3");
 						self.restart();
 					}
-				})
-				.attr("stroke-width",self.opt.radius*0.3)
-				.style("fill",function(d){return (d.organism=="CLUSTER")?"#eee":null;})
-				.style("stroke",function(d){return (d.organism=="CLUSTER")?"#D10000":null});
+				});
 			
 
 			node

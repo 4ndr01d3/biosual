@@ -19,22 +19,30 @@ if (coreURL==null || coreURL=="null" || jQuery.trim(coreURL)=="")
 var private_key=getURLParameter("key");
 
 var model=[],
-	mainfields=["p1","p1_organism","p2","p2_organism","score"],
-	prefix=["p1_",false,"p2_",false,"score_"];
+	mainfields=["p1","p1_organism","p2","p2_organism","score","level"],
+	prefix=["p1_",false,"p2_",false,"score_",false];
 
 var callback = function (response) {
 //	console.debug("callback from luke!!!");
 	for (var i=0;i<mainfields.length;i++) {
-		var subfields=[];
+		var subfields=[],
+			hasMainfield=false;
 		if (prefix[i]==="")
 			for (var field in response.fields) {
 				if (mainfields.indexOf(field)==-1 && prefix.indexOf(field.substring(0,3))==-1 && response.fields[field].type!="text_ws")
 					subfields.push(field);
 			}
 		else
-			for (var field in response.fields) {
-				if (prefix[i] !=false && field.indexOf(prefix[i])!=-1 && response.fields[field].type!="text_ws")
-					subfields.push(field);
+			if (prefix[i] !=false){
+				for (var field in response.fields) {
+					if (field.indexOf(prefix[i])!=-1 && response.fields[field].type!="text_ws")
+						subfields.push(field);
+				}
+			}else{
+				for (var field in response.fields) {
+					if (field== mainfields[i])
+						hasMainfield=true;
+				}
 			}
 		if (subfields.length>0)
 			model.push({
@@ -42,7 +50,7 @@ var callback = function (response) {
 				"label":mainfields[i],
 				"subcolumns":subfields
 			});
-		else
+		else if(hasMainfield)
 			model.push({
 				"id":mainfields[i],
 				"label":mainfields[i]

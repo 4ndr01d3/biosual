@@ -131,7 +131,7 @@
 //				type = "normal";
 //			else{
 				currentQ=currentQ.substr(5);
-			var filter=(typeof self.manager.response.responseHeader.params.fq=="undefined")?"":self.manager.response.responseHeader.params.fq;
+			var filter=self.manager.widgets["requester"].getFqFromResponse(this.manager.response);
 			var type = self.manager.widgets["requester"].requestedProteins[currentQ][filter].type;
 					
 //			}
@@ -159,7 +159,7 @@
 			var currentQ=json.currentQ;
 			var type =json.type;
 
-			if (type=="normal" || type=="recursive"){
+			if (type=="normal" || type=="recursive" || type=="cluster"){
 				for (var i = 0, l = json.response.docs.length; i < l; i++) 
 					self._addRow(json.response.docs[i]);
 			}else{
@@ -189,8 +189,10 @@
 			for (var j=0;j<self.columns.length;j++){
 				doc_array.push(doc[self.columns[j].id]);
 				if (typeof self.columns[j].subcolumns !="undefined")
-					for (var k=0;k<self.columns[j].subcolumns.length;k++)
-						doc_array.push(doc[self.columns[j].subcolumns[k]]);
+					for (var k=0;k<self.columns[j].subcolumns.length;k++){
+						var value = (typeof doc[self.columns[j].subcolumns[k]] == "undefined")?"":doc[self.columns[j].subcolumns[k]];
+						doc_array.push(value);
+					}
 				if (self.ids.indexOf(doc[self.columns[j].id])==-1)
 					self.ids.push(doc[self.columns[j].id]);
 			}

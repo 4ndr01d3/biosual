@@ -766,6 +766,13 @@
 				   		},
 				   		{	"source":"graph",
 				   			"object":"graph",
+				   			"event":"proteinDoubleClick",
+				   			"listener":"graph",
+				   			"method":"proteinDoubleClick",
+				   			"type":"afterRequest"
+				   		},
+				   		{	"source":"graph",
+				   			"object":"graph",
 				   			"event":"proteinMouseOver",
 				   			"listener":"graph",
 				   			"method":"proteinMouseOver",

@@ -70,3 +70,7 @@ input[type="checkbox"]:checked + label {
 .graphNetwork .selected path, .graphNetwork path.selected  {
 	stroke-width: 5;
 }
+.graphNetwork .cluster path.figure{
+	fill: #eee;
+	stroke: #D10000;
+}

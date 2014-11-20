@@ -9,6 +9,7 @@
 		previousRequest:null,ids:[],
 		features:["id"],
 		scores:[],
+		hasLevels:false,
 		/**
 		 * Constructor method. 
 		 * It paints the current header in the page and load the model of the current core
@@ -21,6 +22,10 @@
 				$("header.main h2").html("Core: Default");
 			
 			if (modelrequester!=null) modelrequester.done(function(p){
+				for (var i=0;i<model.length;i++){
+					if (typeof model[i].id != "undefined" && model[i].id=="level")
+						self.hasLevels = true;
+				}
 				for (var i=0;i<model[0].subcolumns.length;i++){
 					self.features.push(model[0].subcolumns[i].substring(prefix[0].length));
 				}
@@ -28,7 +33,18 @@
 				self.scores = model[4].subcolumns;
 			});
 		},
-		
+		getFqFromResponse:function(response){
+			var self = this;
+			var filter="";
+			if ($.isArray( response.responseHeader.params.fq)){
+				var fq =response.responseHeader.params.fq;
+				for (var i=0; i<fq.length;i++)
+					if (fq[i].indexOf("level")!=0)
+						filter=fq[i];
+			}else if (response.responseHeader.params.fq.indexOf("level:0")!=0)
+					filter=(typeof response.responseHeader.params.fq=="undefined")?"":response.responseHeader.params.fq;
+			return filter;
+		},
 		/**
 		 * This method is the first to get executed when a request is received.
 		 * 
@@ -38,8 +54,7 @@
 			if (typeof response == "undefined")
 				response=this.manager.response;
 			
-			var filter=(typeof response.responseHeader.params.fq=="undefined")?"":response.responseHeader.params.fq;
-			
+			var filter = self.getFqFromResponse(response);
 			if (response !=null && typeof response.responseHeader.params.q != 'undefined'){
 				if (self.previousRequest!=null)
 					self.ids=[];
@@ -49,7 +64,7 @@
 				self._addToActiveProteins({query:protein,filter:filter});
 			}
 			
-			self.processJson(response);
+			self.processJson(response,filter);
 
 			self.previousRequest=self.manager.store.get('q').val();
 			
@@ -68,14 +83,28 @@
 		},
 		jointQueries:{},
 		previousAnimationState:false,
-		processJson: function(json){
+		_clusterToBeReplacedBy:{},
+		isActiveCluster: function(cluster){
+			var self = this;
+			if (cluster.length<=3)
+				return true;
+			for (var i=0;i<self.activeProteins.length;i++){
+				var p =self.activeProteins[i];
+				if (p.query==cluster)
+					return true;
+				var pattern = new RegExp("^"+p.query.substring(0,p.query.length-1)+"[0-3]?$");
+				if (pattern.test(cluster))
+					return true;
+			}
+			return false;
+		},
+		processJson: function(json,fq){
 			var self=this;
-			var fq=(typeof json.responseHeader.params.fq=="undefined")?"":json.responseHeader.params.fq;
 
-			var recursive= self.requestedProteins[json.responseHeader.params.q.substr(5)][fq].type=="recursive";
+			var type= self.requestedProteins[json.responseHeader.params.q.substr(5)][fq].type;
 			var protein =json.responseHeader.params.q.substr(5);
 
-			if (recursive){
+			if (type=="recursive"){
 				self._createJointQuery(protein, "Recursive calls from protein: "+protein);
 				for (var i = 0, l = json.response.docs.length; i < l; i++) {
 					var doc = json.response.docs[i];
@@ -84,8 +113,7 @@
 				}
 			}else
 				self._tagIfInJointQuery(protein);
-			
-			
+						
 			for (var i = 0, l = json.response.docs.length; i < l; i++) {
 				var doc = json.response.docs[i];
 				if (self.ids.indexOf(doc[self.fields["p1"]])==-1)
@@ -93,8 +121,20 @@
 				if (self.ids.indexOf(doc[self.fields["p2"]])==-1)
 					self.ids.push(doc[self.fields["p2"]]);
 				
-				if (recursive)
+				if (type=="recursive") 
 					self.getNextInternalInteractions(self,doc);
+				
+				if (type=="cluster"){
+					if (self.isActiveCluster(doc["p1"]) && doc["p1_description"].split(";").length==1){ //it is a cluster of one
+						self._clusterToBeReplacedBy[doc["p1_description"]]=doc[self.fields["p1"]];
+						self.request(doc["p1_description"],"explicit");
+					}
+					if (self.isActiveCluster(doc["p2"]) && doc["p2_description"].split(";").length==1){
+						self._clusterToBeReplacedBy[doc["p2_description"]]=doc[self.fields["p2"]];
+						self.request(doc["p2_description"],"explicit");
+					}
+						
+				}
 			}
 			
 	
@@ -186,11 +226,11 @@
 		 */
 		request: function(parameters,type){
 			var self=this;
+			type= (typeof type=="undefined")?"normal":type;
 			if (!$.isArray(parameters))
 				parameters=[parameters];
-			else
+			else if (type!="cluster")
 				self._createJointQuery("mult_query_"+self.multipleQueries, "Executing multiple requested queries");
-			type= (typeof type=="undefined")?"normal":type;
 			for(var i=0;i<parameters.length;i++){
 				self._addToJointQuery("mult_query_"+self.multipleQueries, parameters[i]);
 				switch (type){
@@ -203,6 +243,9 @@
 					case "recursive":
 						self.requestRecursive(parameters[i]);
 						break;
+					case "cluster":
+						self.requestCluster(parameters[0],parameters[1]);
+						return;
 				}
 			}
 			self.multipleQueries++;
@@ -214,10 +257,8 @@
 			
 			//is there any previous query for that protein?
 			if (protein in self.requestedProteins) {
-				//var fq=(self.requestedProteins[protein].doc==null ||typeof self.requestedProteins[protein].doc.responseHeader.params.fq=="undefined")?"":self.requestedProteins[protein].doc.responseHeader.params.fq;
 
 				if (self.currentFilter in self.requestedProteins[protein]) {//is there any query on the same protein with the same filter?
-				//if (fq==self.currentFilter){ //is it using the same filter?
 					self._tagIfInJointQuery(protein); //TODO: CHECK with dict of filters
 					if (self.requestedProteins[protein][self.currentFilter].type=="normal" || self.requestedProteins[protein][self.currentFilter].type=="recursive")
 						return false; //do nothing because the same protein with the same filter is already there.
@@ -236,6 +277,7 @@
 				if(self.currentFilter!="") self.manager.store.addByValue('fq', self.currentFilter);
 				if (typeof self.requestedProteins[protein] == "undefined") 
 					self.requestedProteins[protein]={};
+				if(self.hasLevels) self.manager.store.addByValue('fq', "level:0");
 				self.requestedProteins[protein][self.currentFilter] ={ "type":"normal", "doc":null};
 				self.manager.doRequest(0);
 			}
@@ -255,6 +297,7 @@
 			if (self.manager.store.addByValue('q', query)) {
 		        self.manager.store.remove('fq');
 				if(self.currentFilter!="") self.manager.store.addByValue('fq', self.currentFilter);
+				if(self.hasLevels) self.manager.store.addByValue('fq', "level:0");
 				self.manager.doRequest(start);
 			}
 			return true;
@@ -266,7 +309,7 @@
 					self._tagIfInJointQuery(protein);
 					if (self.requestedProteins[protein][self.currentFilter].type=="normal" || self.requestedProteins[protein][self.currentFilter].type=="explicit"){
 						self.requestedProteins[protein][self.currentFilter].type ="recursive";
-						self.processJson(self.requestedProteins[protein][self.currentFilter].doc);
+						self.processJson(self.requestedProteins[protein][self.currentFilter].doc,self.currentFilter);
 						return false;
 					}else if (self.requestedProteins[protein][self.currentFilter].type=="recursive"){
 						return false;
@@ -283,6 +326,7 @@
 				if(self.currentFilter!="") self.manager.store.addByValue('fq', self.currentFilter);
 				if (typeof self.requestedProteins[protein] == "undefined") 
 					self.requestedProteins[protein]={};
+				if(self.hasLevels) self.manager.store.addByValue('fq', "level:0");
 				self.requestedProteins[protein][self.currentFilter] ={ "type":"recursive", "doc":null};
 				self.manager.doRequest(0);
 			}
@@ -309,7 +353,33 @@
 				if(self.currentFilter!="") self.manager.store.addByValue('fq', self.currentFilter);
 				if (typeof self.requestedProteins[protein] == "undefined") 
 					self.requestedProteins[protein]={};
+				if(self.hasLevels) self.manager.store.addByValue('fq', "level:0");
 				self.requestedProteins[protein][self.currentFilter] ={ "type":"explicit", "doc":null};
+				self.manager.doRequest(0);
+			}
+			return true;
+		},
+		_clusterQ: {},
+		requestCluster: function(cluster, level){
+			var self =this;
+			var fq="level:"+level;
+			if (typeof self.requestedProteins[cluster] != "undefined" && typeof self.requestedProteins[cluster][fq] != "undefined" && self.requestedProteins[cluster][fq].doc!=null){
+//				if (typeof self._clusterQ[cluster+"#"+fq]=="undefined" || !self._clusterQ[cluster+"#"+fq]){
+					self.manager.handleResponse(self.requestedProteins[cluster][fq].doc);
+//					self._clusterQ[cluster+"#"+fq]=true;
+//				}
+				return true;
+			}
+
+			
+			var qt=(cluster=="")?"*":cluster,
+				q = 'text:'+qt;
+			if (self.manager.store.addByValue('q', q)) {
+		        self.manager.store.remove('fq');
+				if (typeof self.requestedProteins[cluster] == "undefined") 
+					self.requestedProteins[qt]={};
+				if(self.hasLevels) self.manager.store.addByValue('fq', fq);
+				self.requestedProteins[qt][fq] ={ "type":"cluster", "doc":null};
 				self.manager.doRequest(0);
 			}
 			return true;

@@ -77,8 +77,6 @@
 			    	$("#"+self.target+"_bundling").prop("checked",false);
 					$("#"+self.target+"_bundling_slider").hide();
 			    	$("label[for="+self.target+"_bundling] span").removeClass("indicator_on");
-//					self.graph.unbundleLinks();
-	    			
 	    		}
 	    			
 	    		self.graph.enableAnimation();
@@ -93,38 +91,84 @@
 			
 
 
-			var filter=(typeof this.manager.response.responseHeader.params.fq=="undefined")?"":this.manager.response.responseHeader.params.fq;
+			var filter=self.manager.widgets["requester"].getFqFromResponse(this.manager.response);
 			var type = self.manager.widgets["requester"].requestedProteins[currentQ][filter].type;
-
+			
+//TODO: find a way to solve the issue of already open clusters. eg in http://localhost/~4ndr01d3/pinViewer.html?core=plat expand 013 - 0133 - 012, then 013 appears again!
+			var toRequest={}, prots ={};
 			for (var i = 0, l = this.manager.response.response.docs.length; i < l; i++) {
 				var doc = this.manager.response.response.docs[i];
 				doc.organism1 = (typeof self.fields["organism1"] == 'undefined' || typeof doc[self.fields["organism1"]] == 'undefined')?'undefined':doc[self.fields["organism1"]];
 				doc.organism2 = (typeof self.fields["organism2"] == 'undefined' || typeof doc[self.fields["organism2"]] == 'undefined')?'undefined':doc[self.fields["organism2"]];
-				if (type=="normal" || type=="recursive"){
-					
+				if (type=="normal" || type=="recursive") {//{ || type=="cluster"){
 					self.addProtein(doc,self.fields["p1"], self.prefixes["p1"],self.fields["organism1"]);
 					self.addProtein(doc,self.fields["p2"], self.prefixes["p2"],self.fields["organism2"]);
 	
 					doc.id=doc[self.fields["p1"]] +" - "+ doc[self.fields["p2"]];
 					self.graph.addInteraction(doc[self.fields["p1"]] ,doc[self.fields["p2"]] ,{score:doc[self.fields["score"]],doc:self._getInteractionFeaturesFromDoc(doc)});
+				}else if (type=="cluster"){
+					var prot1=null,prot2=null;
+					if (currentQ=="" || currentQ=="*"){
+						prot1 = self.addProtein(doc,self.fields["p1"], self.prefixes["p1"],self.fields["organism1"]);
+						prot2 = self.addProtein(doc,self.fields["p2"], self.prefixes["p2"],self.fields["organism2"]);
+					}else{
+						var p1 = doc[self.fields["p1"]],
+							p2 = doc[self.fields["p2"]];
+						if (currentQ.indexOf("?")==currentQ.length-1){
+							var prefix =currentQ.substring(0, currentQ.length-1);
+							self.removeProtein(prefix);
+							self._openClusters[prefix]=0;
+							prot1 = self.addClusterAsNode(doc,prefix,1);
+							prot2 = self.addClusterAsNode(doc,prefix,2);
+
+							if (prot1.id.indexOf(prefix)!=0 && Object.keys(self._openClusters).indexOf(prot1.id)!=-1 && typeof self._clusterExpanded[prot1.id]=="undefined")
+								toRequest[prot1.id]=0;
+
+							if (prot2.id.indexOf(prefix)!=0 && Object.keys(self._openClusters).indexOf(prot2.id)!=-1 && typeof self._clusterExpanded[prot2.id]=="undefined")
+								toRequest[prot2.id]=0;
+						}
+					}
+					
+					doc.id=prot1.id +" - "+ prot2.id;
+					self.graph.addInteraction(prot1.id ,prot2.id ,{score:doc[self.fields["score"]],doc:self._getInteractionFeaturesFromDoc(doc)});
+					prots[prot1.id]=prot1;
+					prots[prot2.id]=prot2;
 				}else{
+					var prot1=null,prot2=null;
 					var queried=this.manager.response.responseHeader.params.q;
 					if (queried.indexOf(doc[self.fields["p1"]])!=-1){
-						self.addProtein(doc,self.fields["p1"], self.prefixes["p1"],self.fields["organism1"]);
+						prot1 = self.addProtein(doc,self.fields["p1"], self.prefixes["p1"],self.fields["organism1"]);
 						if (typeof self.graph.proteinsA[doc[self.fields["p2"]]] != "undefined"){
 							doc.id=doc[self.fields["p1"]] +" - "+ doc[self.fields["p2"]];
-							self.graph.addInteraction(doc[self.fields["p1"]] ,doc[self.fields["p2"]] ,{score:doc[self.fields["score"]],doc:self._getInteractionFeaturesFromDoc(doc)});
+							prot2 = self.graph.addInteraction(doc[self.fields["p1"]] ,doc[self.fields["p2"]] ,{score:doc[self.fields["score"]],doc:self._getInteractionFeaturesFromDoc(doc)});
 						}
 					} else if (queried.indexOf(doc[self.fields["p2"]])!=-1){
-						self.addProtein(doc,self.fields["p2"], self.prefixes["p2"],self.fields["organism2"]);
+						prot1 = self.addProtein(doc,self.fields["p2"], self.prefixes["p2"],self.fields["organism2"]);
 						if (typeof self.graph.proteinsA[doc[self.fields["p1"]]] != "undefined"){
 							doc.id=doc[self.fields["p1"]] +" - "+ doc[self.fields["p2"]];
-							self.graph.addInteraction(doc[self.fields["p1"]] ,doc[self.fields["p2"]] ,{score:doc[self.fields["score"]],doc:self._getInteractionFeaturesFromDoc(doc)});
+							prot2 = self.graph.addInteraction(doc[self.fields["p1"]] ,doc[self.fields["p2"]] ,{score:doc[self.fields["score"]],doc:self._getInteractionFeaturesFromDoc(doc)});
 						}
 					} else if ((typeof self.graph.proteinsA[doc[self.fields["p1"]]] != "undefined") && (typeof self.graph.proteinsA[doc[self.fields["p2"]]] != "undefined")){
 						doc.id=doc[self.fields["p1"]] +" - "+ doc[self.fields["p2"]];
 						self.graph.addInteraction(doc[self.fields["p1"]] ,doc[self.fields["p2"]] ,{score:doc[self.fields["score"]],doc:self._getInteractionFeaturesFromDoc(doc)});
 					}
+					if (prot1!=null) prots[prot1.id]=prot1;
+					if (prot2!=null) prots[prot2.id]=prot2;
+				}
+			}
+			for (var req in toRequest){
+				self._clusterExpanded[req]=true;
+				Manager.widgets["requester"].request([req+"?",req.length+1],"cluster");
+			}
+			var _clusterToBeReplacedBy =self.manager.widgets["requester"]._clusterToBeReplacedBy;
+			for (var id in prots){
+				var n1=prots[id];
+				if (typeof _clusterToBeReplacedBy[n1.id]!="undefined"){
+					self.graph.replaceProtein(n1,_clusterToBeReplacedBy[n1.id]);
+//					console.debug("to replace",_clusterToBeReplacedBy[n1.id],"with",n1);
+					self._cluster2protein[_clusterToBeReplacedBy[n1.id]] = n1;
+					self._openClusters[_clusterToBeReplacedBy[n1.id]]=0;
+					delete _clusterToBeReplacedBy[n1.id];
 				}
 			}
 			self.previousRequest=currentQ;
@@ -141,11 +185,32 @@
 				self.uploadStatus(self.onceOffStatus);
 				self.onceOffStatus=null;
 			}
-		},	
+		},
+		_cluster2protein:{},
+		addClusterAsNode: function(doc,query,pN){ //pN 1 or 2 for p1 or p2
+			var self = this;
+			var prot=null, id=doc[self.fields["p"+pN]] ;
+			//I need the ones that aren't quadrants of the current query
+			if (id.indexOf(query)!=0){
+				while (id.length>1){
+					//checking if there is a superquadrant loaded
+					if (typeof self.graph.proteinsA[id] != "undefined")
+						 return self.graph.proteinsA[id];
+					id=id.substring(0,id.length-1);
+					
+					// LOOSING CONTENT OF THE DOC!!! 120
+//					doc[self.fields["p"+pN]]=id;
+				}
+			}
+			if (prot==null) prot = self.addProtein(doc,self.fields["p"+pN], self.prefixes["p"+pN],self.fields["organism"+pN]);
+			return prot;
+		},
 		addProtein:function(doc,id,prefix,orgfield){
 			var self = this;
 			var n1=0;
-			if (typeof self.graph.proteinsA[doc[id]] == "undefined"){
+			if (typeof self._cluster2protein[doc[id]] != "undefined"){
+				n1=self._cluster2protein[doc[id]];
+			}else if (typeof self.graph.proteinsA[doc[id]] == "undefined"){
 				var feats = self._getProteinFeaturesFromDoc(doc, prefix);
 				feats.organism =doc[orgfield];
 				n1 = self.graph.addProtein({
@@ -155,12 +220,51 @@
 					"typeLegend":"id",
 					"organism":doc[orgfield],
 					"features":feats,
+					"numClustered":(doc[orgfield]=="CLUSTER")?feats.description.split(";").length:0,
 					"size":1}) -1;
+				n1 = self.graph.proteins[n1];
+				if (doc[orgfield]=="CLUSTER"){
+					self._fixByQuadrant(doc[id]);
+					n1.proteins = feats.description.split(";");
+					n1.level = doc.level;
+				}
 			}else
 				n1 = self.graph.proteinsA[doc[id]];
+			
 			return n1;
 		},		
-
+		_fixByQuadrant: function(protein){
+			var self = this;
+			var id=protein;
+			var w = self.graph.opt.width,
+				h = self.graph.opt.height,
+				x = w/2,
+				y = h/2;
+			for (var i=0;i<id.length;i++){
+				var dx = w/(Math.pow(2,i+2)),
+					dy = h/(Math.pow(2,i+2));
+				switch (id[i]){
+					case "0":
+						x -= dx;
+						y -= dy;
+						break;
+					case "1":
+						x += dx;
+						y -= dy;
+						break;
+					case "2":
+						x -= dx;
+						y += dy;
+						break;
+					case "3":
+						x += dx;
+						y += dy;
+						break;
+				}
+				self.graph.fixProteinAt(id,x,y);
+			}
+			
+		},
 		setSize: function(size){
 			var self=this;
 			var s=size.split("x");
@@ -210,6 +314,19 @@
 				d3.select("#node_"+d.protein.name).classed("selected",true);
 				self.graph.addAura("#node_"+d.protein.name);
 				self.selected=d.protein.name;
+			}
+		},
+		_openClusters:{},
+		_clusterExpanded:{},
+		proteinDoubleClick: function(d){
+			var self=this;
+			if (d.protein.organism=="CLUSTER"){
+				self._clusterExpanded = {};
+				self._clusterExpanded[d.protein.id] = true;
+				Manager.widgets["requester"].request([d.protein.id+"?",d.protein.level+1],"cluster");
+			}
+			if ( typeof Manager.widgets["provenance"] != "undefined") {
+				Manager.widgets["provenance"].addAction("Double Click on protein",self.id,d.protein.name);
 			}
 		},
 		transformOverSVG:function( objEvent ) {
